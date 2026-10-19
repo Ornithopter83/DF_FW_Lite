@@ -1,0 +1,29 @@
+# Visual Studio / VS Code / user-local state
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.VC.opendb
+.vscode/arduino.json
+*.local.cmd
+local.settings.cmd
+.env
+
+# Build artifacts and downloads
+bin/
+artifacts/
+**/bin/
+**/obj/
+**/build/
+vs/x64/
+toolchain/
+*.exe
+*.bin
+*.elf
+*.hex
+*.map
+*.pdb
+*.zip
+*.tmp
+*.bak
+*~
