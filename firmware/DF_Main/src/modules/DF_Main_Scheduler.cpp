@@ -201,8 +201,7 @@ void t10ms_Process_Exec()
  
 void t100ms_Process_Exec()
 {
-	if(exeTo1secLog)	{ setAfterTo_LogOut_Control(); }
-	
+
 	if(rodRegistMode)	{ rodRegistToControl();		}	 
 
 }
@@ -1403,55 +1402,30 @@ static int minOut = 0;
  
 void boardLed_Control()
 {
+    static int bdLed2_out = LOW;
 
+    if (DIAG_MODE == mainMode)
+    {
+        return;
+    }
 
-	 
-	if(DIAG_MODE != mainMode)
-	{
-		if(PROG_END == gameStatus)		 
-		{
-			bdLed2_out = LOW;
-			digitalWrite(BD_LED2_PIN, bdLed2_out); 	 
-		}
-		else
-		{
+    if (CONNECT == ap_conn_status)
+    {
+        if (ROD_CONN == rod_conn_status)
+        {
+            bdLed2_out = !bdLed2_out;
+        }
+        else if (!(count_500ms % 5))
+        {
+            bdLed2_out = !bdLed2_out;
+        }
+    }
+    else
+    {
+        bdLed2_out = (ROD_CONN == rod_conn_status) ? HIGH : LOW;
+    }
 
-			 
-			if (CONNECT == ap_conn_status)	   
-			{
-				if(ROD_CONN == rod_conn_status)
-				{
-					 
-					bdLed2_out = !bdLed2_out;
-					digitalWrite(BD_LED2_PIN, bdLed2_out);	   
-				}
-				else
-				{
-					 
-					if(!(count_500ms % 5))	 
-					{
-						bdLed2_out = !bdLed2_out;
-						digitalWrite(BD_LED2_PIN, bdLed2_out);	   
-					}
-				}
-			}
-			 
-			else
-			{
-				if(ROD_CONN == rod_conn_status)
-				{
-					bdLed2_out = HIGH;
-					digitalWrite(BD_LED2_PIN, bdLed2_out); 	 
-				}
-				else
-				{
-					bdLed2_out = LOW;
-					digitalWrite(BD_LED2_PIN, bdLed2_out);		 
-				}
-			}
-		}
-	}
-
+    digitalWrite(BD_LED2_PIN, bdLed2_out);
 }
 
 

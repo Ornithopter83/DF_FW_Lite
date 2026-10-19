@@ -1893,7 +1893,7 @@ void SerialPortEnable()
 	Serial.begin(115200);			 
 	Serial.setTimeout(10);			 
 	int	nBeforeHeap = ESP.getFreeHeap();
-	Serial.setRxBufferSize(DN_MAX_LEN);		 
+	Serial.setRxBufferSize(4096);		 
 	int	nAfterHeap = ESP.getFreeHeap();
 
 	g_SerialEnable = 1;
