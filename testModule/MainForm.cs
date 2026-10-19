@@ -1,276 +1,926 @@
 using System.Drawing;
+using System.Globalization;
+using System.Text;
 
 namespace DFTestModule;
 
- 
 internal sealed class MainForm : Form
 {
     private readonly SerialConnection serial = new();
     private readonly FrameDecoder decoder = new();
-    private readonly ComboBox portBox = new() { Width = 110, DropDownStyle = ComboBoxStyle.DropDownList };
-    private readonly Button connectionButton = new() { Text = "연결", AutoSize = true };
-    private readonly Label connectionLabel = new() { Text = "연결 안 됨", AutoSize = true };
-    private readonly Label rodLabel = new() { Text = "Rod: ?", AutoSize = true };
-    private readonly Label imuLabel = new() { Text = "IMU: ?", AutoSize = true };
-    private readonly Label versionLabel = new() { Text = "버전: ?", AutoSize = true };
-    private readonly Label inputLabel = new() { Text = "입력: ?", AutoSize = true };
-    private readonly Label batteryLabel = new() { Text = "배터리: ?", AutoSize = true };
-    private readonly Label adcLabel = new() { Text = "ADC: ?", AutoSize = true };
-    private readonly Label calibrationLabel = new() { Text = "엔코더 보정: ?", AutoSize = true };
-    private readonly Label deviceLabel = new() { Text = "장치검사: ?", AutoSize = true };
-    private readonly NumericUpDown torqueDuty = new() { Minimum = 0, Maximum = 255, Value = 60, Width = 70 };
-    private readonly NumericUpDown bldcDuty = new() { Minimum = 0, Maximum = 255, Value = 60, Width = 70 };
-    private readonly TextBox manualCommand = new() { Width = 160, Text = "$10%" };
-    private readonly RichTextBox log = new() {
-        ReadOnly = true, Dock = DockStyle.Fill, Font = new Font("Consolas", 9),
-        BackColor = Color.White, WordWrap = false
+    private readonly Dictionary<string, Panel> pages = new();
+    private readonly Dictionary<string, Label> statusLabels = new();
+    private readonly ComboBox portBox = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 100 };
+    private readonly Button connectButton = new() { Text = "연결", Width = 78 };
+    private readonly Label connectionState = new() { Text = "연결 안 됨", AutoSize = true, ForeColor = Color.DimGray };
+    private readonly Label mainVersion = ValueLabel("Vm -");
+    private readonly Label rodVersion = ValueLabel("Vr -");
+    private readonly Label imuVersion = ValueLabel("IMU -");
+    private readonly Label batteryDiagnostic = new() {
+        Text = "(현재 ---- / 평균 ----)", Width = 245, Height = 48,
+        AutoSize = false, TextAlign = ContentAlignment.MiddleCenter, ForeColor = Color.DimGray,
+        BackColor = Color.FromArgb(247, 248, 250), Padding = new Padding(6, 3, 6, 3)
     };
+    private readonly BatteryGauge batteryGauge = new() { Width = 500, Height = 30, Margin = new Padding(0) };
+    private readonly Label batteryMinimum = new() {
+        Text = "0% (2828)", Width = 110, Height = 22,
+        TextAlign = ContentAlignment.MiddleLeft, ForeColor = Color.DimGray
+    };
+    private readonly Label batteryMaximum = new() {
+        Text = "99% (3546)", Width = 110, Height = 22,
+        TextAlign = ContentAlignment.MiddleRight, ForeColor = Color.DimGray
+    };
+    private readonly RichTextBox logBox = new() { Dock = DockStyle.Fill, ReadOnly = true, BackColor = Color.White, Font = new Font("Consolas", 9F) };
+    private readonly CheckBox autoScroll = new() { Text = "Auto Scroll", Checked = true, AutoSize = true };
+    private readonly Panel pageHost = new() { Dock = DockStyle.Fill, Padding = new Padding(14), BackColor = Color.FromArgb(247, 248, 250) };
+    private readonly FlowLayoutPanel commandRows = new() { Dock = DockStyle.Top, Height = 206, FlowDirection = FlowDirection.TopDown, WrapContents = false };
     private readonly System.Windows.Forms.Timer pollTimer = new() { Interval = 2000 };
+    private readonly ProgressBar firmwareProgress = new() { Width = 440, Height = 24 };
+    private readonly Label firmwareInfo = new() { AutoSize = true, MaximumSize = new Size(600, 0), Text = "업데이트 종류를 선택하세요." };
+    private readonly Button mainUpdateButton = UpdateButton("MAIN 펌웨어 업데이트");
+    private readonly Button rodWirelessButton = UpdateButton("ROD 펌웨어 업데이트 (무선)");
+    private readonly Button rodWiredButton = UpdateButton("ROD 펌웨어 업데이트 (유선)");
+    private readonly Button rodRegisterButton = UpdateButton("ROD 등록");
+    private readonly Label registrationState = ValueLabel("등록 대기 안 함");
+    private readonly Label leftButtonState = Indicator("왼쪽");
+    private readonly Label rightButtonState = Indicator("오른쪽");
+    private readonly Label setupButtonState = Indicator("설정");
+    private readonly Label bootButtonState = Indicator("부트");
+    private readonly Label reelConnectionState = Indicator("릴 연결 대기");
+    private readonly Label imuConnectionState = Indicator("IMU 연결 대기");
+    private readonly ImuOrientationView imuOrientation = new() { Width = 300, Height = 150, Margin = new Padding(18, 0, 0, 0) };
+    private readonly Button imuZeroButton = SmallButton("0점 보정", 100);
+    private readonly Label encoderCalibrationState = ValueLabel("릴 연결 대기");
+    private readonly Label encoderCalibrationRawCount = ValueLabel("00");
+    private readonly Button encoderCalibrationStartButton = SmallButton("엔코더 보정", 120);
+    private readonly Button encoderCalibrationCompleteButton = SmallButton("보정 완료", 100);
+    private readonly Button encoderCalibrationCancelButton = SmallButton("취소", 75);
+    private bool encoderCalibrationActive;
+    private bool encoderCalibrationAwaitingApply;
+    private bool firmwareBusy;
+    private bool initializingMainConnection;
+    private bool rodConnected;
+    private bool imuConnected;
+    private bool imuDataEnabled;
+    private bool encoderMonitorEnabled;
+    private bool registrationWaiting;
+    private string batteryPercent = "--";
+    private string batteryState = "";
 
     public MainForm()
     {
-        Text = "DF Lite Test Module — Stage 1";
-        MinimumSize = new Size(760, 560);
-        ClientSize = new Size(960, 660);
+        Text = Application.ProductName;
         StartPosition = FormStartPosition.CenterScreen;
+        MinimumSize = new Size(1280, 770);
+        ClientSize = new Size(1500, 980);
+        WindowState = FormWindowState.Maximized;
         Font = new Font("맑은 고딕", 9F);
-        BuildUi();
+        BuildLayout();
         serial.BytesReceived += OnBytesReceived;
-        pollTimer.Tick += (_, _) => {
-            if (!serial.IsOpen || !TrySend("$00%", false)) pollTimer.Stop();
-        };
-        FormClosing += (_, _) => { pollTimer.Stop(); serial.Dispose(); pollTimer.Dispose(); };
-        RefreshPorts();
+        pollTimer.Tick += (_, _) => { if (serial.IsOpen && !TrySend("$00%", false)) pollTimer.Stop(); };
+        Shown += (_, _) => RefreshPorts();
+        FormClosing += (_, _) => { pollTimer.Stop(); if (serial.IsOpen) { TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); } serial.Dispose(); };
     }
 
-    private void BuildUi()
+    private void BuildLayout()
     {
-        var root = new TableLayoutPanel {
-            Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 5,
-            Padding = new Padding(12)
-        };
-        for (int i = 0; i < 4; ++i) root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-
-        var connectRow = NewRow();
-        AddText(connectRow, "포트");
-        connectRow.Controls.Add(portBox);
-        AddButton(connectRow, "재검색", RefreshPorts);
-        connectionButton.Click += async (_, _) => await ToggleConnectionAsync();
-        connectRow.Controls.Add(connectionButton);
-        connectRow.Controls.Add(connectionLabel);
-
-        var motorGroup = new GroupBox { Text = "Main 모터 (1초 제한 구동)", Height = 95, Dock = DockStyle.Top };
-        var motorRow = NewRow();
-        motorRow.Dock = DockStyle.Fill;
-        AddText(motorRow, "Torque Duty");
-        motorRow.Controls.Add(torqueDuty);
-        AddButton(motorRow, "Torque 1초", () => TrySend(DeviceProtocol.Torque((int)torqueDuty.Value, 1000)));
-        AddButton(motorRow, "Torque 정지", () => TrySend(DeviceProtocol.TorqueOff()));
-        AddText(motorRow, "BLDC Duty");
-        motorRow.Controls.Add(bldcDuty);
-        AddButton(motorRow, "정방향 1초", () => TrySend(DeviceProtocol.Bldc(true, (int)bldcDuty.Value, 1000)));
-        AddButton(motorRow, "역방향 1초", () => TrySend(DeviceProtocol.Bldc(false, (int)bldcDuty.Value, 1000)));
-        AddButton(motorRow, "BLDC 정지", () => TrySend(DeviceProtocol.BldcOff()));
-        motorGroup.Controls.Add(motorRow);
-
-        var rodGroup = new GroupBox { Text = "Rod 기본 출력", Height = 135, Dock = DockStyle.Top };
-        var rodRow = NewRow();
-        rodRow.Dock = DockStyle.Fill;
-        AddButton(rodRow, "진동 ON", () => TrySend(DeviceProtocol.ReelVibration(true)));
-        AddButton(rodRow, "진동 OFF", () => TrySend(DeviceProtocol.ReelVibration(false)));
-        AddButton(rodRow, "왼쪽 LED ON", () => TrySend(DeviceProtocol.ReelLeftLed(true)));
-        AddButton(rodRow, "왼쪽 LED OFF", () => TrySend(DeviceProtocol.ReelLeftLed(false)));
-        AddButton(rodRow, "오른쪽 LED ON", () => TrySend(DeviceProtocol.ReelRightLed(true)));
-        AddButton(rodRow, "오른쪽 LED OFF", () => TrySend(DeviceProtocol.ReelRightLed(false)));
-        AddButton(rodRow, "IMU ON", () => TrySend(DeviceProtocol.Imu(true)));
-        AddButton(rodRow, "IMU OFF", () => TrySend(DeviceProtocol.Imu(false)));
-        AddButton(rodRow, "보정 시작", () => TrySend("$37S%"));
-        AddButton(rodRow, "측정 완료", () => TrySend("$37C%"));
-        AddButton(rodRow, "보정 적용", () => TrySend("$37A%"));
-        AddButton(rodRow, "보정 취소", () => TrySend("$37X%"));
-        AddButton(rodRow, "보정 조회", () => TrySend("$37Q%"));
-        rodGroup.Controls.Add(rodRow);
-
-        var statusRow = NewRow();
-        statusRow.Controls.Add(rodLabel);
-        statusRow.Controls.Add(imuLabel);
-        statusRow.Controls.Add(versionLabel);
-        statusRow.Controls.Add(inputLabel);
-        statusRow.Controls.Add(batteryLabel);
-        statusRow.Controls.Add(adcLabel);
-        statusRow.Controls.Add(calibrationLabel);
-        statusRow.Controls.Add(deviceLabel);
-        AddButton(statusRow, "장치 검사", () => TrySend("$1501%"));
-        statusRow.Controls.Add(manualCommand);
-        AddButton(statusRow, "명령 전송", SendManualCommand);
-        AddButton(statusRow, "모터 정지", () => _ = StopMotorsAsync());
-
-        root.Controls.Add(connectRow, 0, 0);
-        root.Controls.Add(motorGroup, 0, 1);
-        root.Controls.Add(rodGroup, 0, 2);
-        root.Controls.Add(statusRow, 0, 3);
-        root.Controls.Add(log, 0, 4);
-        Controls.Add(root);
+        Controls.Add(BuildBody());
+        Controls.Add(BuildConnectionBar());
+        CreatePages();
+        ShowPage("모터 제어");
     }
 
-    private static FlowLayoutPanel NewRow() => new() {
-        FlowDirection = FlowDirection.LeftToRight, WrapContents = true,
-        AutoSize = true, Padding = new Padding(4), Margin = new Padding(0, 3, 0, 3)
-    };
-
-    private static void AddText(FlowLayoutPanel row, string label) =>
-        row.Controls.Add(new Label { Text = label, AutoSize = true, Margin = new Padding(6, 9, 6, 3) });
-
-    private static void AddButton(FlowLayoutPanel row, string label, Action action)
+    private Control BuildConnectionBar()
     {
-        var button = new Button { Text = label, AutoSize = true, Margin = new Padding(4) };
-        button.Click += (_, _) => action();
-        row.Controls.Add(button);
+        Panel top = new() { Dock = DockStyle.Top, Height = 76, BackColor = Color.White, Padding = new Padding(16, 13, 16, 10) };
+        FlowLayoutPanel row = new() { Dock = DockStyle.Fill, WrapContents = false, FlowDirection = FlowDirection.LeftToRight };
+        Label title = new() { Text = Application.ProductName, AutoSize = true, Font = new Font("맑은 고딕", 15F, FontStyle.Bold), Margin = new Padding(0, 5, 30, 0) };
+        Button refresh = new() { Text = "재검색", Width = 76, Height = 30 };
+        refresh.Click += (_, _) => RefreshPorts();
+        connectButton.Height = 30;
+        connectButton.Click += async (_, _) => await ToggleConnectionAsync();
+        row.Controls.Add(title); row.Controls.Add(Caption("시리얼")); row.Controls.Add(portBox); row.Controls.Add(connectButton); row.Controls.Add(refresh);
+        row.Controls.Add(connectionState); row.Controls.Add(Spacer(20)); row.Controls.Add(Caption("버전"));
+        row.Controls.Add(mainVersion); row.Controls.Add(rodVersion); row.Controls.Add(imuVersion);
+        top.Controls.Add(row);
+        return top;
+    }
+
+    private Control BuildBody()
+    {
+        TableLayoutPanel body = new() { Dock = DockStyle.Fill, ColumnCount = 3, BackColor = Color.FromArgb(232, 235, 239) };
+        body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 160));
+        body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        body.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 500));
+        body.Controls.Add(BuildNavigation(), 0, 0);
+        body.Controls.Add(pageHost, 1, 0);
+        body.Controls.Add(BuildRightRail(), 2, 0);
+        return body;
+    }
+
+    private Control BuildNavigation()
+    {
+        Panel panel = new() { Dock = DockStyle.Fill, BackColor = Color.FromArgb(38, 45, 56), Padding = new Padding(10, 18, 10, 10) };
+        FlowLayoutPanel buttons = new() { Dock = DockStyle.Top, FlowDirection = FlowDirection.TopDown, WrapContents = false, Height = 400 };
+        foreach (string name in new[] { "모터 제어", "릴 / IMU", "입력", "LED", "업데이트" }) {
+            Button button = new() { Text = name, Width = 138, Height = 48, FlatStyle = FlatStyle.Flat, ForeColor = Color.White, BackColor = Color.FromArgb(51, 61, 75), Margin = new Padding(0, 0, 0, 8) };
+            button.FlatAppearance.BorderSize = 0;
+            button.Click += (_, _) => ShowPage(name);
+            buttons.Controls.Add(button);
+        }
+        panel.Controls.Add(buttons);
+        return panel;
+    }
+
+    private Control BuildRightRail()
+    {
+        Panel rail = new() { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(12) };
+        TableLayoutPanel grid = new() { Dock = DockStyle.Fill, RowCount = 4 };
+        grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
+        grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 222));
+        grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        grid.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        grid.Controls.Add(SectionTitle("수동 명령"), 0, 0);
+        for (int i = 0; i < 6; i++) commandRows.Controls.Add(CreateCommandRow());
+        grid.Controls.Add(commandRows, 0, 1);
+        FlowLayoutPanel tools = new() { Dock = DockStyle.Fill, WrapContents = false };
+        Button save = SmallButton("저장"); save.Click += (_, _) => SaveLog();
+        Button clear = SmallButton("지우기"); clear.Click += (_, _) => logBox.Clear();
+        tools.Controls.Add(autoScroll); tools.Controls.Add(save); tools.Controls.Add(clear);
+        grid.Controls.Add(tools, 0, 2); grid.Controls.Add(logBox, 0, 3);
+        rail.Controls.Add(grid);
+        return rail;
+    }
+
+    private Control CreateCommandRow()
+    {
+        FlowLayoutPanel row = new() { Width = 470, Height = 32, WrapContents = false, Margin = new Padding(0, 1, 0, 1) };
+        TextBox input = new() { Width = 380, Text = "$00%" };
+        Button send = new() { Text = "SEND", Width = 78, Height = 27, BackColor = Color.FromArgb(35, 137, 230), ForeColor = Color.White, FlatStyle = FlatStyle.Flat };
+        send.Click += (_, _) => SendManual(input.Text);
+        input.KeyDown += (_, e) => { if (e.KeyCode == Keys.Enter) { SendManual(input.Text); e.SuppressKeyPress = true; } };
+        row.Controls.Add(input); row.Controls.Add(send);
+        return row;
+    }
+
+    private void CreatePages()
+    {
+        pages["모터 제어"] = BuildMotorPage();
+        pages["릴 / IMU"] = BuildReelPage();
+        pages["입력"] = BuildInputPage();
+        pages["LED"] = BuildLedPage();
+        pages["업데이트"] = BuildFirmwarePage();
+        foreach (Panel page in pages.Values) { page.Visible = false; pageHost.Controls.Add(page); }
+    }
+
+    private Panel BuildMotorPage()
+    {
+        Panel page = Page();
+        FlowLayoutPanel content = Column();
+        content.Controls.Add(SectionTitle("메인 모터"));
+        NumericUpDown torque = Number(0, 255, 70);
+        TrackBar torqueSlider = DutySlider(70, 210);
+        LinkDutyControls(torque, torqueSlider);
+        FlowLayoutPanel torqueRow = new() { Width = 720, Height = 48, WrapContents = false };
+        Button torqueOutput = MotorButton("출력", Color.FromArgb(27, 126, 96), 82);
+        Button torqueStop = MotorButton("정지", Color.Firebrick, 82);
+        torqueOutput.Click += (_, _) => TrySend(DeviceProtocol.Torque((int)torque.Value, 1000));
+        torqueStop.Click += (_, _) => { torque.Value = 0; TrySend(DeviceProtocol.TorqueOff()); };
+        torqueRow.Controls.Add(new Label { Text = "메인 모터 Duty", Width = 110, Height = 36, TextAlign = ContentAlignment.MiddleLeft });
+        torque.Width = 65; torqueRow.Controls.Add(torque); torqueRow.Controls.Add(SliderBorder(torqueSlider));
+        content.Controls.Add(torqueRow);
+        FlowLayoutPanel torqueActions = MotorActionRow();
+        torqueActions.Controls.Add(torqueOutput); torqueActions.Controls.Add(torqueStop);
+        content.Controls.Add(torqueActions);
+
+        content.Controls.Add(SectionTitle("BLDC 모터"));
+        RadioButton cw = new() { Text = "CW", Checked = true, AutoSize = true, Margin = new Padding(3, 7, 3, 0) };
+        RadioButton ccw = new() { Text = "CCW", AutoSize = true, Margin = new Padding(3, 7, 8, 0) };
+        NumericUpDown bldc = Number(0, 255, 20);
+        TrackBar bldcSlider = DutySlider(20, 210);
+        NumericUpDown bldcTime = Number(0, 9999, 3000);
+        LinkDutyControls(bldc, bldcSlider);
+        Button bldcOutput = MotorButton("출력", Color.FromArgb(27, 126, 96), 76);
+        Button bldcStop = MotorButton("정지", Color.Firebrick, 76);
+        bldcOutput.Click += (_, _) => TrySend(DeviceProtocol.Bldc(cw.Checked, (int)bldc.Value, (int)bldcTime.Value));
+        bldcStop.Click += (_, _) => { bldc.Value = 0; TrySend(DeviceProtocol.BldcOff()); };
+        FlowLayoutPanel bldcDirectionRow = FieldRow("방향", cw);
+        bldcDirectionRow.Controls.Add(ccw);
+        content.Controls.Add(bldcDirectionRow);
+        FlowLayoutPanel bldcDutyRow = new() { Width = 560, Height = 48, WrapContents = false };
+        bldcDutyRow.Controls.Add(new Label { Text = "Duty", Width = 125, Height = 36, TextAlign = ContentAlignment.MiddleLeft });
+        bldc.Width = 65; bldcDutyRow.Controls.Add(bldc); bldcDutyRow.Controls.Add(SliderBorder(bldcSlider));
+        content.Controls.Add(bldcDutyRow);
+        bldcTime.Width = 80;
+        content.Controls.Add(FieldRow("시간(ms)", bldcTime));
+
+        FlowLayoutPanel bldcActions = MotorActionRow();
+        bldcActions.Controls.Add(bldcOutput); bldcActions.Controls.Add(bldcStop);
+        content.Controls.Add(bldcActions);
+
+        Button simultaneousOutput = MotorButton("동시 출력", Color.FromArgb(35, 105, 190), 120);
+        simultaneousOutput.Margin = new Padding(0, 2, 0, 2);
+        simultaneousOutput.Click += (_, _) => {
+            if (!RequireConnection()) return;
+            TrySend(DeviceProtocol.Torque((int)torque.Value, 1000));
+            TrySend(DeviceProtocol.Bldc(cw.Checked, (int)bldc.Value, (int)bldcTime.Value));
+        };
+        FlowLayoutPanel simultaneousActions = MotorActionRow();
+        simultaneousActions.Margin = new Padding(0, 0, 0, 6);
+        simultaneousActions.Controls.Add(simultaneousOutput);
+        content.Controls.Add(simultaneousActions);
+        content.Controls.Add(Note("정지 버튼은 해당 Duty를 0으로 바꾸고 0 출력 명령을 보냅니다. Duty 범위는 0~255입니다."));
+        page.Controls.Add(content); return page;
+    }
+
+    private Panel BuildReelPage()
+    {
+        Panel page = Page(); FlowLayoutPanel content = Column();
+        content.Controls.Add(SectionTitle("릴 / IMU 연결 상태"));
+        FlowLayoutPanel connections = new() { Width = 600, Height = 64 };
+        connections.Controls.Add(reelConnectionState); connections.Controls.Add(imuConnectionState);
+        content.Controls.Add(connections);
+        content.Controls.Add(SectionTitle("릴 상태"));
+        statusLabels["릴 엔코더"] = ValueLabel("-");
+        FlowLayoutPanel batteryRow = new() { Width = 1040, Height = 74, WrapContents = false, Margin = new Padding(0, 0, 0, 2) };
+        batteryRow.Controls.Add(new Label { Text = "배터리", Width = 100, Height = 60, TextAlign = ContentAlignment.MiddleLeft });
+        Panel gaugePanel = new() { Width = 500, Height = 58, Margin = new Padding(0, 4, 12, 0) };
+        batteryGauge.Location = new Point(0, 0);
+        batteryMinimum.Location = new Point(0, 34);
+        batteryMaximum.Location = new Point(390, 34);
+        gaugePanel.Controls.Add(batteryGauge);
+        gaugePanel.Controls.Add(batteryMinimum);
+        gaugePanel.Controls.Add(batteryMaximum);
+        batteryRow.Controls.Add(gaugePanel);
+        batteryRow.Controls.Add(batteryDiagnostic);
+        content.Controls.Add(batteryRow);
+        content.Controls.Add(FieldRow("릴 엔코더", statusLabels["릴 엔코더"]));
+        content.Controls.Add(SectionTitle("릴 엔코더 보정"));
+        FlowLayoutPanel encoderCalibrationRow = new() { Width = 760, Height = 48, WrapContents = false };
+        encoderCalibrationRow.Controls.Add(encoderCalibrationStartButton);
+        encoderCalibrationRow.Controls.Add(encoderCalibrationCompleteButton);
+        encoderCalibrationRow.Controls.Add(encoderCalibrationCancelButton);
+        encoderCalibrationRow.Controls.Add(new Label { Text = "회전 카운트", Width = 90, Height = 34, TextAlign = ContentAlignment.MiddleCenter });
+        encoderCalibrationRow.Controls.Add(encoderCalibrationRawCount);
+        content.Controls.Add(encoderCalibrationRow);
+        content.Controls.Add(FieldRow("보정 상태", encoderCalibrationState));
+        encoderCalibrationStartButton.Enabled = false;
+        encoderCalibrationCompleteButton.Enabled = false;
+        encoderCalibrationCancelButton.Enabled = false;
+        encoderCalibrationCompleteButton.Visible = false;
+        encoderCalibrationCancelButton.Visible = false;
+        encoderCalibrationStartButton.Click += (_, _) => {
+            if (!rodConnected || !serial.IsOpen) return;
+            DialogResult result = MessageBox.Show(
+                "릴의 기준 위치를 표시한 뒤 시작하세요. 시작 후 같은 방향으로 정확히 한 바퀴 회전하고, 기준 위치에 돌아오면 '보정 완료'를 누르세요.",
+                "엔코더 보정", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (result != DialogResult.OK) return;
+            encoderCalibrationRawCount.Text = "00";
+            encoderCalibrationState.Text = "보정 시작 요청 중";
+            encoderCalibrationActive = true;
+            encoderCalibrationAwaitingApply = false;
+            UpdateEncoderCalibrationButtons();
+            if (!TrySend(DeviceProtocol.EncoderCalibrationStart())) {
+                encoderCalibrationActive = false;
+                encoderCalibrationState.Text = "시작 명령 송신 실패";
+                UpdateEncoderCalibrationButtons();
+            }
+        };
+        encoderCalibrationCompleteButton.Click += (_, _) => {
+            if (!rodConnected) return;
+            if (encoderCalibrationActive && !TrySend(DeviceProtocol.EncoderCalibrationComplete()))
+                encoderCalibrationState.Text = "측정 완료 명령 송신 실패";
+            else if (encoderCalibrationAwaitingApply && !TrySend(DeviceProtocol.EncoderCalibrationApply()))
+                encoderCalibrationState.Text = "적용 명령 송신 실패";
+        };
+        encoderCalibrationCancelButton.Click += (_, _) => {
+            if (rodConnected && (encoderCalibrationActive || encoderCalibrationAwaitingApply) && !TrySend(DeviceProtocol.EncoderCalibrationCancel()))
+                encoderCalibrationState.Text = "취소 명령 송신 실패";
+        };
+        content.Controls.Add(SectionTitle("릴 버튼 상태"));
+        FlowLayoutPanel indicators = new() { Width = 600, Height = 64 };
+        indicators.Controls.Add(leftButtonState); indicators.Controls.Add(rightButtonState); indicators.Controls.Add(setupButtonState); indicators.Controls.Add(bootButtonState);
+        content.Controls.Add(indicators);
+        content.Controls.Add(SectionTitle("릴 출력"));
+        content.Controls.Add(ToggleRow("진동 모터", DeviceProtocol.ReelVibration));
+        content.Controls.Add(ToggleRow("왼쪽 버튼 LED", DeviceProtocol.ReelLeftLed));
+        content.Controls.Add(ToggleRow("오른쪽 버튼 LED", DeviceProtocol.ReelRightLed));
+        content.Controls.Add(SectionTitle("IMU 센서"));
+        imuZeroButton.Enabled = false;
+        imuZeroButton.Click += (_, _) => {
+            if (!imuDataEnabled) return;
+            if (!imuOrientation.SetCurrentAsZero()) {
+                MessageBox.Show("IMU 자세값이 수신된 뒤 0점 보정을 실행하세요.", "IMU 0점 보정");
+            }
+        };
+        FlowLayoutPanel imuToggle = ToggleRow("IMU 데이터 출력", DeviceProtocol.Imu, enabled => {
+            imuDataEnabled = enabled;
+            imuZeroButton.Enabled = enabled;
+        });
+        imuToggle.Width = 665;
+        imuToggle.Controls.Add(imuZeroButton);
+        content.Controls.Add(imuToggle);
+        FlowLayoutPanel imuArea = new() { Width = 665, Height = 155, WrapContents = false };
+        TableLayoutPanel imu = new() { Width = 315, Height = 110, ColumnCount = 4, RowCount = 3 };
+        string[] keys = { "Roll", "Pitch", "Yaw", "GX", "GY", "GZ" };
+        for (int i = 0; i < keys.Length; i++) {
+            Label name = Caption(keys[i]); Label value = ValueLabel("-");
+            statusLabels["IMU_" + keys[i]] = value;
+            imu.Controls.Add(name, (i % 2) * 2, i / 2); imu.Controls.Add(value, (i % 2) * 2 + 1, i / 2);
+        }
+        imuArea.Controls.Add(imu);
+        imuArea.Controls.Add(imuOrientation);
+        content.Controls.Add(imuArea);
+        page.Controls.Add(content); return page;
+    }
+
+    private Panel BuildInputPage()
+    {
+        Panel page = Page(); FlowLayoutPanel content = Column();
+        content.Controls.Add(SectionTitle("본체 입력 감시"));
+        Button deviceCheck = SmallButton("장치 검사", 120);
+        deviceCheck.Click += (_, _) => TrySend("$1501%");
+        content.Controls.Add(deviceCheck);
+        statusLabels["장치 검사"] = ValueLabel("-");
+        content.Controls.Add(FieldRow("장치 검사 상태", statusLabels["장치 검사"]));
+        content.Controls.Add(ToggleRow("보드 입력 수신", on => DeviceProtocol.InputMonitor("부트", on)));
+        content.Controls.Add(ToggleRow("엔코더 / FG 수신", on => DeviceProtocol.InputMonitor("메인", on)));
+
+        string[] inputKeys = { "부트", "EncA", "EncB", "FG" };
+        string[] inputCaptions = { "BOOT 스위치", "엔코더 A", "엔코더 B", "BLDC FG" };
+        for (int i = 0; i < inputKeys.Length; i++) {
+            statusLabels[inputKeys[i]] = ValueLabel("-");
+            content.Controls.Add(FieldRow(inputCaptions[i], statusLabels[inputKeys[i]]));
+        }
+
+        content.Controls.Add(SectionTitle("본체 엔코더 회전"));
+        FlowLayoutPanel encoderMonitor = ToggleRow("회전값 수신", on => DeviceProtocol.InputMonitor("메인엔코더", on), enabled => {
+            encoderMonitorEnabled = enabled;
+            if (!enabled) SetStatus("본체 엔코더", "-", Color.LightGray);
+        });
+        content.Controls.Add(encoderMonitor);
+        statusLabels["본체 엔코더"] = ValueLabel("-");
+        FlowLayoutPanel encoderValue = FieldRow("방향 / 회전 카운트", statusLabels["본체 엔코더"]);
+        Button clearEncoder = SmallButton("표시 초기화", 100);
+        clearEncoder.Click += (_, _) => SetStatus("본체 엔코더", "-", Color.LightGray);
+        encoderValue.Controls.Add(clearEncoder);
+        content.Controls.Add(encoderValue);
+        page.Controls.Add(content); return page;
+    }
+
+    private Panel BuildLedPage()
+    {
+        Panel page = Page(); FlowLayoutPanel content = Column(); content.Controls.Add(SectionTitle("본체 LED 제어"));
+        ComboBox position = Choice(new[] { "꺼짐 (0)", "중앙 (1)", "왼쪽 (2) - 비활성", "오른쪽 (3) - 비활성" }, 1);
+        ComboBox action = Choice(new[] { "꺼짐 (0)", "켜짐 (1)", "점멸 (2)", "디밍 (3)" }, 1);
+        ComboBox color = Choice(new[] {
+            "00 - White", "01 - Red", "02 - Lime", "03 - Blue", "04 - Yellow", "05 - Cyan", "06 - Magenta", "07 - Maroon",
+            "08 - Olive", "09 - Green", "10 - Purple", "11 - Teal", "12 - Navy", "13 - Silver", "14 - Gray", "15 - Black"
+        }, 1);
+        string[] dimmingColorNames = { "빨강", "초록", "파랑", "노랑", "청록", "자홍" };
+        ComboBox dimmingPattern = Choice(Enumerable.Range(1, DeviceProtocol.LedDimmingMaxPattern)
+            .Select(pattern => pattern.ToString(CultureInfo.InvariantCulture) +
+                (pattern == DeviceProtocol.LedDimmingDefaultPattern ? " (Default)" : ""))
+            .ToArray(), DeviceProtocol.LedDimmingDefaultPattern - 1);
+        dimmingPattern.Width = 108;
+        Label dimmingSequence = new() {
+            Width = 350, Height = 28, TextAlign = ContentAlignment.MiddleLeft,
+            ForeColor = Color.FromArgb(45, 53, 62), Margin = new Padding(10, 0, 0, 0)
+        };
+        NumericUpDown time = Number(10, 9999, 2000), brightness = Number(10, 100, 100);
+        FlowLayoutPanel colorRow = FieldRow("색상", color);
+        FlowLayoutPanel dimmingRow = FieldRow("디밍 패턴", dimmingPattern);
+        dimmingRow.Width = 665;
+        dimmingRow.Controls.Add(dimmingSequence);
+        FlowLayoutPanel timeRow = FieldRow("표시 시간(ms)", time);
+        content.Controls.Add(FieldRow("위치", position));
+        content.Controls.Add(FieldRow("표시 액션", action));
+        content.Controls.Add(colorRow);
+        content.Controls.Add(dimmingRow);
+        content.Controls.Add(timeRow);
+
+        void UpdateLedOptions()
+        {
+            bool isDimming = action.SelectedIndex == 3;
+            colorRow.Visible = !isDimming;
+            dimmingRow.Visible = isDimming;
+            int pattern = dimmingPattern.SelectedIndex + 1;
+            dimmingSequence.Text = string.Join(" → ", dimmingColorNames.Take(pattern));
+            timeRow.Controls[0].Text = isDimming ? "디밍 시간(ms)" : "표시 시간(ms)";
+        }
+        action.SelectedIndexChanged += (_, _) => UpdateLedOptions();
+        dimmingPattern.SelectedIndexChanged += (_, _) => UpdateLedOptions();
+        UpdateLedOptions();
+
+        Button apply = MotorButton("적용", Color.FromArgb(27, 126, 96), 110);
+        apply.Margin = new Padding(125, 10, 0, 10);
+        position.SelectedIndexChanged += (_, _) => apply.Enabled = position.SelectedIndex <= 1;
+        apply.Click += (_, _) => {
+            int parameter = action.SelectedIndex == 3 ? dimmingPattern.SelectedIndex + 1 : color.SelectedIndex;
+            TrySend(DeviceProtocol.LedControl(position.SelectedIndex, action.SelectedIndex, parameter, (int)time.Value));
+        };
+        content.Controls.Add(apply);
+        content.Controls.Add(Note("위치 2(왼쪽)와 3(오른쪽)은 현재 본체에서 비활성이라 명령을 전송하지 않습니다."));
+        content.Controls.Add(FieldRow("밝기(%)", brightness));
+        FlowLayoutPanel brightActions = new() { Width = 520, Height = 45, Margin = new Padding(125, 2, 0, 0) };
+        Button read = MotorButton("읽기", Color.FromArgb(35, 105, 190), 90); Button write = MotorButton("쓰기", Color.FromArgb(27, 126, 96), 90);
+        read.Click += (_, _) => TrySend(DeviceProtocol.LedBrightnessRead()); write.Click += (_, _) => TrySend(DeviceProtocol.LedBrightnessWrite((int)brightness.Value));
+        brightActions.Controls.Add(read); brightActions.Controls.Add(write); content.Controls.Add(brightActions);
+        statusLabels["Brightness"] = ValueLabel("-"); content.Controls.Add(FieldRow("수신 밝기", statusLabels["Brightness"]));
+        page.Controls.Add(content); return page;
+    }
+    private Panel BuildFirmwarePage()
+    {
+        Panel page = Page(); FlowLayoutPanel content = Column(); content.Controls.Add(SectionTitle("펌웨어 업데이트"));
+        content.Controls.Add(Note("Lite 펌웨어에서 OTA/내장 업데이터는 제외되었습니다. 업데이트 버튼은 비활성화되며 ROD 등록은 사용할 수 있습니다."));
+        mainUpdateButton.Enabled = false;
+        rodWirelessButton.Enabled = false;
+        rodWiredButton.Enabled = false;
+        rodRegisterButton.Click += (_, _) => ToggleRodRegistration();
+        content.Controls.Add(mainUpdateButton); content.Controls.Add(rodWirelessButton); content.Controls.Add(rodWiredButton);
+        FlowLayoutPanel registration = new() { Width = 620, Height = 48, WrapContents = false };
+        registration.Controls.Add(rodRegisterButton); registration.Controls.Add(registrationState); content.Controls.Add(registration);
+        content.Controls.Add(firmwareInfo); content.Controls.Add(firmwareProgress);
+        page.Controls.Add(content); return page;
+    }
+
+    private FlowLayoutPanel ToggleRow(string caption, Func<bool, string> command, Action<bool>? changed = null)
+    {
+        FlowLayoutPanel row = new() { Width = 560, Height = 40, WrapContents = false };
+        Label name = new() { Text = caption, Width = 180, TextAlign = ContentAlignment.MiddleLeft, Height = 30 };
+        RadioButton on = ToggleButton("ON");
+        RadioButton off = ToggleButton("OFF"); off.Checked = true;
+        bool ready = false;
+        on.CheckedChanged += (_, _) => {
+            SetToggleButtonState(on, on.Checked, Color.FromArgb(27, 126, 96));
+            if (ready && on.Checked && TrySend(command(true))) changed?.Invoke(true);
+        };
+        off.CheckedChanged += (_, _) => {
+            SetToggleButtonState(off, off.Checked, Color.Firebrick);
+            if (ready && off.Checked && TrySend(command(false))) changed?.Invoke(false);
+        };
+        SetToggleButtonState(on, false, Color.FromArgb(27, 126, 96));
+        SetToggleButtonState(off, true, Color.Firebrick);
+        row.Controls.Add(name); row.Controls.Add(on); row.Controls.Add(off); ready = true;
+        return row;
     }
 
     private void RefreshPorts()
     {
-        var previous = portBox.SelectedItem?.ToString();
-        portBox.Items.Clear();
-        portBox.Items.AddRange(SerialConnection.FindPorts());
-        if (previous != null && portBox.Items.Contains(previous)) portBox.SelectedItem = previous;
+        string previous = portBox.SelectedItem?.ToString() ?? string.Empty;
+        portBox.Items.Clear(); portBox.Items.AddRange(SerialConnection.FindPorts());
+        if (portBox.Items.Contains(previous)) portBox.SelectedItem = previous;
+        else if (portBox.Items.Contains("COM4")) portBox.SelectedItem = "COM4";
         else if (portBox.Items.Count > 0) portBox.SelectedIndex = 0;
+        AppendLog("SYSTEM", portBox.Items.Count + "개 시리얼 포트를 찾았습니다.");
     }
 
     private async Task ToggleConnectionAsync()
     {
         if (serial.IsOpen) {
-            await StopMotorsAsync();
-            Disconnect();
-            return;
+            DisconnectMain();
+            AppendLog("SYSTEM", "연결을 종료했습니다."); return;
         }
-        if (portBox.SelectedItem == null) { MessageBox.Show("연결할 COM 포트를 선택하세요."); return; }
-        connectionButton.Enabled = false;
+        if (portBox.SelectedItem == null) { MessageBox.Show("연결할 시리얼 포트를 선택하세요."); return; }
+        connectButton.Enabled = false;
         try {
             decoder.Reset();
             serial.Open(portBox.SelectedItem.ToString()!);
-            connectionButton.Text = "연결 해제";
-            connectionLabel.Text = serial.PortName + " 초기화 중";
-            Append("INFO", "시리얼 연결됨 (115200bps)");
-            await InitializeMainAsync();
-            if (serial.IsOpen && !IsDisposed) {
-                connectionLabel.Text = serial.PortName + " 연결됨";
+            connectButton.Text = "끊음";
+            connectionState.Text = serial.PortName + " 초기화 중"; connectionState.ForeColor = Color.DarkOrange;
+            AppendLog("SYSTEM", serial.PortName + " 연결됨, 초기 명령 대기");
+            initializingMainConnection = true;
+            bool initialized;
+            try { initialized = await InitializeConnectedMainAsync(); }
+            finally { initializingMainConnection = false; }
+            if (!initialized) {
+                if (serial.IsOpen) DisconnectMain();
+                AppendLog("WARNING", "연결 초기화를 완료하지 못했습니다.");
+                return;
+            }
+            if (serial.IsOpen) {
+                connectionState.Text = serial.PortName + " 연결됨"; connectionState.ForeColor = Color.SeaGreen;
                 pollTimer.Start();
+                AppendLog("SYSTEM", "초기 명령 송신 완료, 2초 polling 시작");
             }
         }
         catch (Exception ex) {
-            Append("ERROR", ex.Message);
-            Disconnect();
+            if (serial.IsOpen) DisconnectMain();
+            MessageBox.Show("시리얼 포트를 열거나 초기화할 수 없습니다.\r\n" + ex.Message, "연결 실패");
         }
-        finally { if (!IsDisposed) connectionButton.Enabled = true; }
+        finally { connectButton.Enabled = !firmwareBusy; }
     }
-
-     
-    private async Task InitializeMainAsync()
-    {
-        string[][] groups = {
-            new[] { "$00%", "$290101%" },
-            new[] { "$00%", "$080%" },
-            new[] { "$00%", "$0112%", "$0110%", "$0115%", "$0117%", "$1501%" }
-        };
-        foreach (string[] group in groups) {
-            foreach (string command in group) {
-                if (!serial.IsOpen || IsDisposed || !TrySend(command, false)) return;
-                await Task.Delay(60);
-            }
-            await Task.Delay(500);
-        }
-    }
-
-    private async Task StopMotorsAsync()
-    {
-        if (!serial.IsOpen) return;
-        TrySend(DeviceProtocol.TorqueOff(), false);
-        await Task.Delay(80);
-        if (serial.IsOpen) TrySend(DeviceProtocol.BldcOff(), false);
-    }
-
-    private void Disconnect()
-    {
-        pollTimer.Stop();
-        serial.Close();
-        connectionButton.Text = "연결";
-        connectionLabel.Text = "연결 안 됨";
-        rodLabel.Text = "Rod: ?";
-        imuLabel.Text = "IMU: ?";
-    }
-
-    private void SendManualCommand()
-    {
-        string command = manualCommand.Text.Trim();
-        if (command.Length < 3 || command.Length > 120 || command[0] != '$'
-            || command[^1] != '%' || command.Any(c => c > 127)) {
-            MessageBox.Show("ASCII $...% 형식이며 120자 이하여야 합니다.");
-            return;
-        }
-        string[] allowed = { "$00", "$02", "$04", "$08", "$10", "$15", "$23", "$24", "$27", "$30", "$37" };
-        if (!allowed.Any(prefix => command.StartsWith(prefix, StringComparison.Ordinal))) {
-            MessageBox.Show("허용된 Lite 명령(모터, Rod, ADC/상태, 장치 검사, 엔코더 보정)만 수동 송신할 수 있습니다.");
-            return;
-        }
-        TrySend(command);
-    }
-
-    private bool TrySend(string command, bool showError = true)
-    {
-        if (!serial.IsOpen) {
-            if (showError) MessageBox.Show("먼저 연결하세요.");
-            return false;
-        }
-        try { serial.WriteText(command); Append("TX", command); return true; }
-        catch (Exception ex) {
-            Append("ERROR", ex.Message);
-            if (showError) MessageBox.Show(ex.Message, "송신 실패");
-            return false;
-        }
-    }
-
     private void OnBytesReceived(byte[] data)
     {
-        foreach (string frame in decoder.Push(data)) {
-            try {
-                if (IsHandleCreated && !IsDisposed)
-                    BeginInvoke(new Action(() => ProcessFrame(frame)));
-            }
-            catch (InvalidOperationException) {   }
+        IList<string> frames = decoder.Push(data);
+        foreach (string frame in frames) {
+            BeginInvoke(new Action(() => ProcessFrame(frame)));
         }
     }
 
     private void ProcessFrame(string frame)
     {
-        if (IsDisposed) return;
-        Append("RX", frame);
-        if (frame.StartsWith("$20", StringComparison.Ordinal) && frame.Length >= 5)
-            rodLabel.Text = "Rod: " + (frame.Substring(3, 2) == "01" ? "연결" : "미연결");
-        else if (frame.StartsWith("$21", StringComparison.Ordinal) && frame.Length >= 5)
-            imuLabel.Text = "IMU: " + (frame.Substring(3, 2) == "01" ? "연결" : "미연결");
-        else if (frame.StartsWith("$10", StringComparison.Ordinal))
-            versionLabel.Text = "버전: " + frame.Substring(3).TrimEnd('%');
-        else if (frame.StartsWith("$12", StringComparison.Ordinal))
-            batteryLabel.Text = "배터리: " + frame.Substring(3).TrimEnd('%');
-        else if (frame.StartsWith("$31", StringComparison.Ordinal))
-            adcLabel.Text = "ADC: " + frame.Substring(3).TrimEnd('%');
-        else if (frame.StartsWith("$37", StringComparison.Ordinal))
-            calibrationLabel.Text = "엔코더 보정: " + frame.Substring(3).TrimEnd('%');
-        else if (frame.StartsWith("$15", StringComparison.Ordinal))
-            deviceLabel.Text = "장치검사: " + frame.Substring(3).TrimEnd('%');
-        else if (frame.StartsWith("$13", StringComparison.Ordinal) || frame.StartsWith("$14", StringComparison.Ordinal)
-            || frame.StartsWith("$09", StringComparison.Ordinal))
-            inputLabel.Text = "입력: " + frame.Substring(0, Math.Min(40, frame.Length));
+        if (!frame.StartsWith("$OR", StringComparison.Ordinal)) AppendLog("RECV", frame);
+        if (frame.StartsWith("$15", StringComparison.Ordinal)) SetStatus("장치 검사", frame.Substring(3).TrimEnd('%'), Color.LightGreen);
+        if (frame.StartsWith("$10", StringComparison.Ordinal)) {
+            string[] values = frame.Substring(3).TrimEnd('%').Split(',');
+            foreach (string value in values) {
+                if (value.StartsWith("Vm", StringComparison.OrdinalIgnoreCase)) mainVersion.Text = value;
+                else if (value.StartsWith("Vr", StringComparison.OrdinalIgnoreCase)) rodVersion.Text = value;
+                else if (value.Length > 0) imuVersion.Text = value;
+            }
+        } else if (frame.StartsWith("$09", StringComparison.Ordinal)) {
+            string[] values = frame.Substring(3).TrimStart(',').TrimEnd('%').Split(',');
+            string[] keys = { "Roll", "Pitch", "Yaw", "GX", "GY", "GZ" };
+            for (int i = 0; i < Math.Min(keys.Length, values.Length); i++) SetStatus("IMU_" + keys[i], values[i], null);
+            if (imuDataEnabled && values.Length >= 3 &&
+                float.TryParse(values[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float roll) &&
+                float.TryParse(values[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float pitch) &&
+                float.TryParse(values[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float yaw)) {
+                imuOrientation.SetAngles(roll, pitch, yaw);
+            }
+        } else if (frame.StartsWith("$13", StringComparison.Ordinal) && frame.Length >= 5) {
+            string code = frame.Substring(3, 2);
+            if (code == "10") SetButtonIndicator(leftButtonState, true, Color.Red); else if (code == "11") SetButtonIndicator(leftButtonState, false, Color.Gray);
+            else if (code == "20") SetButtonIndicator(rightButtonState, true, Color.Blue); else if (code == "21") SetButtonIndicator(rightButtonState, false, Color.Gray);
+            else if (code == "80") SetButtonIndicator(setupButtonState, true, Color.Red); else if (code == "81") SetButtonIndicator(setupButtonState, false, Color.LightYellow);
+            else if (code == "90") SetButtonIndicator(bootButtonState, true, Color.Red); else if (code == "91") SetButtonIndicator(bootButtonState, false, Color.LightYellow);
+        } else if (frame.StartsWith("$0608", StringComparison.Ordinal)) {
+            SetStatus("Brightness", frame.Substring(5).TrimEnd('%'), null);
+        } else if (frame.StartsWith("$27", StringComparison.Ordinal)) {
+            ParseInput(frame);
+        } else if (frame.StartsWith("$20", StringComparison.Ordinal) && frame.Length >= 5) {
+            bool wasRodConnected = rodConnected;
+            rodConnected = frame.Substring(3, 2) == "01";
+            SetConnectionIndicator(reelConnectionState, rodConnected, "릴");
+            if (!rodConnected) {
+                batteryDiagnostic.Text = "(현재 ---- / 평균 ----)";
+                batteryDiagnostic.ForeColor = Color.DimGray;
+                batteryGauge.AverageAdc = -1;
+                encoderCalibrationActive = false;
+                encoderCalibrationAwaitingApply = false;
+                encoderCalibrationState.Text = "보정 상태를 확인할 수 없음";
+                encoderCalibrationRawCount.Text = "00";
+                UpdateEncoderCalibrationButtons();
+            } else if (!wasRodConnected && serial.IsOpen) {
+                encoderCalibrationState.Text = "Rod 보정 상태 조회 중";
+                UpdateEncoderCalibrationButtons();
+                if (!TrySend(DeviceProtocol.EncoderCalibrationQuery(), false)) {
+                    encoderCalibrationState.Text = "보정 상태 조회 실패";
+                    AppendLog("WARNING", "ROD 연결 후 엔코더 보정 상태 조회 송신 실패");
+                }
+                if (!initializingMainConnection) {
+                    rodVersion.Text = "Vr 조회 중";
+                    imuVersion.Text = "IMU 조회 중";
+                    if (!TrySend("$10%", false)) {
+                        rodVersion.Text = "Vr 조회 실패";
+                        imuVersion.Text = "IMU 조회 실패";
+                        AppendLog("WARNING", "ROD 재연결 후 버전 조회 송신 실패");
+                    } else {
+                        AppendLog("SYSTEM", "ROD 재연결 감지: ROD/IMU 버전 재조회 요청");
+                    }
+                }
+            }
+        } else if (frame.StartsWith("$21", StringComparison.Ordinal) && frame.Length >= 5) {
+            bool wasImuConnected = imuConnected;
+            imuConnected = frame.Substring(3, 2) == "01";
+            SetConnectionIndicator(imuConnectionState, imuConnected, "IMU");
+            if (!imuConnected && wasImuConnected) {
+                imuVersion.Text = "IMU 미연결";
+            } else if (imuConnected && !wasImuConnected && serial.IsOpen && !initializingMainConnection) {
+                imuVersion.Text = "IMU 조회 중";
+                if (!TrySend("$10%", false)) {
+                    imuVersion.Text = "IMU 조회 실패";
+                    AppendLog("WARNING", "IMU 재연결 후 버전 조회 송신 실패");
+                } else {
+                    AppendLog("SYSTEM", "IMU 재연결 감지: IMU 버전 재조회 요청");
+                }
+            }
+        } else if (frame.StartsWith("$12", StringComparison.Ordinal)) {
+            UpdateBatteryStatus(frame.Substring(3).TrimEnd('%'));
+        } else if (frame.StartsWith("$31", StringComparison.Ordinal)) {
+            UpdateBatteryDiagnostic(frame.Substring(3).TrimEnd('%'));
+        } else if (frame.StartsWith("$14", StringComparison.Ordinal)) {
+            SetStatus("릴 엔코더", frame.Substring(3).TrimEnd('%'), Color.LightGreen);
+            imuOrientation.AdvanceHandleCounterClockwise();
+        } else if (frame.StartsWith("$37", StringComparison.Ordinal)) {
+            UpdateEncoderCalibration(frame.Substring(3).TrimEnd('%'));
+        } else if (frame.StartsWith("$30", StringComparison.Ordinal) && frame.Length >= 5) {
+            string code = frame.Substring(3, 2);
+            if (code == "03") FinishRegistration("등록 취소", Color.LightGray);
+            else if (code == "04") { registrationWaiting = true; rodRegisterButton.Text = "ROD 등록 취소"; registrationState.Text = "등록 진행 중"; registrationState.BackColor = Color.LightPink; }
+            else if (code == "05") FinishRegistration("등록 완료", Color.LightBlue);
+        }
     }
 
-    private void Append(string direction, string message)
+    private void UpdateEncoderCalibration(string payload)
     {
-        if (IsDisposed) return;
-        if (log.TextLength > 40000) log.Clear();
-        log.AppendText($"[{DateTime.Now:HH:mm:ss}] {direction} {message}\r\n");
-        log.SelectionStart = log.TextLength;
-        log.ScrollToCaret();
+        string[] values = payload.Split(',');
+        if (values.Length < 4 || values[0].Length != 1) return;
+        char state = values[0][0];
+        int.TryParse(values[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int rawCount);
+        int.TryParse(values[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out int pulsesPerRevolution);
+        encoderCalibrationRawCount.Text = Math.Max(0, rawCount).ToString("00", CultureInfo.InvariantCulture);
+        encoderCalibrationActive = state == '1';
+        encoderCalibrationAwaitingApply = state == '7';
+        switch (state) {
+            case '0':
+                encoderCalibrationState.Text = values[1] == "1"
+                    ? "저장된 보정 사용 중 (회전당 " + pulsesPerRevolution.ToString(CultureInfo.InvariantCulture) + "펄스)"
+                    : "미보정: 기본 환산 사용 중";
+                break;
+            case '1': encoderCalibrationState.Text = "보정 중: 한 바퀴 회전 후 완료를 누르세요"; break;
+            case '2': encoderCalibrationState.Text = "보정 저장 완료 (회전당 " + pulsesPerRevolution.ToString(CultureInfo.InvariantCulture) + "펄스)"; break;
+            case '3': encoderCalibrationState.Text = "보정 실패: 카운트가 0이거나 허용 범위를 벗어났습니다"; break;
+            case '4': encoderCalibrationState.Text = "저장 또는 설정 오류: 기본/이전 환산을 사용합니다"; break;
+            case '5': encoderCalibrationState.Text = "릴 연결 또는 동작 상태를 확인하세요"; break;
+            case '6': encoderCalibrationState.Text = "보정 명령을 인식하지 못했습니다"; break;
+            case '7': encoderCalibrationState.Text = "측정 완료: 적용하거나 취소하세요"; break;
+            default: encoderCalibrationState.Text = "알 수 없는 보정 상태"; break;
+        }
+        UpdateEncoderCalibrationButtons();
+    }
+
+    private void UpdateEncoderCalibrationButtons()
+    {
+        bool connected = serial.IsOpen && rodConnected;
+        bool editingCalibration = encoderCalibrationActive || encoderCalibrationAwaitingApply;
+        encoderCalibrationStartButton.Visible = !editingCalibration;
+        encoderCalibrationCompleteButton.Visible = editingCalibration;
+        encoderCalibrationCompleteButton.Text = encoderCalibrationAwaitingApply ? "적용" : "보정 완료";
+        encoderCalibrationCancelButton.Visible = editingCalibration;
+        encoderCalibrationStartButton.Enabled = connected && !editingCalibration;
+        encoderCalibrationCompleteButton.Enabled = connected && editingCalibration;
+        encoderCalibrationCancelButton.Enabled = connected && editingCalibration;
+    }
+
+    private void UpdateBatteryStatus(string value)
+    {
+        if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)) return;
+        if (parsed >= 0 && parsed <= 99) {
+            batteryPercent = parsed.ToString(CultureInfo.InvariantCulture);
+            batteryState = "";
+        } else if (parsed < 0 && parsed >= -5) {
+            batteryState = parsed.ToString(CultureInfo.InvariantCulture);
+            if (parsed == -1 || parsed == -2) batteryPercent = "--";
+        } else {
+            return;
+        }
+
+        UpdateBatteryGauge();
+    }
+
+    private void UpdateBatteryGauge()
+    {
+        if (int.TryParse(batteryPercent, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed) && parsed >= 0 && parsed <= 99) {
+            batteryGauge.Percent = parsed;
+        } else {
+            batteryGauge.Percent = -1;
+        }
+
+        batteryGauge.BatteryState = batteryState;
+    }
+
+    private void UpdateBatteryDiagnostic(string payload)
+    {
+        string[] values = payload.Split(',');
+        if (values.Length != 4 ||
+            !int.TryParse(values[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int currentAdc) ||
+            !int.TryParse(values[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int averageAdc) ||
+            !int.TryParse(values[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int mappedPercent) ||
+            !int.TryParse(values[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out int displayPercent) ||
+            currentAdc < 0 || currentAdc > 4095 || averageAdc < 0 || averageAdc > 4095 ||
+            mappedPercent < -1000 || mappedPercent > 1000 || displayPercent < 0 || displayPercent > 99) return;
+
+        batteryGauge.AverageAdc = averageAdc;
+        batteryDiagnostic.Text = string.Format(CultureInfo.InvariantCulture,
+            "(현재 {0:D4} / 평균 {1:D4})", currentAdc, averageAdc);
+        batteryDiagnostic.ForeColor = Color.FromArgb(35, 65, 95);
+    }
+
+    private void ParseInput(string frame)
+    {
+        string body = frame.Substring(3).TrimEnd('%');
+        int comma = body.IndexOf(','); if (comma < 0) return;
+        string code = body.Substring(0, comma); string value = body.Substring(comma + 1);
+        if (code == "03-03") {
+            if (!encoderMonitorEnabled) return;
+            string[] encoder = value.Split(',');
+            if (encoder.Length < 2) return;
+            string direction = encoder[0] == "1" ? "CW" : encoder[0] == "2" ? "CCW" : "방향 오류";
+            SetStatus("본체 엔코더", direction + " / " + encoder[1], Color.LightGreen);
+            return;
+        }
+        string? key = code switch { "01-02" => "부트", "03-01" => "EncA", "03-02" => "EncB", "03-05" => "FG", _ => null };
+        if (key != null) SetStatus(key, value, value == "0" ? Color.LightGray : Color.LightGreen);
+    }
+
+    private void SendManual(string message)
+    {
+        message = message.Trim();
+        if (!message.StartsWith('$') || !message.EndsWith('%') || message.Length > 120 || message.Any(c => c > 0x7f)) { MessageBox.Show("명령은 ASCII $로 시작하고 %로 끝나야 합니다 (120자 이하)."); return; }
+        string[] allowedPrefixes = { "$00", "$01", "$02", "$04", "$06", "$08", "$10", "$15", "$23", "$24", "$27", "$29", "$30", "$37" };
+        if (!allowedPrefixes.Any(prefix => message.StartsWith(prefix, StringComparison.Ordinal))) { MessageBox.Show("Lite에서는 LM JIG, 게임, OTA, 전원 명령을 전송하지 않습니다."); return; }
+        TrySend(message);
+    }
+
+    private bool TrySend(string message, bool showError = true)
+    {
+        if (!serial.IsOpen) { if (showError) MessageBox.Show("먼저 시리얼 포트를 연결하세요."); return false; }
+        try { serial.WriteText(message); AppendLog("SEND", message); return true; }
+        catch (Exception ex) { if (showError) MessageBox.Show("명령 송신 실패\r\n" + ex.Message); return false; }
+    }
+
+    private bool RequireConnection() { if (serial.IsOpen) return true; MessageBox.Show("먼저 시리얼 포트를 연결하세요."); return false; }
+
+    internal static string[][] InitialCommandGroups()
+    {
+        return new string[][] {
+            new string[] { "$00%", "$290101%" },
+            new string[] { "$00%", "$080%" },
+            new string[] { "$00%", "$0112%", "$0110%", "$0115%", "$0117%", "$1501%" }
+        };
+    }
+    private async Task<bool> InitializeConnectedMainAsync()
+    {
+        rodConnected = false; imuConnected = false; registrationWaiting = false;
+        encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
+        rodRegisterButton.Text = "ROD 등록"; registrationState.Text = "등록 대기 안 함";
+        registrationState.BackColor = Color.FromArgb(239, 241, 244);
+        SetPeripheralConnectionPending();
+
+        string[][] commandGroups = InitialCommandGroups();
+
+        for (int group = 0; group < commandGroups.Length; group++) {
+            await Task.Delay(500);
+            if (!serial.IsOpen) return false;
+            foreach (string command in commandGroups[group]) {
+                if (!TrySend(command, false)) {
+                    AppendLog("WARNING", "초기 명령 송신 중단: " + command);
+                    return false;
+                }
+                await Task.Delay(60);
+                if (!serial.IsOpen) return false;
+            }
+        }
+        int connectionWait = 0;
+        while (serial.IsOpen && connectionWait < 20 && (!rodConnected || !imuConnected)) {
+            await Task.Delay(100);
+            connectionWait++;
+        }
+        if (!serial.IsOpen) return false;
+        if (rodConnected) {
+            encoderCalibrationState.Text = "Rod 보정 상태 조회 중";
+            if (!TrySend(DeviceProtocol.EncoderCalibrationQuery(), false)) {
+                encoderCalibrationState.Text = "보정 상태 조회 실패";
+                AppendLog("WARNING", "초기 연결 후 엔코더 보정 상태 조회 송신 실패");
+            }
+        }
+        if (!TrySend("$10%", false)) {
+            AppendLog("WARNING", "초기 버전 조회 송신 실패");
+            return false;
+        }
+        AppendLog("SYSTEM", "초기 연결: TM 상태와 IMU OFF, 장치 검사 및 버전 조회를 수행했습니다.");
+        return true;
+    }
+    private void DisconnectMain()
+    {
+        if (serial.IsOpen) { TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); }
+        pollTimer.Stop(); serial.Close(); connectButton.Text = "연결"; connectionState.Text = "연결 안 됨"; connectionState.ForeColor = Color.DimGray;
+        rodConnected = false; imuConnected = false; imuDataEnabled = false; imuZeroButton.Enabled = false; imuOrientation.ClearZero(); registrationWaiting = false; rodRegisterButton.Text = "ROD 등록";
+        encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
+        mainVersion.Text = "Vm -"; rodVersion.Text = "Vr -"; imuVersion.Text = "IMU -";
+        SetConnectionIndicator(reelConnectionState, false, "릴"); SetConnectionIndicator(imuConnectionState, false, "IMU");
+    }
+
+    private void ToggleRodRegistration()
+    {
+        if (!RequireConnection()) return;
+        if (!mainVersion.Text.StartsWith("Vm", StringComparison.OrdinalIgnoreCase)) { MessageBox.Show("ROD 등록은 MAIN 연결에서만 수행할 수 있습니다."); return; }
+        if (!registrationWaiting) {
+            if (!TrySend("$3001%")) return;
+            registrationWaiting = true; rodRegisterButton.Text = "ROD 등록 취소";
+            registrationState.Text = "ROD 왼쪽 버튼을 길게 누르세요"; registrationState.BackColor = Color.LightYellow;
+        } else {
+            if (!TrySend("$3002%")) return;
+            FinishRegistration("취소 요청", Color.LightGray);
+        }
+    }
+
+    private void FinishRegistration(string text, Color color)
+    {
+        registrationWaiting = false; rodRegisterButton.Text = "ROD 등록";
+        registrationState.Text = text; registrationState.BackColor = color;
+    }
+
+    private void AppendLog(string direction, string text)
+    {
+        if (InvokeRequired) { BeginInvoke(new Action(() => AppendLog(direction, text))); return; }
+        logBox.AppendText(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + " " + direction.PadRight(6) + " " + text + Environment.NewLine);
+        if (autoScroll.Checked) { logBox.SelectionStart = logBox.TextLength; logBox.ScrollToCaret(); }
+    }
+
+    private void SaveLog()
+    {
+        using SaveFileDialog dialog = new() { Filter = "Text log (*.txt)|*.txt", FileName = "DFLOG[" + DateTime.Now.ToString("yyyyMMddHHmm") + "].txt" };
+        if (dialog.ShowDialog(this) == DialogResult.OK) File.WriteAllText(dialog.FileName, logBox.Text, Encoding.UTF8);
+    }
+
+    private void ShowPage(string name)
+    {
+        foreach (Panel page in pages.Values) page.Visible = false;
+        Panel selected = pages[name]; selected.Visible = true; selected.BringToFront();
+    }
+
+    private void SetStatus(string key, string text, Color? color)
+    {
+        if (!statusLabels.TryGetValue(key, out Label? label)) return;
+        label.Text = text; if (color.HasValue) label.BackColor = color.Value;
+    }
+
+    private void SetPeripheralConnectionPending()
+    {
+        reelConnectionState.Text = "릴 연결 시도"; reelConnectionState.BackColor = Color.LightYellow; reelConnectionState.ForeColor = Color.Black;
+        imuConnectionState.Text = "IMU 연결 시도"; imuConnectionState.BackColor = Color.LightYellow; imuConnectionState.ForeColor = Color.Black;
+    }
+
+    private static void SetConnectionIndicator(Label label, bool connected, string name)
+    {
+        label.Text = name + (connected ? " 연결됨" : " 연결 안 됨");
+        label.BackColor = connected ? Color.LightGreen : Color.FromArgb(230, 230, 230);
+        label.ForeColor = Color.FromArgb(35, 35, 35);
+    }
+    private static void SetButtonIndicator(Label label, bool pressed, Color color)
+    {
+        label.BackColor = pressed ? color : Color.FromArgb(230, 230, 230); label.ForeColor = pressed ? Color.White : Color.Black;
+    }
+
+    private static Panel Page() => new() { Dock = DockStyle.Fill, BackColor = Color.White };
+    private static FlowLayoutPanel Column() => new() { Dock = DockStyle.Fill, AutoScroll = true, FlowDirection = FlowDirection.TopDown, WrapContents = false, Padding = new Padding(22, 22, 22, 70) };
+    private static Label SectionTitle(string text) => new() { Text = text, Font = new Font("맑은 고딕", 13F, FontStyle.Bold), AutoSize = true, Margin = new Padding(0, 6, 0, 14) };
+    private static Label Caption(string text) => new() { Text = text, AutoSize = true, TextAlign = ContentAlignment.MiddleLeft, Margin = new Padding(7, 7, 7, 0) };
+    private static Label ValueLabel(string text) => new() { Text = text, AutoSize = true, BackColor = Color.FromArgb(239, 241, 244), Padding = new Padding(8, 5, 8, 5), Margin = new Padding(4, 2, 4, 0) };
+    private static Label Indicator(string text) => new() { Text = text, Width = 100, Height = 42, TextAlign = ContentAlignment.MiddleCenter, BackColor = Color.FromArgb(230, 230, 230), ForeColor = Color.FromArgb(35, 35, 35), Margin = new Padding(4) };
+    private static Label Note(string text) => new() { Text = text, AutoSize = true, MaximumSize = new Size(620, 0), ForeColor = Color.DimGray, Margin = new Padding(0, 12, 0, 12) };
+    private static Control Spacer(int width) => new Panel { Width = width, Height = 1 };
+    private static ComboBox Choice(string[] items, int selectedIndex)
+    {
+        ComboBox box = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 180 }; box.Items.AddRange(items); box.SelectedIndex = selectedIndex; return box;
+    }
+    private static NumericUpDown Number(int min, int max, int value) => new() { Minimum = min, Maximum = max, Value = value, Width = 110 };
+    private static TrackBar DutySlider(int value, int width) => new() { Minimum = 0, Maximum = 255, Value = value, Width = width, Height = 38, TickFrequency = 25, SmallChange = 1, LargeChange = 10, AutoSize = false };
+    private static Panel SliderBorder(TrackBar slider)
+    {
+        Panel border = new() { Width = slider.Width + 4, Height = 40, BorderStyle = BorderStyle.FixedSingle, Padding = new Padding(1), Margin = new Padding(3, 0, 6, 0) };
+        slider.Dock = DockStyle.Fill; slider.Margin = Padding.Empty;
+        border.Controls.Add(slider);
+        return border;
+    }
+    private static void LinkDutyControls(NumericUpDown number, TrackBar slider)
+    {
+        number.ValueChanged += (_, _) => { if (slider.Value != (int)number.Value) slider.Value = (int)number.Value; };
+        slider.ValueChanged += (_, _) => { if (number.Value != slider.Value) number.Value = slider.Value; };
+    }
+    private static FlowLayoutPanel MotorActionRow() => new() { Width = 560, Height = 40, WrapContents = false, Margin = new Padding(0, 0, 0, 2) };
+    private static Button MotorButton(string text, Color color, int width) => new() { Text = text, Width = width, Height = 34, BackColor = color, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Margin = new Padding(0, 2, 8, 2) };
+    private static Button SmallButton(string text, int width = 72) => MotorButton(text, Color.FromArgb(35, 105, 190), width);
+    private static Button UpdateButton(string text)
+    {
+        Button button = MotorButton(text, Color.FromArgb(35, 105, 190), 290); button.Height = 40; button.Margin = new Padding(0, 3, 0, 3); return button;
+    }
+    private static RadioButton ToggleButton(string text) => new() { Text = text, Width = 70, Height = 34, AutoSize = false, Appearance = Appearance.Button, FlatStyle = FlatStyle.Flat, TextAlign = ContentAlignment.MiddleCenter, Margin = new Padding(0, 2, 8, 2) };
+    private static void SetToggleButtonState(RadioButton button, bool selected, Color activeColor)
+    {
+        button.BackColor = selected ? activeColor : Color.FromArgb(230, 230, 230);
+        button.ForeColor = selected ? Color.White : Color.FromArgb(35, 35, 35);
+    }
+    private static FlowLayoutPanel FieldRow(string caption, Control control)
+    {
+        FlowLayoutPanel row = new() { Width = 560, Height = 38, WrapContents = false };
+        row.Controls.Add(new Label { Text = caption, Width = 125, Height = 28, TextAlign = ContentAlignment.MiddleLeft });
+        row.Controls.Add(control); return row;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
