@@ -8,6 +8,7 @@ internal sealed class MainForm : Form
 {
     private readonly SerialConnection serial = new();
     private readonly FrameDecoder decoder = new();
+    private readonly EspToolWiredUpdater wiredUpdater = new();
     private readonly Dictionary<string, Panel> pages = new();
     private readonly Dictionary<string, Label> statusLabels = new();
     private readonly ComboBox portBox = new() { DropDownStyle = ComboBoxStyle.DropDownList, Width = 100 };
@@ -431,10 +432,10 @@ internal sealed class MainForm : Form
     private Panel BuildFirmwarePage()
     {
         Panel page = Page(); FlowLayoutPanel content = Column(); content.Controls.Add(SectionTitle("펌웨어 업데이트"));
-        content.Controls.Add(Note("Lite 펌웨어에서 OTA/내장 업데이터는 제외되었습니다. 업데이트 버튼은 비활성화되며 ROD 등록은 사용할 수 있습니다."));
-        mainUpdateButton.Enabled = false;
+        content.Controls.Add(Note("MAIN/ROD USB 유선 업데이트: bootloader / partitions / boot_app0 / application 네 파일을 내장 esptool로 기록합니다. ROD 무선 OTA는 Lite 펌웨어에서 지원하지 않습니다."));
+        mainUpdateButton.Click += async (_, _) => await UpdateMainAsync();
+        rodWiredButton.Click += async (_, _) => await UpdateRodWiredAsync();
         rodWirelessButton.Enabled = false;
-        rodWiredButton.Enabled = false;
         rodRegisterButton.Click += (_, _) => ToggleRodRegistration();
         content.Controls.Add(mainUpdateButton); content.Controls.Add(rodWirelessButton); content.Controls.Add(rodWiredButton);
         FlowLayoutPanel registration = new() { Width = 620, Height = 48, WrapContents = false };
@@ -791,6 +792,76 @@ internal sealed class MainForm : Form
         SetConnectionIndicator(reelConnectionState, false, "릴"); SetConnectionIndicator(imuConnectionState, false, "IMU");
     }
 
+    private async Task UpdateMainAsync()
+    {
+        if (firmwareBusy) return;
+        string preferredPort = "COM4";
+        if (serial.IsOpen) {
+            if (!mainVersion.Text.StartsWith("Vm", StringComparison.OrdinalIgnoreCase)) { MessageBox.Show("현재 연결이 MAIN인지 확인할 수 없습니다."); return; }
+            if (MessageBox.Show("MAIN 업데이트 전에 현재 시리얼 연결을 끊습니다. 계속할까요?", "MAIN 연결 해제 확인", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK) return;
+            DisconnectMain(); AppendLog("SYSTEM", "MAIN 업데이트 전 시리얼 연결을 종료했습니다.");
+        }
+        using PortSelectionDialog portDialog = new("MAIN 통신포트 선택", "USB로 연결한 MAIN의 통신포트를 선택하세요.", string.Empty, preferredPort);
+        if (portDialog.ShowDialog(this) != DialogResult.OK) return;
+        string port = portDialog.SelectedPort;
+        if (portBox.Items.Contains(port)) portBox.SelectedItem = port;
+        WiredFirmwarePackage? package = SelectWiredFirmwareFolder((byte)'M'); if (package == null) return;
+        if (MessageBox.Show(port + "에 연결된 MAIN의 펌웨어 네 영역을 기록합니다. 대상 포트와 바이너리를 확인했습니까?", "MAIN USB 업데이트 확인", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK) return;
+        SetFirmwareBusy(true, "MAIN 업데이트 준비");
+        try {
+            Progress<int> progress = new(value => firmwareProgress.Value = value);
+            Progress<string> toolOutput = new(value => AppendLog("FLASH", value));
+            connectionState.Text = port + " MAIN 업데이트"; connectionState.ForeColor = Color.DarkOrange;
+            AppendLog("SYSTEM", "MAIN USB 업데이트 시작: " + package.Version + ", " + port);
+            await wiredUpdater.UpdateAsync(port, package, progress, toolOutput, CancellationToken.None);
+            AppendLog("SYSTEM", "MAIN 네 영역 기록 및 검증 완료");
+            connectionState.Text = "연결 안 됨"; connectionState.ForeColor = Color.DimGray;
+            MessageBox.Show("MAIN 펌웨어 업데이트를 완료했습니다. 보드는 자동 재부팅됩니다. 부팅 후 연결 버튼으로 버전을 확인하세요.");
+        } catch (Exception ex) { DisconnectMain(); AppendLog("ERROR", ex.Message); MessageBox.Show(ex.Message, "MAIN 업데이트 실패"); }
+        finally { SetFirmwareBusy(false, firmwareInfo.Text); }
+    }
+
+    private WiredFirmwarePackage? SelectWiredFirmwareFolder(byte boardId)
+    {
+        string target = boardId == (byte)'M' ? "MAIN" : "ROD";
+        using FolderBrowserDialog dialog = new() { Description = target + " 펌웨어 네 파일이 있는 출력 폴더 선택", UseDescriptionForTitle = true, ShowNewFolderButton = false };
+        if (dialog.ShowDialog(this) != DialogResult.OK) return null;
+        try {
+            WiredFirmwarePackage package = WiredFirmwarePackage.Load(dialog.SelectedPath, boardId);
+            firmwareInfo.Text = "대상: " + package.TargetName + " (USB 직접 업데이트)\r\n버전: " + package.Version +
+                "\r\n파일: bootloader / partitions / boot_app0 / application" +
+                "\r\n크기: " + package.TotalSize.ToString("N0") + " bytes\r\nAPP SHA-256: " + package.ApplicationSha256;
+            firmwareProgress.Value = 0;
+            AppendLog("SYSTEM", target + " 유선 업데이트 폴더 검증 완료: " + dialog.SelectedPath);
+            return package;
+        }
+        catch (Exception ex) {
+            firmwareInfo.Text = "폴더 오류: " + ex.Message;
+            MessageBox.Show(ex.Message, "올바르지 않은 " + target + " 펌웨어 폴더");
+            return null;
+        }
+    }
+
+    private async Task UpdateRodWiredAsync()
+    {
+        if (firmwareBusy) return;
+        using PortSelectionDialog portDialog = new("ROD 유선 통신포트 선택", "USB로 연결한 ROD의 통신포트를 선택하세요.", serial.IsOpen ? serial.PortName : string.Empty, string.Empty);
+        if (portDialog.ShowDialog(this) != DialogResult.OK) return;
+        string rodPort = portDialog.SelectedPort;
+        WiredFirmwarePackage? package = SelectWiredFirmwareFolder((byte)'R'); if (package == null) return;
+        if (MessageBox.Show(rodPort + "에 USB로 연결한 ROD의 네 펌웨어 영역을 업데이트합니다.", "ROD 유선 업데이트", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK) return;
+        SetFirmwareBusy(true, "ROD 유선 업데이트 중");
+        try {
+            Progress<int> progress = new(value => firmwareProgress.Value = value);
+            Progress<string> toolOutput = new(value => AppendLog("FLASH", value));
+            AppendLog("SYSTEM", "ROD USB 업데이트 시작: " + package.Version + ", " + rodPort);
+            await wiredUpdater.UpdateAsync(rodPort, package, progress, toolOutput, CancellationToken.None);
+            AppendLog("SYSTEM", "ROD 네 영역 기록 및 검증 완료: " + rodPort);
+            MessageBox.Show("ROD 유선 펌웨어 업데이트를 완료했습니다. ROD는 자동 재부팅됩니다.");
+        } catch (Exception ex) { AppendLog("ERROR", ex.Message); MessageBox.Show(ex.Message, "ROD 유선 업데이트 실패"); }
+        finally { SetFirmwareBusy(false, firmwareInfo.Text); }
+    }
+
     private void ToggleRodRegistration()
     {
         if (!RequireConnection()) return;
@@ -811,6 +882,11 @@ internal sealed class MainForm : Form
         registrationState.Text = text; registrationState.BackColor = color;
     }
 
+    private void SetFirmwareBusy(bool busy, string text)
+    {
+        firmwareBusy = busy; mainUpdateButton.Enabled = !busy; rodWirelessButton.Enabled = false; rodWiredButton.Enabled = !busy; rodRegisterButton.Enabled = !busy;
+        connectButton.Enabled = !busy; if (busy) AppendLog("SYSTEM", text);
+    }
     private void AppendLog(string direction, string text)
     {
         if (InvokeRequired) { BeginInvoke(new Action(() => AppendLog(direction, text))); return; }
