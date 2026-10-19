@@ -1,6 +1,6 @@
-//
-//
-//
+ 
+ 
+ 
 
 #include "Common.h"
 #include "Battery.h"
@@ -12,16 +12,16 @@ Battery::Battery()
 
 }
 
-//void Battery::init()
-//{
-//}
+ 
+ 
+ 
 
 void Battery::init()
 {
 	int i = 0;
-	adc_value	= analogRead(BATTERY_LVL_PIN);	// (Vr1.0.1.0) 멤버 변수로 공유함.
+	adc_value	= analogRead(BATTERY_LVL_PIN);	 
 
-	integ_ad	= adc_value;					// 초기 누적 Val저장.
+	integ_ad	= adc_value;					 
 
 	sum_ad = 0;
 	for(i=0; i<BAT_BUF_SIZE; i++)
@@ -33,26 +33,26 @@ void Battery::init()
 	avg_ad = (int)(sum_ad / BAT_BUF_SIZE);
 	ad_idx = 0;
 
-	// update rest Level
+	 
 	scanAvgInteg();
 
-	// Add STRING INIT_VAL
-	String str = getLevel3Char(rest_lvl);	// rest_lvl : 00~99
+	 
+	String str = getLevel3Char(rest_lvl);	 
 	restLvlStr = str;
 
-	// LOG to INIT AD VAL
+	 
 }
 
 
-//
-//	BAT LEVEL READ , 100ms
-//
+ 
+ 
+ 
 void Battery::scanAvgInteg()
 {
   int i = 0;
   int rest_ad;
 	
-  adc_value = analogRead(BATTERY_LVL_PIN);					// (Vr1.0.1.0) 멤버 변수로 공유함.
+  adc_value = analogRead(BATTERY_LVL_PIN);					 
 
 		ad_buff[ad_idx] = adc_value;
   		ad_idx++;
@@ -70,11 +70,11 @@ void Battery::scanAvgInteg()
 	mapped_lvl = map(rest_ad, BATTERY_MIN_VALUE_NEW, BATTERY_MAX_VALUE_NEW, 0, 100);
 	rest_lvl = mapped_lvl;
 
-  if( BATTERY_PER_MIN_0 > rest_lvl) rest_lvl = BATTERY_PER_MIN_0;	// 0 %
-  //if( BATTERY_PER_MIN_1 > rest_lvl) rest_lvl = BATTERY_PER_MIN_1;	// 1 %
-  if( BATTERY_PER_MAX < rest_lvl) rest_lvl = BATTERY_PER_MAX;	// 99 %
+  if( BATTERY_PER_MIN_0 > rest_lvl) rest_lvl = BATTERY_PER_MIN_0;	 
+   
+  if( BATTERY_PER_MAX < rest_lvl) rest_lvl = BATTERY_PER_MAX;	 
   
-  lowState = ( BATTERY_PER_LOW > rest_lvl );				// 20% under
+  lowState = ( BATTERY_PER_LOW > rest_lvl );				 
 
 }
 
@@ -87,7 +87,7 @@ void Battery::scanKalFilter()
 
 String Battery::getLevel3Char(int _lvl)
 {
-  //if(rest_lvl < 0)	rest_lvl = 0;	// test
+   
   
   if (10 > _lvl) {
     return "00" + String(_lvl);

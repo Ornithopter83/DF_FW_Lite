@@ -1,4 +1,4 @@
-// RotaryEncoder.h
+ 
 
 #pragma once
 
@@ -6,17 +6,17 @@
 
 #include "SPIFFS.h"
 
-#define MPU_BUF_SIZE      128		// IMU Recv Buffer Size 64 Byte
-#define MPU_RES_TIMEOUT   3000		// IMU Response Wait Time 4 Sec(4000ms)
+#define MPU_BUF_SIZE      128		 
+#define MPU_RES_TIMEOUT   3000		 
 
 #define IMU_DATA_SIZE   6
 
-// Define IMU START, STOP
-#define IMU_CONF_STOP		0		// IMU CONFIG STOP
-#define IMU_CONF_START 		1		// IMU CONFIG START
+ 
+#define IMU_CONF_STOP		0		 
+#define IMU_CONF_START 		1		 
 
-// Define IMU_RESP_OK/NG
-// TBD Resp String, INTV, OUT, CALB, Inteval Measure
+ 
+ 
 #define STX_IMU_RESP_OK		"$0800000001%"
 #define STX_IMU_RESP_NG		"$0800000000%"
 
@@ -47,7 +47,7 @@ class EB_IMU
     int  uartRecv_Normal();
     void setConfig(String msg);
     void setConfigString(String msg);
-	String convert_oldSetup(String msg);		// OLD SETUP
+	String convert_oldSetup(String msg);		 
 
 	String getversion();
 
@@ -55,12 +55,12 @@ class EB_IMU
     void jyro_calibration();
     void setInterval(int ms);
 	void setStartStop(int set);
-    //void write(String pid, String str);
+     
 
     void setStateCallback(void (*imuCallback)(String, String));
     int  uartRecv_Setup();
 
-	int  polling();		//Connection Check
+	int  polling();		 
 
 	short checkSetupFileVal();
 	String getIntervalFileStr();	

@@ -3,7 +3,7 @@
 
 
 
-// Shared low-level state and compatibility API. Feature-owned declarations live in module headers.
+ 
 
 
 

@@ -1,4 +1,4 @@
-// Encoder.h
+ 
 
 #pragma once
 
@@ -8,14 +8,14 @@
 #define MIN_COUNT   -40
 #define MAX_COUNT   40
 
-#define ENC_MUL_V2	8	// 10	// 출력 카운터 수
-#define ENC_DIV_V2	12			// 디바이스 카운터 수 ( 12펄스/회전 )
-#define MAX_COUNT_V2  ((MAX_COUNT * ENC_DIV_V2 ) / ENC_MUL_V2) // 48	// = 40 * 12/10
+#define ENC_MUL_V2	8	 
+#define ENC_DIV_V2	12			 
+#define MAX_COUNT_V2  ((MAX_COUNT * ENC_DIV_V2 ) / ENC_MUL_V2)  
 
-// (Vr1.0.1.0) 엔코더 계산 방식 변경
-#define ENC_MUL_V3	8	// 10	// 출력 카운터 수
-#define ENC_DIV_V3	6			// 디바이스 카운터 수 ( 12펄스/회전 )
-#define MAX_COUNT_V3  ((MAX_COUNT * ENC_DIV_V3 ) / ENC_MUL_V3) // 48	// = 40 * 12/10
+ 
+#define ENC_MUL_V3	8	 
+#define ENC_DIV_V3	6			 
+#define MAX_COUNT_V3  ((MAX_COUNT * ENC_DIV_V3 ) / ENC_MUL_V3)  
 #define ENC_MUL_VX		ENC_MUL_V3
 #define ENC_DIV_VX		ENC_DIV_V3
 #define MAX_COUNT_VX	MAX_COUNT_V3
@@ -68,6 +68,6 @@ class Encoder
 
 
 extern unsigned long curr_ms_tick;
-//extern int isRodNewBoard();
+ 
 extern int getEncType();
 

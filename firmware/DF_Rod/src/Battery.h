@@ -8,27 +8,27 @@
 #define BATTERY_PER_LOW		20
 #define BATTERY_PER_MAX		99
 
-//-- OLD ROD, 3350mA
-#define BATTERY_MIN_VALUE  2795		// 9.0 V = 0%
-#define BATTERY_MAX_VALUE  4095		// 12.0 V = 100%
+ 
+#define BATTERY_MIN_VALUE  2795		 
+#define BATTERY_MAX_VALUE  4095		 
 
-//-- NEW ROD, 800mA
-#define BATTERY_MIN_VALUE_NEW  	2828	// 기존 20%를 0%로 설정함(Vr1.0.1.0)
-#define BATTERY_MAX_VALUE_NEW   3546	// 기존 82%를 100%로 설정함(Vr1.0.1.0)
+ 
+#define BATTERY_MIN_VALUE_NEW  	2828	 
+#define BATTERY_MAX_VALUE_NEW   3546	 
 
-#define BAT_BUF_SIZE 		20		// 20 samples; scanAvgInteg is called every 500 ms (~10 sec window)
+#define BAT_BUF_SIZE 		20		 
 
-#define	BAT_UPDATE_INTVL	(60*1000)		// 60sec
-#define	BAT_UPDATE_GAP		2				// 
+#define	BAT_UPDATE_INTVL	(60*1000)		 
+#define	BAT_UPDATE_GAP		2				 
 
 class Battery
 {
   public:
 
     Battery();
-//    void init();
+ 
 	void init();
-    //void scanAvg();
+     
     void scanAvgInteg();
     void scanKalFilter();
 
@@ -38,17 +38,17 @@ class Battery
 	int ad_buff[BAT_BUF_SIZE];
 	int ad_idx = 0;
 
-	int adc_value;						// Vr1.0.1.0
-	int mapped_lvl;					// ADC 환산 원값(0~100 이상), 표시용 clamp 전
+	int adc_value;						 
+	int mapped_lvl;					 
 	long sum_ad;
 	int avg_ad;
 	int integ_ad;
 
   	int rest_lvl = -2;
-	int old_restLvl = -2;		// PowerOn 1st Change
-	int	old_dir = 0;					// Vr1.0.1.0
-	unsigned long last_tick = 9999999;	// *
-	int	chk_cnt = 2;					// *
+	int old_restLvl = -2;		 
+	int	old_dir = 0;					 
+	unsigned long last_tick = 9999999;	 
+	int	chk_cnt = 2;					 
 
 	String restLvlStr;
 	
@@ -58,7 +58,7 @@ class Battery
 
 };
 
-// Extern Define
-//extern int isRodNewBoard();
+ 
+ 
 extern int getBattType();
 

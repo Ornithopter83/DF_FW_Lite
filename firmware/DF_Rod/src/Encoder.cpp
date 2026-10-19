@@ -1,6 +1,6 @@
-//
-//
-//
+ 
+ 
+ 
 
 #include "Common.h"
 #include "Encoder.h"
@@ -45,7 +45,7 @@ void Encoder::init()
 	loadCalibration();
 }
 
-//callback Function Name : rotateChangeCallback
+ 
 void Encoder::setRotateCallback(void (*rotateCallback)(String))
 {
   DF_Rod_Encoder_RotateCallback = rotateCallback;
@@ -293,8 +293,8 @@ bool Encoder::saveCalibration(unsigned long pulseCount)
 
 
 
-//
-//
+ 
+ 
 void Encoder::rotate()
 {
 	unsigned int previousCount;
@@ -307,7 +307,7 @@ void Encoder::rotate()
 	multiplyCorrection = calibrationValid && (calibratedPulsesPerRevolution < DF_Rod_Encoder_CalibrationTargetStepCount);
 	pulsesPerRevolution = multiplyCorrection ? calibratedPulsesPerRevolution : MAX_COUNT_VX;
 
-	// 2체배, LE and TE ,  6.3 Pulse / Rev =>  12.6 Pulse/Rev (*2) = 25.2 Pulse (Count * 2 ) => 12.6 Pulse/Rev ( Count 1/2)
+	 
 	if (lastCLK != currentCLK)
 	{
 		if (calibrationActive)
@@ -378,11 +378,11 @@ String Encoder::fillZero2char(int _count)
   String str;
   if(0) {}
   
-  else if (10 > _count)		//  0 + 1char(1~9)
+  else if (10 > _count)		 
   {
     str = "0" + String(_count);
   }
-  else					//  2char (10 ~ 99)
+  else					 
   {
     str = String(_count);
   }
@@ -390,10 +390,10 @@ String Encoder::fillZero2char(int _count)
 }
 
 
-/*------------------------------------------------------------
-  1. VAL = Pulse /2
-  2. Send Only Change
-------------------------------------------------------------*/
+ 
+
+
+
 String Encoder::sendCount()
 {
 	String str = "";
@@ -405,24 +405,24 @@ String Encoder::sendCount()
 	if (0 == pulsesPerRevolution) pulsesPerRevolution = MAX_COUNT_VX;
 	correctedStepCount = ((long)count * DF_Rod_Encoder_CalibrationTargetStepCount) / (long)pulsesPerRevolution;
 
-	if ( 0 < correctedStepCount)			// +
+	if ( 0 < correctedStepCount)			 
 	{
 		str = "+" + fillZero2char(correctedStepCount);
 	}
-	else if ( 0 > correctedStepCount)		// -
+	else if ( 0 > correctedStepCount)		 
 	{
 		str = "-" + fillZero2char(abs(correctedStepCount));
 	}
-	else	// if 0
+	else	 
 	{
-		str = "000";				// else 000
+		str = "000";				 
 	}
 
-	// Send MSG, Only Change
-	if (!str.equals(oldStr))			// if Change String(CNT)
+	 
+	if (!str.equals(oldStr))			 
 	{
 		oldStr = str;
-		//str = "$0700000" + str + "%";
+		 
 
 		if (DF_Rod_Encoder_RotateCallback != NULL)
 		{

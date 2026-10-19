@@ -1,4 +1,4 @@
-// ENow.h
+ 
 
 #pragma once
 
@@ -8,9 +8,9 @@
 
 #include "SPIFFS.h"
 
-#define NOW_MSG_CH_SIZE	24 //28		// max 21 + Dummy(3)
+#define NOW_MSG_CH_SIZE	24  
 typedef struct now_message {
-  //int pid;
+   
   short pid;
   char str[NOW_MSG_CH_SIZE];
 } now_message;
@@ -37,6 +37,6 @@ class ENow
   private:
 };
 
-//----------------------------------------
+ 
 extern void	ESP_Soft_Reset();
 
