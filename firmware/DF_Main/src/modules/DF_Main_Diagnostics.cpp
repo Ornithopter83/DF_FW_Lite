@@ -1,4 +1,4 @@
- 
+
 #include "../DF_Main_Internal.h"
 #include "DF_Main_Diagnostics.h"
 void diagInput_AllOff()
@@ -7,16 +7,14 @@ void diagInput_AllOff()
 	DiagInput_MotInAllOff();
 	DiagInput_MechaInAllOff();
 	DiagInput_ElecInAllOff();
-	
-}
 
- 
+}
 
 #define DIAG_CHAGE_VAL	3		 
 
 void diagInput_BoardInAllOff()
 {
-	 
+
 	diagInFlag_ResetSwc = 0; 	
 	diagInFlag_BootSwc = 0; 	
 	diagInFlag_WdtLbSig = 0; 	
@@ -24,12 +22,10 @@ void diagInput_BoardInAllOff()
 }
 void diagInput_BoardInAllOn()
 {
-	 
-	 
+
 	diagInFlag_BootSwc = 1; 	
 	oldsensorBootSwc = sensorBootSwc + DIAG_CHAGE_VAL;
-	 
-	 
+
 }
 
 void DiagInput_MotInAllOff()
@@ -40,7 +36,6 @@ void DiagInput_MotInAllOff()
 	diagInFlag_AngleHomeSns = 0;
 	diagInFlag_BbnBldcFG = 0;	
 }
-
 
 void DiagInput_MotInAllOn()
 {
@@ -62,23 +57,18 @@ void DiagInput_MainEcoderInAllOn()
 		oldsensorBbnEncCnt= sensorBbnEncCnt + DIAG_CHAGE_VAL;
 	}
 
-	 
-
 }
-
-
 
 void DiagInput_MechaInAllOff()
 {
-	 
-}
 
+}
 
 void DiagInput_ElecInAllOff()
 {
 	diagInFlag_PonSwc = 0;
 	diagInFlag_PcUsb5V = 0;
-	 
+
 }
 void DiagInput_ElecInAllOn()
 {
@@ -86,36 +76,34 @@ void DiagInput_ElecInAllOn()
 	oldsensorPonSwc = sensorPonSwc + DIAG_CHAGE_VAL;
 	diagInFlag_PcUsb5V = 1;
 	oldsensorUsb5V = sensorUsb5V + DIAG_CHAGE_VAL;
-	 
-	 
+
 }
 
 void diagInput_Cat0(String _msg)
 {
-	 
+
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
 	switch(iItemNo)
 	{
 		case 0:
 			diagInput_AllOff();
-			
+
 			LogPrintln(" LG] IO_in All Input mon OFF");
 			break;
 		 default:
-			 
+
 			 LogPrintln(" LG] IO_in Can't Find Item No");
 			 break;
 	 }
 
 }
 
- 
 void diagIput_Cat1(String _msg)
 {
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
-		    
+
 	int iAct = _msg.substring(9,(9+1)).toInt();
-		    
+
 	int iPara = _msg.substring(11,(11+3)).toInt();	 
 
 		   switch(iItemNo)
@@ -129,26 +117,26 @@ void diagIput_Cat1(String _msg)
 				   {
 					   diagInput_BoardInAllOn();
 				   }
-				   
+
 				   LogPrintln(" LG] IO_in Board Input All OFF");
 				   break;
 			   case 1:
 				   if(DAIG_OFF == iAct)
 				   {
 					   diagInFlag_ResetSwc = 0; 		    
-					   
+
 					   LogPrintln(" LG] IO_in Reset SWC mon ON");
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
 					   diagInFlag_ResetSwc = 1; 		    
 					   oldsensorResetSwc = sensorResetSwc + DIAG_CHAGE_VAL;
-					   
+
 					   LogPrintln(" LG] IO_in Reset SWC mon ON");
 				   }
 				   else
 				   {
-					   
+
 					   LogPrintln(" LG] IO_in Can't Find Act No");
 				   }
 				   break;
@@ -156,14 +144,14 @@ void diagIput_Cat1(String _msg)
 				   if(DAIG_OFF == iAct)
 				   {
 					   diagInFlag_BootSwc = 0;			    
-					   
+
 					   LogPrintln(" LG] IO_in Boot SWC mon OFF");
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
 					   diagInFlag_BootSwc = 1;			    
 					   oldsensorBootSwc = sensorBootSwc + DIAG_CHAGE_VAL;
-					   
+
 					   LogPrintln(" LG] IO_in Boot SWC mon ON");
 				   }
 				   else
@@ -179,7 +167,7 @@ void diagIput_Cat1(String _msg)
 				   {
 					   diagInFlag_WdtLbSig = 1; 		    
 					   oldsensorWdtFbSig = sensorWdtFbSig + DIAG_CHAGE_VAL;
-					   
+
 					   LogPrintln(" LG] IO_in WDT LB Signal mon ON");
 				   }
 				   else
@@ -195,27 +183,26 @@ void diagIput_Cat1(String _msg)
 				   {
 					   diagInFlag_SelectBoard = 1; 
 					   oldsensorSelBoard = sensorSelBoard + DIAG_CHAGE_VAL;
-					   
+
 					   LogPrintln(" LG] IO_in Door Interlock mon ON");
 				   }
 				   break;  
 			   default: 
-				   
+
 				   LogPrintln(" LG] IO_in Can't Find Item No");
 				   break;
 		   	}
 }
 
- 
 void diagInput_Cat3(String _msg)
 {
 
 	String logmsg;
-	
+
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
-	 
+
 	int iAct = _msg.substring(9,(9+1)).toInt();
-	 
+
 	int iPara = _msg.substring(11,(11+3)).toInt();	  
 
 	switch(iItemNo)
@@ -236,14 +223,14 @@ void diagInput_Cat3(String _msg)
 			if(DAIG_OFF == iAct)
 			{
 				 diagInFlag_BobbinEncA = 0; 		 
-				 
+
 				 LogPrintln(" LG] IO_in Main Enc_A mon OFF");
 			}
 			else if(DAIG_ON == iAct)
 			{
 				diagInFlag_BobbinEncA = 1; 
 				oldsensorBbnEncA = sensorBbnEncA + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Main Enc_A mon ON");
 			}
 			break;  
@@ -257,7 +244,7 @@ void diagInput_Cat3(String _msg)
 			{
 				diagInFlag_BobbinEncB = 1; 
 				oldsensorBbnEncB= sensorBbnEncB+ DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Main Enc_B mon ON");
 			}
 			break;  
@@ -271,7 +258,7 @@ void diagInput_Cat3(String _msg)
 			{
 				diagInFlag_BobbinEncDir = 1; 
 				oldsensorBbnEncCnt= sensorBbnEncCnt + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Main Enc Dir/Cnt ON");
 			}
 			break;  
@@ -286,7 +273,7 @@ void diagInput_Cat3(String _msg)
 			{
 				diagInFlag_AngleHomeSns = 1; 
 				oldsensorAngHomeSns = sensorAngHomeSns + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Angle HomeSensor mon ON");
 			}
 			break;  
@@ -301,15 +288,11 @@ void diagInput_Cat3(String _msg)
 			{
 				diagInFlag_BbnBldcFG = 1; 
 				oldsensorBbnFG = sensorBbnFG + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in BBN BLDC FG mon ON");
 			}
 			break;  
-	
-		  
-		  
-			 
-	
+
 		default:
 			LogPrintln(" LG] IO_in Can't Find Item No");
 			break;
@@ -317,14 +300,13 @@ void diagInput_Cat3(String _msg)
 
 }
 
- 
 void diagInput_Cat5(String _msg)
 {
-	    
+
 	   int iItemNo = _msg.substring(6,(6+2)).toInt();
-	    
+
 	   int iAct = _msg.substring(9,(9+1)).toInt();
-	    
+
 	   int iPara = _msg.substring(11,(11+3)).toInt();	 
 
 	switch(iItemNo)
@@ -348,7 +330,7 @@ void diagInput_Cat5(String _msg)
 			{
 				diagInFlag_PonSwc = 1; 
 				oldsensorPonSwc = sensorPonSwc + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Power On Switch mon ON");
 			}
 			break;  
@@ -361,7 +343,7 @@ void diagInput_Cat5(String _msg)
 			{
 				diagInFlag_PcUsb5V = 1; 
 				oldsensorUsb5V = sensorUsb5V + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Usb 5V mon ON");
 			}
 			break;  
@@ -374,20 +356,17 @@ void diagInput_Cat5(String _msg)
 			{
 				diagInFlag_Interlock = 1;
 				oldsensorDoorIlk = sensorDoorIlk + DIAG_CHAGE_VAL;
-				
+
 				LogPrintln(" LG] IO_in Door Interlock mon ON");
 			}
 			break;  
-			
+
 		default: 
 			LogPrintln(" LG] IO_in Can't Find Item No");
 			break;
 	}
 
 }
-
- 
-
 
 void diagInputTest(String _msg)
 {
@@ -397,21 +376,15 @@ void diagInputTest(String _msg)
 	   int iPara = 0;
 
 	   String logmsg = "";
-	   
-	    
-	    
 
-	    
-	    
-	    
 	   iCatNo = _msg.substring(3,(3+2)).toInt();	 
-	    
+
 	   iItemNo = _msg.substring(6,(6+2)).toInt();	 
-	    
+
 	   iAct = _msg.substring(9,(9+1)).toInt();		 
-	    
+
 	   iPara = _msg.substring(11,(11+3)).toInt();	 
-	   
+
 	   if( 0 == iCatNo)
 	   {
 			diagInput_Cat0(_msg);
@@ -423,7 +396,7 @@ void diagInputTest(String _msg)
 	   }
 	   else if( 2 == iCatNo)		    
 	   {
-		    
+
 		   LogPrintln(" LG] IO_in Can't Find Cat No");
 	   }
 	   else if( 3 == iCatNo)		    
@@ -431,13 +404,11 @@ void diagInputTest(String _msg)
 	   		diagInput_Cat3(_msg);
 	   }
 
-	    
 	   else if( 4 == iCatNo)	    
 	   {
-	   	 
+
 	   }
 
-	    
 	   else if( 5 == iCatNo)	    
 	   {
 	   		diagInput_Cat5(_msg);
@@ -460,17 +431,11 @@ void diagInputTest(String _msg)
 	   }
 	   else
 	   {
-		   
+
 		   LogPrintln(" LG] IO_in Can't Find Cat No");
 	   }
 
-    
-    
 }
-
- 
- 
- 
 
 void diagOutput_AllOff()
 {
@@ -481,7 +446,6 @@ void diagOutput_BoardOutAllOff()
 {
 	setRGBcolor(LED_IDX_CENT, COLOR_BLACK);
 }
-
 
 void setRGBcolor(int pos, int Color)
 {
@@ -511,8 +475,6 @@ void setOutRGBcolor(int pos, int Color)
 	}
 }
 
- 
- 
 void diagBbnMotor_TimeoutStart(unsigned int _time)
 {
 	bbnTimeout_Val = _time;
@@ -520,19 +482,9 @@ void diagBbnMotor_TimeoutStart(unsigned int _time)
 	diagOutflag_bbnTimeOut = 1;		 
 }
 
- 
- 
-
-
-
-
-
-
-
- 
 void diagBbnMotor_TimeoutControl()
 {
-	
+
 	switch(bbnTimeout_step)
 	{
 		case 0x00:	 
@@ -556,14 +508,11 @@ void diagBbnMotor_TimeoutControl()
 			bbnTimeout_step = 0x00;
 			break;
 		default:
-			 
+
 			break;
 	}
 }
 
- 
- 
- 
 void daigBbnMotor_TokTokEnd()
 {
 	diagBbnflag_TokTokControl = 0;
@@ -571,50 +520,31 @@ void daigBbnMotor_TokTokEnd()
 	bbnMotor.offBldc();
 }
 
-
 void diagBbnMotor_TokTokStart(unsigned int _ackKind, unsigned int _cnt)
 {
 
- 
-
-
-
-
-
 	bbnActKind = _ackKind;
-	 
-  	bbnReqCnt[bbnActKind] = _cnt;
 
+  	bbnReqCnt[bbnActKind] = _cnt;
 
 	bbnTokTok_step = 0x10;
 	diagBbnflag_TokTokControl = 1;		 
 }
 
-
- 
 void diagBbnMotor_TokTokControl(unsigned _opKind)		 
 {
-	 
-   
 
-
-
-
-
-
-
-	
 	switch(bbnTokTok_step)
 	{
 		case 0x00:	 
 			break;
-			
+
 		case 0x10:	 
 			bbnRptCnt = 0;
 			setTO(bbnTokTO);
 			bbnTokTok_step = 0x20;
 			break;
-			
+
 		case 0x20:	 
 			bbnMotor.onBldc(BBN_MOT_CW, sBbnActTbl[bbnActKind].onDuty);	 
 			setTO(bbnTokTO);
@@ -648,78 +578,75 @@ void diagBbnMotor_TokTokControl(unsigned _opKind)
 
 		case 0x60:	 
 			break;
-			
 
 		case 0x70:	 
 			bbnMotor.offBldc(); 			 
-			 
+
 			bbnRptCnt = 0;
-			
+
 			bbnTokTok_step = 0x00;
 			break;
 		default:
-			 
+
 			break;
 	}
 }
 
- 
 void diagOut_Cat1(String _msg)
 {
 	int iCatNo = _msg.substring(3,(3+2)).toInt();	 
-	 
+
 	int iItemNo = _msg.substring(6,(6+2)).toInt();	 
-	 
+
 	int iAct = _msg.substring(9,(9+1)).toInt(); 	 
-	 
+
 	int iPara = _msg.substring(11,(11+3)).toInt();	 
-	 
-	 
+
 	int iPara2 = _msg.substring(15,(15+4)).toInt();  
-	 
+
 	int iPara3 = _msg.substring(20,(20+5)).toInt();  
 
 	switch(iItemNo)
 	{
 		case 0:
 			diagOutput_BoardOutAllOff();
-			
+
 			LogPrintln(" LG] IOout Board Output All OFF");
 			break;
 		case 1:
 			diagOutFlag_WDToff = 1; 		 
-			
+
 			LogPrintln(" LG] IOout WDT OFF");
 			break;
 		case 2:
 			if(DAIG_OFF == iAct)
 			{
 				digitalWrite(BD_LED2_PIN, LED_OFF);
-				
+
 				LogPrintln(" LG] IOout BD LED2 OFF");
 			}
 			else if(DAIG_ON == iAct)
 			{
 				digitalWrite(BD_LED2_PIN, LED_ON);
-				
+
 				LogPrintln(" LG] IO_in	BD LED2 ON");
 			}
 			else
 			{
 			}
 			break;
-	
+
 		case 3:
 			if(DAIG_OFF == iAct)
 			{
 				digitalWrite(BD_LED3_PIN, LED_OFF);
-				
+
 				LogPrintln(" LG] IOout BD LED3 OFF");
 			}
 			else if(DAIG_ON == iAct)
 			{
 				digitalWrite(BD_LED3_PIN, LED_ON);
-				
+
 				LogPrintln(" LG] IOout BD LED3 ON");
 			}
 			else
@@ -730,13 +657,13 @@ void diagOut_Cat1(String _msg)
 			if(DAIG_OFF == iAct)
 			{
 				digitalWrite(BD_LED4_PIN, LED_OFF);
-				
+
 				LogPrintln(" LG] IOout BD LED4 OFF");
 			}
 			else if(DAIG_ON == iAct)
 			{
 				digitalWrite(BD_LED4_PIN, LED_ON);
-				
+
 				LogPrintln(" LG] IOout BD LED4 ON");
 			}
 			else
@@ -754,33 +681,31 @@ void diagOut_Cat1(String _msg)
 				debugPort_On();
 				LogPrintln(" LG] IOout BD DebugPort ON");
 			}
-	
+
 			else
 			{
-				 
+
 			}
 			break;
-	
+
 		default: 
 			break;
 	}
 
 }
 
- 
 void diagOut_Cat3(String _msg)
 {
 	int iCatNo = _msg.substring(3,(3+2)).toInt();	 
-	 
+
 	int iItemNo = _msg.substring(6,(6+2)).toInt();	 
-	 
+
 	int iAct = _msg.substring(9,(9+1)).toInt(); 	 
-	 
+
 	int iPara = _msg.substring(11,(11+3)).toInt();	 
-	 
-	 
+
 	int iPara2 = _msg.substring(15,(15+4)).toInt();  
-	 
+
 	int iPara3 = _msg.substring(20,(20+5)).toInt();  
 
 	switch(iItemNo)
@@ -788,154 +713,105 @@ void diagOut_Cat3(String _msg)
 		case 0 :	 
 			torqMotor.setValue(0);
 			bbnMotor.offBldc();
-			
+
 			LogPrintln(" LG] IOout Motot ALL OFF");
 			break;
-			
+
 		case 1 :	 
 			if(DAIG_MOT_OFF == iAct)
 			{
 				torqMotor.setValue(0);
-				
+
 				LogPrintln(" LG] IOout Main Mot(Torq) OFF");
 			}
 			else if(DAIG_MOT_CW == iAct)
 			{
 				torqMotor.setValue(iPara);
-				
+
 				LogPrintln(" LG] IOout Main Mot(Torq) ON, Duty : " + String(iPara));
 			}
-	
+
 			else
 			{
 			}
 			break;
-			
+
 		case 2 :	 
 			break;
-	
+
 		case 3 :	 
-			 
-			 
 
-
-
-
-
-
-
-
-
-
-			
 			if(DAIG_MOT_OFF == iAct)
 			{
 				bbnMotor.offBldc();
-				
+
 				LogPrintln(" LG] IOout BBNMT OFF");
 			}
 			else if(DAIG_MOT_CW == iAct)
 			{
 				bbnMotor.onBldc(BBN_MOT_CW, iPara);
 				diagBbnMotor_TimeoutStart(3000);
-				
+
 				LogPrintln(" LG] IOout BBNMT CW ON, Duty : " + String(iPara));
 			}
 			else if(DAIG_MOT_CCW == iAct)
 			{
 				bbnMotor.onBldc(BBN_MOT_CCW, iPara);
 				diagBbnMotor_TimeoutStart(3000);
-				
+
 				LogPrintln(" LG] IOout BBNMT CCW ON, Duty : " + String(iPara));
 			}
 			else
 			{
 			}
 			break;
-			
-			
+
 		case 4 :	 
 			if(DAIG_MOT_OFF == iAct)
 			{
 				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VOFF);	 
-				
+
 				LogPrintln(" LG] IOout BBN24 OFF");
 			}
 			else			 
 			{
 				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VON);	   
-				
+
 				LogPrintln(" LG] IOout BBN24 ON");
 			}
 			break;
-	
+
 		case 5 :	 
-			 
-			 
 
-
-
-
-
-
-
-
-
-
-			
 			if(DAIG_MOT_OFF == iAct)
 			{
-				 
+
 				daigBbnMotor_TokTokEnd();
-				
+
 				LogPrintln(" LG] IOout BBNTK OFF");
 			}
 			else if(DAIG_MOT_CW == iAct)
 			{
-				 
-				 
-				 
+
 				if ( (BBNACT_TBLMAX) <= iPara)	{ iPara = 0; }		 
-				 
-				 
-				 
+
 				if ( (10000) <= iPara2) { iPara2 = 10000; }
-			 
-			 
-
-
 
 				diagBbnMotor_TokTokStart(iPara, iPara2);			 
-				 
-				
+
 				LogPrintln(" LG] IOout BBNTK ON, AckKind : " + String(iPara) + ", opKind: " + String(iPara2) + ", Repeat CNT: " + String(iPara3)+ ", On/Time/Off/Time: " + String(bbnTokTok_OnDuty) + ", " + String(bbnTokTok_OnTime) + ", " + String(bbnTokTok_OffDuty) + ", " + String(bbnTokTok_OffTime));
 			}
-		 
-
-
-
-
-
-
-
 
 			else
 			{
 			}
 			break;
-			
-	
+
 		default:
 			break;
 	}
 
 }
-
- 
-
-
-
-
 
 void diagOutputTest(String _msg)
 {
@@ -948,47 +824,42 @@ void diagOutputTest(String _msg)
 
 		int dir = 0;
 		int dutyPercent = 0;
-		
+
 		iCatNo = _msg.substring(3,(3+2)).toInt();	 
-		 
+
 		iItemNo = _msg.substring(6,(6+2)).toInt();	 
-		 
+
 		iAct = _msg.substring(9,(9+1)).toInt();		 
-		 
+
 		iPara = _msg.substring(11,(11+3)).toInt();	 
-		 
-		 
+
 		iPara2 = _msg.substring(15,(15+4)).toInt();	 
-		 
+
 		iPara3 = _msg.substring(20,(20+5)).toInt();	 
-		
-	
+
 		dutyPercent = iPara;
 
-		 
 		if( 0 == iCatNo && 0 == iItemNo )
 		{
-			 
+
 			diagOutput_AllOff();
-			
+
 			LogPrintln(" LG] IOout All Output ALL OFF");
 		}
 
-		 
 		else if( 1 == iCatNo)		 
 		{
 			diagOut_Cat1(_msg);
 		}
 
-		 
 		else if( 2 == iCatNo)			 
 		{
 			switch(iItemNo)
 			{
 				case 0:	 
-					 
+
 					extLed_AllOff();					
-					
+
 					LogPrintln(" LG] IOout Ext LED All OFF");
 					break;
 				case 1:
@@ -996,14 +867,14 @@ void diagOutputTest(String _msg)
 					{
 						diagOutFlag_LedCent_R = 0;			 
 						extLed.off(LEDPOS_CENT_R);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_R OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
 						diagOutFlag_LedCent_R = 1;			 
 						extLed.on(LEDPOS_CENT_R, iPara);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_R ON");
 					}
 					else
@@ -1015,14 +886,14 @@ void diagOutputTest(String _msg)
 					{
 						diagOutFlag_LedCent_G = 0;			 
 						extLed.off(LEDPOS_CENT_G);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_G OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
 						diagOutFlag_LedCent_G = 1;			 
 						extLed.on(LEDPOS_CENT_G, iPara);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_G ON");
 					}
 					else
@@ -1034,14 +905,14 @@ void diagOutputTest(String _msg)
 					{
 						diagOutFlag_LedCent_B = 0;			 
 						extLed.off(LEDPOS_CENT_B);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_B OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
 						diagOutFlag_LedCent_B = 1;			 
 						extLed.on(LEDPOS_CENT_B, iPara);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_B ON");
 					}
 					else
@@ -1055,16 +926,16 @@ void diagOutputTest(String _msg)
 						extLed.off(LEDPOS_CENT_R);		 
 						extLed.off(LEDPOS_CENT_G);		 
 						extLed.off(LEDPOS_CENT_B);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
 						diagOutFlag_LedCent_RGB = 1;
-						 
+
 						setRGBcolor(LEDPOS_CENT_RGB, iPara);				 
 						extLed.RGBon(LEDPOS_CENT_RGB, sRGB[LEDPOS_CENT_RGB].r, sRGB[LEDPOS_CENT_RGB].g, sRGB[LEDPOS_CENT_RGB].b);
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
 					}
 					else
@@ -1072,62 +943,56 @@ void diagOutputTest(String _msg)
 					}
 					break;  
 
-				 
 				case 5:
 					break;
-					
+
 				case 6: 
 					if(DAIG_OFF == iAct)
 					{
-						 
+
 						extLed.off(LEDPOS_BTM);		 
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
 					}
 					else if(DAIG_ON == iAct)
 					{
-						 
-						 
-						 
+
 						extLed.on(LEDPOS_BTM, iPara);
-						
+
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
 					}
 					else
 					{
 					}
 					break;  
-					
+
 				default: 
 					break;
 			}
 		}
 
-		 
 		else if( 3 == iCatNo )
 		{
 			diagOut_Cat3(_msg);
 		}
 
-		 
 		else if( 4 == iCatNo )
 		{
 		}
 
-		 
 		else if( 5 == iCatNo )
 		{
 			switch(iItemNo)
 			{
 				case 0 : 	 
-					 
+
 					LogPrintln(" LG] IOout Board_1 ALL OFF");
 					break;
-					
+
 				case 1 : 	 
 					if(DAIG_OFF == iAct)
 					{
-						 
+
 						subAcOff_WithOtherOff();
 					}
 					else if(DAIG_ON == iAct)
@@ -1137,10 +1002,10 @@ void diagOutputTest(String _msg)
 
 					else
 					{
-						 
+
 					}
 					break;
-					
+
 				default:
 					break;
 			}
@@ -1148,23 +1013,21 @@ void diagOutputTest(String _msg)
 
 		else
 		{
-			 
+
 		}
 }
 
- 
 void findDiagCode(String msg, stDiagCode code)
 {
 	code.catNo = msg.substring(3,5).toInt();	 
-												 
+
 	code.itemNo = msg.substring(6,8).toInt(); 	 
-	
+
 	code.act = msg.substring(8,9).toInt();		 
-	
+
 	code.para = msg.substring(9).toInt();		 
 }
 
- 
 int controlDiagInput(String msg)
 {
 	stDiagCode diag_code;		 
@@ -1172,17 +1035,12 @@ int controlDiagInput(String msg)
 
 }
 
- 
 int controlDiagOutput(String msg)
 {
 	stDiagCode diag_code;		 
 	findDiagCode(msg, diag_code);
-	
-	 
 
 }
-
-
 
 void diagOutAllOff()
 {
@@ -1190,14 +1048,6 @@ void diagOutAllOff()
 	bbnMotor.offBldc();
 }
 
-
-
-
-
- 
-
-
- 
 #define POWER_ON_WAIT		(DEF_PWRON_DELAY_TIME*1000)	 
 #define BOOTING_WAIT		(DEF_USB_SAFE_TIME*1000)	 
 #define FORCE_OFF_2MIN		(2*60*1000)				 
@@ -1217,27 +1067,25 @@ static unsigned long	g_TmBTM = 0;
 static unsigned int	g_PSON_Count = 0;
 static unsigned int	g_PSOF_Count = 0;
 static unsigned int	g_USB5V_Count = 0;
- 
+
 void subAcOff_WithOtherOff()
 {
 	subAC_Off();		 
-	 
+
 	ledOff_MbCent();
 	ledOff_MbBtm();
 	ledOff_OptLeft();
 	ledOff_OptRight();
 	g_RecvCmdCount = 0;
- 
+
 }
 
 int CheckAppCmd()
 {
- 
- 
- 
+
 	{
 		if ((g_RecvCmdCount > 2) && !checkTO(g_LastCmdTick, 4000)) {	 
- 
+
 			return 1;													 
 		}
 	}
@@ -1295,7 +1143,7 @@ void check_PowerSwitch_Change_10ms()
 		break;
 	case PS_ON_WAIT :		 
 		if (CheckPowerSwitch() == PWR_SW_OFF) {		 
-		 
+
 			extLed_AllOff();
 			extLed_controlOff();
 			pwrMode = PWR_OFF;						 
@@ -1381,6 +1229,3 @@ void check_PowerSwitch_Change_10ms()
 		SaveStatus = g_ProcStatus;
 	}
 }
-
-
- 

@@ -1,13 +1,11 @@
- 
+
 #include "../DF_Main_Internal.h"
 #include "DF_Main_CommandRouter.h"
-
-
 
 void analedContCmd(String msg)
 {
 	int lightReadFlag = 0;
-	
+
 	unsigned int pos;
 	unsigned int act;
 	unsigned int color;
@@ -25,20 +23,20 @@ void analedContCmd(String msg)
 	{
 		case 0:		 
 			ledCont[pos].cont = act;
-			
+
 			ledCont_OffStart(pos);
 			break;
-			
+
 		case 1:		 
 			ledCont[pos].cont = act;
 
 			color = msg.substring(5,(5+2)).toInt();
 			if(0> color) { color = 0; } if(14 < color) { color = 0; }  
 			ledCont[pos].colorNo = color;
-			
+
 			ledCont_OnStart(pos);
 			break;
-			
+
 		case 2:		 
 			ledCont[pos].cont = act; 
 
@@ -52,7 +50,7 @@ void analedContCmd(String msg)
 
 			ledCont_BlinkStart(pos);
 			break;
-			
+
 		case 3:		 
 			ledCont[pos].cont = act; 
 
@@ -83,13 +81,13 @@ void analedContCmd(String msg)
 			ledColorOrder[pos][7] = msg.substring(11,(11+1)).toInt();
 			ledColorOrder[pos][8] = msg.substring(12,(12+1)).toInt();
 			ledColorOrder[pos][9] = msg.substring(13,(13+1)).toInt();
-			 
+
 			break;
-			
+
 		case 8:			 
 			lightReadFlag=1;
 			break;
-		
+
 		case 9:			 
 			light = msg.substring(5).toInt();
 			if(  10 > light) { light = 10; }
@@ -97,9 +95,9 @@ void analedContCmd(String msg)
 			ledLight = light;			 
 			lightReadFlag=1;
 			break;
-			
+
 		default:
-			 
+
 			break;
 	}
 
@@ -114,18 +112,13 @@ void analedContCmd(String msg)
 	else
 	{
 	}
-	
+
 }
 
-
-
- 
- 
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime)
 {
 	String msg = "0";
 	int rts = 0;		 
-	 
 
 	switch(act)
 	{
@@ -133,12 +126,12 @@ void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int 
 		case 1:
 			msg = String(act);
 			break;
-		
+
 		case 2:
 		case 3:
 			rts = 1;
 			break;		 
-		
+
 		case 4:
 			msg = String(act);
 			if(99 < cnt){ cnt = 1;}	 
@@ -150,28 +143,24 @@ void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int 
 			if(999 < offtime) { offtime = 100;}
 			msg += fillZero2String3Char(offtime);
 			break;
-			
+
 		default:
 			rts = 1;
 			break;		 
 	}
 
-	 
 	if(rts)	 
 	{
-		 
+
 		LogPrintln(" lg] VrtMot CMD Error");
 	}
 	else
 	{
 		eNow.write(DF_Protocol_MainToRod_VerticalMotor,msg);
 	}
-	
+
 }
 
- 
- 
- 
 void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, unsigned int offtime)
 {
 	String msg = "00";
@@ -185,20 +174,19 @@ void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, 
 
 	msg = String(posi);
 	msg += String(act);
-	 
 
 	switch(act)
 	{
 		case 0:
 		case 1:
-			 
+
 			break;
-		
+
 		case 2:
 		case 3:
 			rts = 1;
 			break;		 
-		
+
 		case 4:
 			if(99 < cnt){ cnt = 5;}			 
 			if(9 < cnt) { msg += String(cnt); }			 
@@ -215,121 +203,58 @@ void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, 
 			break;		 
 	}
 
-	 
 	if(rts)	 
 	{
-		 
+
 		LogPrintln(" lg] BtnLED CMD Error");
 	}
 	else
 	{
 		eNow.write(DF_Protocol_MainToRod_ButtonLed,msg);
 	}
-	
+
 }
 
- 
-#define GMWAT_MIN	GMWAT_AP_INFO	 
- 
-#define GMWAT_AP_INFO	1
-#define GMWAT_PAY		3
-#define GMWAT_WIREHOME	4
-#define GMWAT_SELECT	5
-#define GMWAT_POINTMOVE	6
-#define GMWAT_WAVE		7
-#define GMWAT_BITE		8
-#define GMWAT_HOOK		9
-#define GMWAT_HIT		10
-#define GMWAT_FAIL		11
-#define GMWAT_FIGHT		12
-#define GMWAT_HOLDON	13
-#define GMWAT_HARDACT	14
-#define GMWAT_RANDING	15
-#define GMWAT_SUCCESS	16
-#define GMWAT_POINTUP	17
-#define GMWAT_TUTORIAL	18
-#define GMWAT_BONUS		19
-#define GMWAT_STAGECLR	20
-#define GMWAT_MALL		21
-#define GMWAT_CONTINUE	22
-#define GMWAT_OVER		23
- 
-#define GMWAT_MAX	(1+GMWAT_OVER)	 
- 
-
- 
-
-
- 
-
-
-static volatile short wireHome_Step=0;
-static volatile short wireHomeExe_Flag=0;
-
-
-
-
- 
- 
-byte nvm_fish_level = FISH_LVL_AUTO;
-
-
- 
-#define FIGHT_PTN_CW_CCW	1
-
-
-
- 
- 
- 
- 
- 
- 
 void anaDeviceInfoReq(String msg)
 {
-
 
 	String respMsg = "";
 
 	String strKind = msg.substring(3,(3+2));
-	 
 
 	int iKind = strKind.toInt();
-	
+
 	switch(iKind)
 	{
-		 
+
 		case NUM_MAIN_IF_VER:
 			respMsg = STX_INFO_REQ + MAIN_IF_VER + IfVer;
 			respMsg += "%";
 			Resp2ApPrintln(respMsg);
-			
+
 			LogPrintln(" LG] InfRq IF_Ver: " + IfVer);
 			break;
 
-		 
 		case NUM_ROD_BOARD_TYPE:
 			respMsg = STX_INFO_REQ + ROD_BOARD_TYPE;
 			respMsg += strRodBoardType;		 
 			respMsg += "%";
 			Resp2ApPrintln(respMsg);
-			
+
 			LogPrintln(" LG] InfRq ROD Board Type: " + strRodBoardType);
 			break;
 
-		 
 		case NUM_ROD_REGIST_TO_SEC:
 			respMsg = STX_INFO_REQ + ROD_REGIST_TO_SEC;
 			respMsg += String(ROD_REGI_CANCEL_TO/1000);	
 			respMsg += "%";
 			Resp2ApPrintln(respMsg);
-			
+
 			LogPrintln(" LG] InfRq ROD Regist Wait T/O Sec: " + respMsg);
 			break;
 
-		 
 		case NUM_IMU_INTVAL_TIME:		 
-			 
+
 			{
 				respMsg = STX_INFO_REQ + IMU_INTVAL_TIME + strImuInterval + "%";	 
 				Resp2ApPrintln(respMsg);
@@ -338,9 +263,8 @@ void anaDeviceInfoReq(String msg)
 			}
 			break;
 
-		 
 		case NUM_MAINMOT_INFO_READ:		 
-			 
+
 			{
 				respMsg = fsInfo.getInfo(MAINMOT_INFO);
 				respMsg = STX_INFO_REQ + MAINMOT_INFO_READ + respMsg + "%";	 
@@ -350,15 +274,15 @@ void anaDeviceInfoReq(String msg)
 			break;
 
 		case NUM_MAINMOT_INFO_SAVE:		 
-			 
+
 			{
 				short result = fsInfo.saveInfo(MAINMOT_INFO, msg.substring(5));
-				 
+
 				if(0 < result)	 
 				{
 					defaultTorqueMotor = msg.substring(5).toInt();
 				}
-				
+
 				respMsg = STX_INFO_REQ + MAINMOT_INFO_SAVE + ((0 < result)? String(defaultTorqueMotor): String(-1)) + "%";	 
 				Resp2ApPrintln(respMsg);
 
@@ -366,19 +290,17 @@ void anaDeviceInfoReq(String msg)
 			break;
 
 		case NUM_MAIN_BOARD_TYPE:		 
-			 
+
 			respMsg = STX_INFO_REQ + MAIN_BOARD_TYPE + strMainBoard[mainBoardType]+ "%";
 			Resp2ApPrintln(respMsg);
-			
+
 			break;
 
-
-		 
 		case NUM_BLDC_MOT_LIMIT_READ:		 
 			if(AP_IS_TM == apType)
 			{
 				respMsg = fsInfo.getInfo(BLDC_LIMIT_INFO);
-				 
+
 				respMsg = STX_INFO_REQ + BLDC_MOT_LIMIT_READ + respMsg + "%";	 
 				Resp2ApPrintln(respMsg);
 
@@ -390,18 +312,18 @@ void anaDeviceInfoReq(String msg)
 			{
 				short result;
 				short val = msg.substring(5).toInt();
-				 
+
 				if( (BLDC_LIMIT_MIN > val) || (BLDC_LIMIT_MAX < val) )
-				 
+
 				{
 					result = ERR_PARA_NG;	 
 				}
-				 
+
 				else
 				{
-				
+
 					result= fsInfo.saveInfo(BLDC_LIMIT_INFO, String(val));
-					 
+
 					if(0 < result)	 
 					{
 						bldcLimitVal = val;
@@ -413,24 +335,15 @@ void anaDeviceInfoReq(String msg)
 			}
 			break;
 
-
-		 
 		default:
 			Resp2ApPrintln(STX_INFO_REQ + strKind + "1%");	 
 			break;
 	}
 
-
 }
 
-
 #define AP_ALIVE_NOTRECV_TO	10		 
- 
- 
- 
- 
- 
- 
+
 void apAlive_Check()
 {
 	if( CONNECT == ap_conn_status)			 
@@ -449,39 +362,26 @@ void apAlive_Check()
 		}
 		else
 		{
-			 
-			 
+
 			ap_conn_status = DISCONNECT;	 
 			sendSleepEnable(SS_EXIT, TIME_SLEEP_DEEP, 1);
 			motor_AllOff();
 
 			reelOut_AllOff();
 
-
-		 
-		  	 
-		 
-		 
-
-			
 		}
 	}
 
-	 
 	else if( UNKNOWN == ap_conn_status)
 	{
-	
-	
+
 	}
 	else
 	{
-		 
+
 	}
 }
 
- 
- 
- 
 void send2RodAlive_CntCheck()
 {
 	int	CheckTime;
@@ -495,38 +395,30 @@ void send2RodAlive_CntCheck()
 		CheckTime = gRodSleepTime + 4;
 	}
 	else {
-		 
- 
+
 		eNow.write(DF_Protocol_MainToRod_Alive, String(gRodSleepMode));
 		CheckTime = ROD_RESP_OVER_CNT;
 	}
 
-	 
 	if(CheckTime > rodAlive_SendCnt)	 
 	{
-		 
+
 		rodAlive_SendCnt++;
 	}
 	else
 	{
-		 
+
 		rod_conn_status = (ROD_DISCONN);
 	}
 }
 
- 
- 
- 
-
 static unsigned int rodRegistToStep = 0;	 
 
- 
 void rodRegistToStop()
 {
 	rodRegistToStep = 0;	 
 }
 
- 
 void rodRegistToStart()
 {
 	rodRegistToStep = 10;	 
@@ -537,9 +429,6 @@ void rodRegi3secToStart()
 	rodRegistToStep = 30;	 
 }
 
- 
- 
- 
 void rodRegistToControl()
 {
 	static unsigned int oldStep = 0;
@@ -549,7 +438,7 @@ void rodRegistToControl()
 	{
 		case 0:
 			break;
-			
+
 		case 10:	 
 			setTO(_to);
 			rodRegistToStep = 11;
@@ -557,7 +446,7 @@ void rodRegistToControl()
 		case 11:
 			if(checkTO(_to, ROD_REGI_CANCEL_TO))
 			{
-				 
+
 				rodRegistCancel();		 
 				rodRegistToStep = 0;		 
 				StsSendPrintln(STX_ROD_REGIST + ROD_REGI_FW_CANCEL);  
@@ -581,25 +470,22 @@ void rodRegistToControl()
 			{
 				rodRegistToStep = 0;		 
 				rodRegistCancel();
-				 
-				 
+
 				esp_soft_reset();
-				 
+
 			}
 			break;
-			
+
 		default:
 			break;
 	}
 }
 
- 
 void rodRegistCancel()
 {
 	rodRegistMode = 0;
 }
 
- 
 void anaRodRegist(String msg)
 {
 	String respMsg;
@@ -609,8 +495,7 @@ void anaRodRegist(String msg)
 		case ROD_REGI_AP_ENTRY:		 
 			rodRegistMode = 1;
 			LogPrintln(" LG] RodRg ApMsg:" + String(Act));
-			 
-			 
+
 			rodRegistToStart();
 			break;
 		case ROD_REGI_AP_CANCEL:		 
@@ -619,54 +504,50 @@ void anaRodRegist(String msg)
 				rodRegistToStop();		 
 				rodRegistCancel();		 
 				LogPrintln(" LG] RodRg ApMsg:" + String(Act));
-				 
+
 			}
 			break;
 		default:
 			break;
 	}
-		
+
 }
 
- 
 void rodRegistExec(String msg)
 {
 	  rodRegistMode = 2;	   
-	   
+
 	  rodRegistToStop();
-	   
+
 	  StsSendPrintln(STX_ROD_REGIST+ ROD_REGI_WRITE_START);    
-	
-	   
+
 	  rodRegistMode = 3;	   
-	   
+
 	  int peerRet;
 	  peerRet = esp_now_del_peer(slave_board_addr);
 	  if (ESP_OK != peerRet)
 	  {
 		  LogPrintln(" LG] ERROR DEL PEER:" + String(peerRet));
 	  }
-	   
+
 	  peerRet = eNow.addPeerAddress(rcv_src_addr_back);    
 	  if (ESP_OK != peerRet)
 	  {
 		  LogPrintln(" LG] ERROR Add PEER: newROD" + String(peerRet));
 	  }
-	   
+
 	  rodRegistMode = 4;
-	   
+
 	  peerRet = eNow.addPeerAddress(broad_cast_addr);  
 	  if (ESP_OK != peerRet)
 	  {
 		  LogPrintln(" LG] ERROR Add PEER: BC" + String(peerRet));
 	  }
-	   
+
 	  String myAddr = eNow.getMyAddress();
 	  eNow.writeBC(DF_Protocol_MainToRod_MainAddress, myAddr);	   
 		  LogPrintln(" LG] Write Send:" + myAddr);
-	   
-	  
-	   
+
 	  peerRet = esp_now_del_peer(broad_cast_addr);
 	  if (ESP_OK != peerRet)
 	  {
@@ -675,37 +556,31 @@ void rodRegistExec(String msg)
 	  esp_now_peer_num_t rodPeer;
 	  esp_now_get_peer_num(&rodPeer);
 	  LogPrintln(" LG] nowPR PeerNum:" + String(rodPeer.total_num));
-	
-	   
+
 	  rodRegistMode = 5;
-	
-	   
+
 	  {
-		   
+
 		  bool errRet = eNow.setTargetAddress(msg);	   
 		  if(false == errRet)
 		  {
 			  LogPrintln(" LG] rodRg ERROR TRGT ADDR WRITE");
 		  }
 	  }
-	  
+
 	  String wrtAddr = eNow.getTargetAddress();
 	  LogPrintln(" LG] rodRg Addr:" + wrtAddr);
-	  
-	   
+
 	  rodRegistMode = 6;	   
 	  rodRegi3secToStart(); 	   
 
 }
 
-
- 
- 
 void tmInput_BoardElecMonitorExec(short _exec)
 {
 	if(AP_IS_TM == apType)
 	{
-		 
+
 		diagInFlag_BootSwc = _exec;		 
 		diagInFlag_PonSwc = _exec;		 
 		diagInFlag_PcUsb5V = _exec;		 
@@ -716,52 +591,41 @@ void tmInput_BbnMotorMonitorExec(short _exec)
 {
 	if(AP_IS_TM == apType)
 	{
-		 
+
 		diagInFlag_BobbinEncA = _exec;		 
 		diagInFlag_BobbinEncB = _exec;		 
 		diagInFlag_BbnBldcFG = _exec;			 
 	}
 }
 
-
- 
 void anaTmInputTestReq(String msg)
 {
-	 
+
 	diagInputTest(msg);
 }
 
- 
 void anaTmOutputTestReq(String msg)
 {
-	 
+
 	diagOutputTest(msg);
 }
 
- 
- 
- 
- 
 void anaApInfo(String msg)
 {
 
 	short kind = msg.substring(3,(3+2)).toInt();
 	short act = msg.substring(5,(5+2)).toInt();
-	
-	 
-	 
-	String send2rodMsg = msg.substring(3,(3+4));
 
+	String send2rodMsg = msg.substring(3,(3+4));
 
 	switch(kind)
 	{
-		 
+
 		case DEF_AP_TYPE:		 
 			apType = act;	 
 			dfMainAdcDiagnosticEnabled = 0;
 			eNow.write(DF_Protocol_MainToRod_ApInfo, send2rodMsg);
 
-			 
 			if(AP_IS_TM == apType)
 			{
 				String statusMsg = RESP_STX_ROD_CONN;
@@ -776,46 +640,31 @@ void anaApInfo(String msg)
 				statusMsg += (ROD_CONN == rod_conn_status) ? battLvlStr : String("-2");
 				StsSendPrintln(statusMsg + "%");
 			}
-			 
+
 			break;
 
 		default:
 			break;
 	}
-	
+
 }
-
- 
-
 
 void anaMainAlive(String msg)
 {
 
-	 
-	 
 	String respMsg;
 	respMsg = STX_MAINALIVE;  
 	respMsg += "%";
 	Resp2ApPrintln(respMsg);		   
-	  		
 
-	 
   	if( (2 > recvMainConn_Pwr1stCnt))	 
   	{
 		recvMainConn_Pwr1stCnt++;
  		sendCurrentStatus();
  	}
 
-	 
 	apAliveElse_NotRecvCnt = 0;
 	apAliveConn_NotRecvCnt = 0;		 
 	ap_conn_status = CONNECT;	 
-	
+
 }
- 
-
-
-
- 
- 
- 

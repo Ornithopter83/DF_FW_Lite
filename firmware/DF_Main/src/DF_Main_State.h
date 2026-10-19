@@ -1,6 +1,5 @@
 #pragma once
 
- 
 #define PWR_ON 1
 #define PWR_OFF 0
 #define SEND_NOW_STEP_TIME 10
@@ -24,12 +23,6 @@ enum
 extern int pwrMode;
 extern volatile int reelOut_AllOff_Flag;
 extern volatile int reelAlloffStep;
-
-
-
- 
-
-
 
 #include <Arduino.h>
 
@@ -117,7 +110,6 @@ extern ServoMotor sMotor;
 extern BobbinMotor bbnMotor;
 
 extern Encoder mainEnc;
-
 
 extern Led extLed;
 
@@ -248,7 +240,6 @@ extern String STX_BBN_MOTOR;
 extern String STX_BREAK_MOTOR;
 
 extern String STX_LED_CONT;
-
 
 extern String STX_IMU_SET;
 
@@ -603,34 +594,6 @@ extern int cntRightButtonOff;
 
 extern int rightBtnOnCount;
 
-extern int exeWave;
-
-extern int exeBite;
-
-extern int exeHit;
-
-extern int exeHit_1st;
-
-extern int exeResist;
-
-extern int exeFight;
-
-extern int exeHoldon;
-
-extern int exeHoldOff;
-
-extern int bitePtn_Flag;
-
-extern int exeBitePtn1flag;
-
-extern int exeBitePtn2flag;
-
-extern int exeBitePtn3flag;
-
-extern short holdOnPtnAll_Flag;
-
-extern short holdOnPtn1_Flag;
-
 extern int exeFastHoldOn;
 
 extern int exeFastHoldOff;
@@ -639,37 +602,13 @@ extern int exeButtonCombo;
 
 extern int exeButtonComboOff;
 
-extern int exeRanding;
-
-extern int exeSuccessFail;
-
-extern int exeContinue;
-
-extern int exeGameOver;
-
 extern int execContinue2Ready;
-
-extern int exeProgramEnd;
 
 extern int exeResistServoENB;
 
 extern int exeHoldonServoENB;
 
 extern int biteLogOut;
-
-extern int gameLevel;
-
-extern int gameStatus;
-
-extern int oldgameStatus;
-
-extern int fishTypeFixENB;
-
-extern int fishTypeAuto;
-
-extern int fishTypeFix;
-
-extern int waveControlCase;
 
 #define WAVE_NOT_CONT	0
 
@@ -680,8 +619,6 @@ extern int waveControlCase;
 #define WAVE_STRONG		3
 
 #define WAVE_MAX		4
-
-extern int waveType;
 
 typedef struct _stWaveServoSet
 {
@@ -737,7 +674,7 @@ typedef struct _biteTorqSet
 	int incInterval;
 	int decTorq;
 	int decInterval;
-	  
+
 	int shallowTorq;
 	int shallowInterval;
 	int deepTorq;
@@ -779,7 +716,7 @@ typedef struct _hitTorqSet
 
 	int holdonTorq;
 	int holdonInterval;
-	
+
 	int lowTorq;
 	int lowInterval;
 
@@ -1214,16 +1151,11 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define SNS_bbnEncB		BIT_7
 
-
-
-
 #define SNS_RSV11		BIT_11
 
 #define SNS_RSV12		BIT_12
 
-
 #define SNS_RSV14		BIT_14
-
 
 #define BIT_SNS_BOOT	0x0001
 
@@ -1247,11 +1179,6 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define BIT_SNS_ENCAB	(BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)
 
-
-
-
-
-
 #define SNS_ON		1
 
 #define SNS_OFF		0
@@ -1264,32 +1191,17 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define LVL01_BBNENCB	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
 
-
-
-
-
-
 #define LE01_BBNFG		(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNFG))
 
 #define LE01_BBNENCA	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCA))
 
 #define LE01_BBNENCB	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCB))
 
-
-
-
-
-
 #define TE01_BBNFG		(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 
 #define TE01_BBNENCA	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCA))
 
 #define TE01_BBNENCB	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCB))
-
-
-
-
-
 
 #define LVL10_BOOT		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BOOT))
 
@@ -1309,9 +1221,6 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define	LVL10_ENCAB		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_ENCAB))
 
-
-
-
 #define LVL10_LMMOTFG	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
 
 #define LVL10_LMENC		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMENC))
@@ -1322,21 +1231,11 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define LE10_PWROFF_SWC	(sensor10ms[SENSOR_1].le & (BIT_SNS_PWRSWC))
 
-
-
-
-
-
 #define TE10_BBNFG		(sensor10ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 
 #define TE10_USB5V		(sensor10ms[SENSOR_1].te & (BIT_SNS_USB5V))
 
 #define TE10_PWROFF_SWC	(sensor10ms[SENSOR_1].te & (BIT_SNS_PWRSWC))
-
-
-
-
-
 
 extern int recvPwrOffExec_Resp;
 
@@ -1354,47 +1253,11 @@ extern uint8_t broad_cast_addr[];
 
 extern volatile int rodRegistMode;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 extern short endTmReqDuty;
 
 extern short leftEndTmReqDuty;
 
 extern short rightEndTmReqDuty;
-
-
-
-
-
-
-
-
-
-
-
 
 typedef struct _motdutyTbl
 {
@@ -1436,12 +1299,7 @@ extern STLMOTDUTYTBL stLmReturnTbl;
 
 extern volatile int nvm01_home_stopWait_time;
 
-
-
-
-
 #define LM_START_WAIT_TIME 10
-
 
 #define LM_MOVE_ERR_TO_TIME		3000
 
@@ -1450,12 +1308,6 @@ extern volatile int nvm01_home_stopWait_time;
 extern short fishLevel;
 
 extern short rcvlmPwr;
-
-
-
-
-
-
 
 extern short fishPwr;
 
@@ -1495,7 +1347,6 @@ extern volatile unsigned int oldcurrWirePulse;
 
 #define DF_CONFIG_STAND_ALONE	1
 
-
 extern short dfConfig;
 
 extern unsigned short apType;
@@ -1513,11 +1364,7 @@ extern unsigned short devCheckBbnEncFlag;
 
 extern unsigned short devCheckTorqFlag;
 
-
 extern unsigned short devCheckBldc24VFlag;
-
-extern unsigned short mainMotAutoSet_Flag;
-
 
 extern unsigned short devBbnAllChkStep;
 
@@ -1527,17 +1374,13 @@ extern unsigned short devBbnEncChkStep;
 
 extern unsigned short devTorqChkStep;
 
-
 extern unsigned short devBldc24VChkStep;
 
 extern unsigned short mainMotAutoSet_Step;
 
-
 extern unsigned short devChkErrOccure;
 
 extern unsigned short stbyTorqOffControl_Req_Flag;
-
-extern unsigned short stbyTorqOffControl_Flag;
 
 extern unsigned short stbyTorqOffControlStep;
 
@@ -1618,9 +1461,6 @@ extern int g_ProcPtr;
 
 extern unsigned char g_readBuf[MAX_SAVE_LEN];
 
-
-
-
 extern volatile unsigned int g_idleCountCore0;
 
 #define	MAX_IDLE_CORE	11893125
@@ -1674,7 +1514,6 @@ int GetDefValue4torqMotor();
 void servoDefault();
 
 void bbnBldcOff();
-
 
 void breakMotorOff();
 

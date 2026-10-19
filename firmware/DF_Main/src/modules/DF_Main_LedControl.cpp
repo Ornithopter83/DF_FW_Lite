@@ -1,11 +1,10 @@
- 
+
 #include "../DF_Main_Internal.h"
 #include "DF_Main_LedControl.h"
 void initSet_LedContVal(int Act)
 {
 	int i=0;
 
-	 
 	memset(ledCont, 0, sizeof(ledCont));
 	for(i=0; i<LED_IDX_MAX; i++)
 	{
@@ -26,7 +25,6 @@ void initSet_LedContVal(int Act)
 		ledCont[i].rsv_e = 		initledCont[i].rsv_e;
 	}
 
-	 
 	for(i=LED_IDX_CENT; i<LED_IDX_MAX; i++)
 	{
 		switch(ledCont[i].cont)
@@ -46,34 +44,29 @@ void initSet_LedContVal(int Act)
 		}
 	}
 
-	 
 	ledControlMode = 1;
-	 
+
 	ledLight = 100;	 
-	
+
 }
 
- 
 void ledCont_OffStart(unsigned int pos)
 {
 	if(0==pos) { return;}
-	
-	 
+
 	ledCont[pos].bStep = 0;
 	ledCont[pos].dStep = 0;
-	 
+
 	extLed.off(pos+2);
 }
 
 void ledCont_OnStart(unsigned int pos)
 {
 	if(0==pos) { return;}
-	
-	 
+
 	ledCont[pos].bStep = 0;
 	ledCont[pos].dStep = 0;
 
-	 
 	if(LED_IDX_CENT == pos)
 	{
 		setRGBcolor(pos, (int)ledCont[pos].colorNo);
@@ -83,40 +76,32 @@ void ledCont_OnStart(unsigned int pos)
 	{
 		extLed.on(pos+2, (int)LED_MAX_DUTY);
 	}
-	 
+
 }
 
 void ledCont_BlinkStart(unsigned int pos)
 {
 	if(0==pos) { return;}
-	
-	 
+
 	ledCont[pos].dStep = 0;
 
-	 
 	setRGBcolor((int)pos, (int)ledCont[pos].colorNo );
 
-	 
 	ledCont[pos].bStep = 10;	 
 }
 
-
- 
- 
- 
 void execledCont_Blink(int pos)
 {
 	static unsigned long _to[LED_IDX_MAX] ={0,0,0,0,0};
 	static unsigned int _oldStep[LED_IDX_MAX] = {0,0,0,0,0};
-	 
 
 	switch(ledCont[pos].bStep)
 	{
 		case 0:	 
 			break;
-			
+
 		case 10:	 
-			 
+
 			if(LED_IDX_CENT == pos)
 			{
 				extLed.RGBon((pos+2), sRGB[pos].r, sRGB[pos].g, sRGB[pos].b );
@@ -135,22 +120,21 @@ void execledCont_Blink(int pos)
 				ledCont[pos].bStep = 20;
 			}
 			break;
-			
+
 		case 20:		 
 			extLed.off(pos+2);
-			
+
 			setTO(_to[pos]);
 			ledCont[pos].bStep = 21;	 
-			
+
 			break;
-			
+
 		case 21:	 
 			if(checkTO(_to[pos], ledCont[pos].bTime))
 			{
 				ledCont[pos].bStep = 10;
 			}
 			break;
-			
 
 		case 30:
 			break;
@@ -159,22 +143,18 @@ void execledCont_Blink(int pos)
 
 		case 90:
 			break;
-			
+
 		default:
 			break;
 	}
 }
 
- 
 void ledCont_DimmStart(unsigned int pos)
 {
 	if(0==pos) { return;}
-	
-	 
+
 	ledCont[pos].bStep = 0;
 
-	 
-	 
 	if(7 > ledCont[pos].colorMany)
 	{
 		ledCont[pos].dColorCnt = COLOR_RED;				 
@@ -186,25 +166,20 @@ void ledCont_DimmStart(unsigned int pos)
 	ledCont[pos].dReqCnt = (ledCont[pos].dTime/LED_CONTROL_10MS/2);	 
 	setRGBcolor((int)pos, (int)ledCont[pos].dColorCnt );
 
-	 
 	ledCont[pos].dStep = 10;	 
 }
 
-
- 
- 
 void execledCont_Dimm(int pos)
 {
 	static unsigned long _to[LED_IDX_MAX] ={ 0,0,0,0,0 };
 	static unsigned int _oldStep[LED_IDX_MAX] = { 0,0,0,0,0 };
 	static unsigned int _cnt[LED_IDX_MAX] = { 0,0,0,0,0 };
-	 
-	
+
 	switch(ledCont[pos].dStep)
 	{
 		case 0:  
 			break;
-				
+
 		case 10:	 
 			if(LED_IDX_BTM == pos)
 			{
@@ -213,14 +188,14 @@ void execledCont_Dimm(int pos)
 			else
 			{
 				setRGBcolor(pos, ledCont[pos].dColorCnt);	 
-				 
+
 			}
-			 
+
 			_cnt[pos] = 0;
 			ledCont[pos].dStep = 20;
-			 
+
 			break;
-			
+
 		case 20:		 
 			_cnt[pos]++;
 			if(_cnt[pos] > ledCont[pos].dReqCnt)
@@ -288,19 +263,16 @@ void execledCont_Dimm(int pos)
 
 		case 50:
 			break;
-			
+
 		default:
 			break;
 	}
 
 }
 
- 
- 
-
 unsigned int ext_led_dim_step = 10;
 static unsigned int old_ext_led_dim_step = 0x00;
- 
+
 static unsigned long tot_time = 0;
 unsigned int cnt = 0;
 unsigned int reqCnt = 0;
@@ -310,19 +282,14 @@ static unsigned int outCnt = 0;
 static unsigned int bDuty = (LED_MAX_DUTY*10);
 static unsigned int updownStep = (1*10);
 
- 
- 
- 
 void old_execCentLed_Dimming_Control(int color, int sec)
 {
-
-	 
 
 	switch(ext_led_dim_step)
 	{
 		case 0:	 
 			break;
-			
+
 		case 10:	 
 			reqCnt = (sec * 1000) / 2 / 10;	 
 			loopCnt = (reqCnt+128)/256;  
@@ -330,7 +297,7 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 			{
 				loopCnt = 1;
 			}
-			
+
 			if(256 > reqCnt)
 			{
 				updownStep = (256*10)/reqCnt;
@@ -339,17 +306,15 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 			{
 				updownStep = (1*10);
 			}
-			
-			bDuty = (0*10);
 
-			 
+			bDuty = (0*10);
 
 			ledOut(LED_CENT_R_PIN, 0);
 			ledOut(LED_CENT_G_PIN, 0);
 			ledOut(LED_CENT_B_PIN, bDuty);	 
 			ext_led_dim_step = 20;
 			break;
-			
+
 		case 20:		 
 			bDuty += updownStep ;
 			if((LED_MAX_DUTY*10) < bDuty)		 
@@ -364,7 +329,7 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 			}
 			ledOut(LED_CENT_B_PIN, (bDuty/10));  
 			break;
-			
+
 		case 21:
 			outCnt++;
 			if( !(outCnt % loopCnt) )
@@ -382,7 +347,7 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 				}
 			}
 			break;
-			
+
 		case 29:
 			outCnt++;
 			if(outCnt > ledoffHoldTimeCnt)
@@ -392,7 +357,7 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 				ext_led_dim_step = 30;
 			}
 			break;
-			
+
 		case 30:		 
 			bDuty -= updownStep;
 			if((0*10) > bDuty)		 
@@ -407,7 +372,7 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 			}
 			ledOut(LED_CENT_B_PIN, (bDuty/10));	 
 			break;
-			
+
 		case 31:
 			outCnt++;
 			if( !(outCnt % loopCnt) )
@@ -434,15 +399,12 @@ void old_execCentLed_Dimming_Control(int color, int sec)
 				ext_led_dim_step = 20;
 			}
 			break;
-			
+
 		default:
 			break;
 	}
 }
 
-
-
- 
 void extLed_Off(unsigned int idx)
 {
 	switch(idx)
@@ -455,66 +417,46 @@ void extLed_Off(unsigned int idx)
 		case LED_IDX_LEFT:
 		case LED_IDX_RIGHT:
 			break;
-		
+
 		default:
 			break;
 	}
 }
 
- 
- 
 void extLed_On(unsigned int idx)
 {
 	unsigned int color;
-	
+
 	switch(idx)
 	{
 		case LED_IDX_CENT:
-			 
+
 			color = ledCont[idx].colorNo;
 			if(COLOR_MAGENTA < color) { color = COLOR_WHITE; }	 
 			setRGBcolor((int)idx, (int)color);
 			extLed.RGBon((idx+2), sRGB[idx].r, sRGB[idx].g, sRGB[idx].b);
 			break;
-		
+
 		case LED_IDX_BTM:
 			extLed.on((idx+2), (int)LED_MAX_DUTY);	 
 			break;
-		
+
 		case LED_IDX_LEFT:
 		case LED_IDX_RIGHT:
 			break;
-			
+
 		default:
 			break;
 	}
 }
 
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
- 
- 
 void extLed_Control() 
 {
 	unsigned int pos=0;
-	 
+
 	if(PWR_ON == pwrMode)
 	{
-		
-		 
+
 		if(ledControlMode)
 		{
 
@@ -522,14 +464,14 @@ void extLed_Control()
 			{
 				if(LED_CON_BLINK == ledCont[pos].cont)		 
 				{
-					 
+
 					execledCont_Blink(pos);
 				}
 				else if(LED_CON_DIMM == ledCont[pos].cont)	 
 				{
-					 
+
 					{
-						 
+
 						execledCont_Dimm(pos);		 
 					}
 				}
@@ -549,7 +491,7 @@ void extLed_Control()
 					}
 					else
 					{
-						 
+
 					}
 				}
 			}
@@ -557,10 +499,3 @@ void extLed_Control()
 	}
 
 }
-
- 
- 
- 
- 
-
- 

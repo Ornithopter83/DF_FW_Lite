@@ -1,9 +1,5 @@
- 
-#include <Arduino.h>
- 
- 
- 
 
+#include <Arduino.h>
 
 #include "Common.h"
 #include "DF_Main.h"
@@ -20,9 +16,6 @@
 #include <Update.h>
 #include <FreeRTOSConfig.h>
 
- 
-
- 
 String strMainBoard[10] =
 {
 	"",				 
@@ -30,7 +23,6 @@ String strMainBoard[10] =
 	"MBD_V11",		 
 };
 
- 
 typedef struct _ledCont
 {
 	unsigned int oldcont;			 
@@ -47,17 +39,14 @@ typedef struct _ledCont
 }stLedCont;
 typedef stLedCont *ptrLedCont;
 
- 
 #define LED_CONTROL_10MS	10
 #define LED_CONTROL_20MS	20
 #define LED_CONTROL_50MS	50
 
-
- 
 extern const stLedCont initledCont[LED_IDX_MAX] =
 {
 	{0, },								 
-	 
+
 	{ 3, 3, 	3, 		6, 		500,	3000, 	0,	0,	1,	(3000/2/LED_CONTROL_10MS), 0	},	 
 	{ 1, 1, 	3, 		1, 		500, 	3000, 	0,	0,	3,	(3000/2/LED_CONTROL_10MS), 0	},	 
 	{ 0, 0, 	3, 		1, 		500, 	3000,	0,	0,	0,	(3000/2/LED_CONTROL_10MS), 0	},	 
@@ -71,7 +60,7 @@ unsigned int ledLight=100;
 unsigned int ledDimmHoldTime[LED_IDX_MAX] = 	 
 { 
 	10,		 
-	 
+
 	10,		 
 	10,		 
 	10,		 
@@ -82,17 +71,13 @@ unsigned int ledDimmHoldTime[LED_IDX_MAX] =
 unsigned int ledColorOrder[LED_IDX_MAX][COLOR_ORDER] = 
 {
 	{0,},
-	 
+
 	{0,1,2,3,4,5,6,7,8,9},		 
 	{0,1,2,3,4,5,6,7,8,9},		 
 	{0,1,2,3,4,5,6,7,8,9},		 
 	{0,1,2,3,4,5,6,7,8,9},		 
 };
- 
 
- 
-
- 
 typedef struct _diagCode
 {
 	int catNo;			 
@@ -102,8 +87,6 @@ typedef struct _diagCode
 }stDiagCode;
 typedef stDiagCode *ptrDiagCode;
 
-
- 
 ENow eNow;
 Potentiometer torqMotor;		 
 
@@ -111,40 +94,25 @@ ServoMotor sMotor;
 
 BobbinMotor bbnMotor;					 
 Encoder mainEnc;				 
- 
-
- 
 
 Led extLed;		 
 
 Eeprom eNvm;
 
- 
-
 FileSys fsInfo;	 
 
- 
-
- 
- 
-
 String eulerStr;
- 
+
 String battLvlStr = "-1";			 
- 
 
 int ibatteryLvl = UNKNOWN;			 
 int oldibatteryLvl = UNKNOWN;		 
 int ibatChargeLvl = UNKNOWN;		 
 
- 
- 
 #define ERR_OK		0
 #define ERR_CW		-1
 #define ERR_CCW		-2
 
- 
- 
 #define ERR_NG			-1
 #define ERR_FAIL			ERR_NG
 #define ERR_RETRY_OVER		ERR_NG
@@ -161,28 +129,14 @@ int ibatChargeLvl = UNKNOWN;
 #define ERR_FS_WRITE	-7
 #define ERR_FW_CAL_NG	-8
 
- 
- 
 #define STR_ERR_OK			"00"
 #define STR_ERR_NG			"-1"
 #define STR_ERR_FAIL		STR_ERR_NG
 #define STR_ERR_RANGE_OVER	"-2"
 #define STR_ERR_PARA_NG		"-3"
 
-
- 
-
-
-
-
-
-
- 
- 
- 
- 
 String STX_MAINALIVE       = "$00";
- 
+
 String STX_INFO_REQ        = "$01";
 	#define MAIN_IF_VER			"00"
 	#define NUM_MAIN_IF_VER		0
@@ -219,7 +173,6 @@ String STX_INFO_REQ        = "$01";
 	#define NUM_BLDC_MOT_LIMIT_READ		13
 	#define BLDC_MOT_LIMIT_WRITE		"14"			 
 	#define NUM_BLDC_MOT_LIMIT_WRITE	14
-	
 
 String STX_TORQUE_MOTOR   = "$02";
 String STX_SERVO_MOTOR    = "$03";
@@ -232,7 +185,6 @@ String STX_LED_CONT			= "$06";
 String STX_IMU_SET			= "$08";
 
 String STX_IMU_DATA_STS		= "$09";
-
 
 String STX_VER_READ       = "$10";		 
 String STX_GAME_STS       = "$11";		 
@@ -260,7 +212,7 @@ String STX_BTN_LED_CONT      = "$24";
 	#define BTN_LED_LEFT_POSI	1
 	#define BTN_LED_RIGHT_POSI	2
 	#define BTN_LED_LAST_POSI	BTN_LED_RIGHT_POSI		 
-	
+
 String STX_GAME_STS_WAT     = "$25";		 
 	#define GAME_xxx	0
 
@@ -274,24 +226,22 @@ String STX_AP_INFO_SEND     = "$29";
 	#define DEF_AP_TYPE		1			 
 
 String STX_ROD_REGIST		="$30";			 
-	 
+
 	#define ROD_REGI_AP_ENTRY	1
 	#define ROD_REGI_AP_CANCEL	2
-	 
+
 	#define ROD_REGI_FW_CANCEL		"03%"
 	#define ROD_REGI_WRITE_START	"04%"
 	#define ROD_REGI_FINISH			"05%"
 
- 
 String STX_DEV_CHK_ERR_LOG	= "$89";		 
 
 String STX_DEV_FUNCTION_REQ	= "$98";		 
 	#define STR_WIRE_AGING_TEST		"01"
 	#define NUM_WIRE_AGING_TEST		01
-	
 
 String STX_DATA_PARA_SET	= "$99";		 
-	
+
 String STX_DIAG_INPUT		= "$DI";		 
 String STX_DIAG_OUTPUT		= "$DO";		 
 String STX_DIAG_FUNC		= "$DF";		 
@@ -316,10 +266,6 @@ String STX_ENB_SET        = "$FF";
 
 String STX_TEST_EXEC      = "$TE";		 
 
-
-
- 
- 
 String OLD_RESP_STX_BUTTON      = "$06";
 String OLD_RESP_STX_ENCODER     = "$07";
 String RESP_STX_BUTTON          = "$13";
@@ -327,7 +273,7 @@ String RESP_STX_ENCODER         = "$14";
 String STS_APSTS_REQ         	= "$18";
 
 String RESP_STX_ROD_CONN		= "$20";
- 
+
 String RESP_STX_IMU_CONNECT     = "$21";
 String RESP_STX_BATTERY_DIAG    = "$31";
 	#define RESP_IMU_FULLSTR_CONN		"$2101%"
@@ -335,10 +281,6 @@ String RESP_STX_BATTERY_DIAG    = "$31";
 
 String STS_PWRON_STS         	= "$22";			 
 
- 
-
- 
- 
 #define STX_CMD_MAINALIVE			0
 #define STX_CMD_INFO_REQ			1
 #define STX_CMD_TORQUE_MOTOR		2
@@ -371,33 +313,16 @@ String STS_PWRON_STS         	= "$22";
 #define STX_CMD_ROD_REGIST			30		 
 #define STX_STS_ROD_REGIST			30		 
 
-
- 
 #define ROD_REGI_CANCEL_TO		(25*1000)	 
 #define ROD_REGI_END_TO_1ST		(1500)	 
 #define ROD_REGI_END_TO_2ND		(4000)	 
 
-
- 
-
-
- 
- 
- 
 #define DEF_STX_GET_ADDR     16
 
-
-
- 
-
- 
 String STATE_DISABLE   = "00000000";		 
 String STATE_WAITING   = "00000000";		 
 String STATE_ENABLE    = "11111111";		 
 String STATE_READY     = "22222222";		 
-
-
- 
 
 #define STATE_CONN_UNKNOWN     "-1";		 
 
@@ -408,17 +333,9 @@ String STATE_READY     = "22222222";
 #define STATE_DISCONN_SLEEP    "88";
 #define STATE_DISCONN_MAC      "99";
 
-
 #define IMU_CONN_2CHAR_INT 11
 
-
-
- 
-
 bool isGameEnable = false;				 
- 
-
- 
 
 #define STR_BOOTINFO_DEFAULT	"06028"	 
 #define	DEF_PWRON_DELAY_TIME	60
@@ -431,42 +348,26 @@ unsigned long	g_LastCmdTick;
 int				g_SerialEnable=0;		 
 int				g_ResetReason=-1;		 
 int				g_AutoReboot=0;			 
- 
- 
 
-
- 
- 
- 
 unsigned short mainBoardType = MAIN_BOARD_V10;	 
 unsigned short mainBoardTypedData = 0;	 
 
-
- 
 #define ROD_BOARD_V1	0
 #define ROD_BOARD_V2	1
 unsigned short rodBoardType = ROD_BOARD_V2;	 
 
 String strRodBoardType = "001";		 
 
-
- 
 int ap_conn_status = UNKNOWN;
 int old_ap_conn_status = UNKNOWN;
 unsigned int apAliveConn_NotRecvCnt = 0;		 
 unsigned int apAliveElse_NotRecvCnt = 0;		 
-
- 
-
 
 int rod_conn_status = ROD_UNKNOWN;
 int old_rod_conn_status = ROD_UNKNOWN;
 
 String g_RespVersion = "";						 
 
- 
-
- 
 bool isPowerOnReady = false;
 
 unsigned long curr_ms_tick = 0;			 
@@ -487,12 +388,9 @@ unsigned int sys_count_500ms = 0;
 unsigned int sys_count_1sec = 0;
 unsigned int sys_count_5sec = 0;
 
-
 #define TO_1MS_TICK 1
 #define TO_10MS_TICK 10
 #define TO_100MS_TICK 100
-
- 
 
 #define setTO(var) (var = curr_ms_tick)				 
 #define getTO(var) ( (curr_ms_tick < var)? (0xFFFFFFFF - var + curr_ms_tick + 1 ) :  (curr_ms_tick - var) )
@@ -501,8 +399,6 @@ unsigned int sys_count_5sec = 0;
 #define setLmEnc(var) (var = mainEnc.lmCnt)
 #define checkLmEnc(var,TO) (TO < (mainEnc.lmCnt - var))
 
-
- 
 int reqServoMotor = 2;
 int oldServoMotor = -1;
 int absReqServoMotor = 2;
@@ -516,7 +412,6 @@ int oldBreakMotor = 0;
 long reqImuMeasFlag = 0;			 
 long oldImuMeasFlag = 0;
 
- 
 short defaultTorqueMotor = DEFAULT_TORQ;
 short bldcLimitVal = BLDC_LIMIT_MIN;
 
@@ -524,78 +419,23 @@ int cntRightButtonOn = 0;
 int cntRightButtonOff = 0;		 
 int rightBtnOnCount = 0;		 
 
-int exeWave = 0;
-int exeBite = 0;
-int exeHit = 0;				 
-int exeHit_1st = 0;			 
-int exeResist = 0;
-int exeFight = 0;		 
-int exeHoldon = 0;		 
-int exeHoldOff = 0;
-
- 
-int bitePtn_Flag = 0;		 
-int exeBitePtn1flag = 0;		 
-int exeBitePtn2flag = 0;		 
-int exeBitePtn3flag = 0;		 
-
- 
-short holdOnPtnAll_Flag = 0;		 
-short holdOnPtn1_Flag = 0;		 
-
- 
 int exeFastHoldOn = 0;
 int exeFastHoldOff = 0;
 int exeButtonCombo = 0;
 int exeButtonComboOff = 0;
- 
-int exeRanding = 0;
-int exeSuccessFail = 0;
-int exeContinue = 0;
-int exeGameOver = 0;
 
 int execContinue2Ready = 0;
 
-int exeProgramEnd = 0;
-
- 
- 
 int exeResistServoENB = 0;		 
 int exeHoldonServoENB = 1;		 
 
 int biteLogOut = 1;
 
-int gameLevel = 2;				 
-
-int gameStatus = PROG_END;
-int oldgameStatus = -1;
-
-int fishTypeFixENB = 0;		 
-int fishTypeAuto = 3;	 
-int fishTypeFix = 3;		 
- 
-
-
- 
- 
- 
- 
- 
- 
- 
-int waveControlCase = 5;  
-
- 
- 
- 
- 
- 
 #define WAVE_NOT_CONT	0
 #define WAVE_WEAK		1
 #define WAVE_NORMAL		2
 #define WAVE_STRONG		3
 #define WAVE_MAX		4
-int waveType = WAVE_WEAK;				 
 
 typedef struct _stWaveServoSet
 {
@@ -604,15 +444,10 @@ typedef struct _stWaveServoSet
 	int interval;
 }stWaveServoSet;
 
- 
- 
- 
- 
 stWaveServoSet stWaveServoVal = { -10, 10, 1500 };
 
 #define WAVE_PWR_MAX	(1+12)		 
 
- 
 typedef struct _stWaveTorqSet
 {
 	int rtTorq;			 
@@ -625,16 +460,9 @@ typedef struct _stWaveTorqSet
 
 typedef stWaveTorqSet *stWavePtr;
 
- 
- 
- 
- 
-
- 
- 
 stWaveTorqSet stWaveTorqVal = { 
 	DEFAULT_TORQ-20, DEFAULT_TORQ, 900, 1100,		 
-	
+
 	0,							 
 	DEFAULT_TORQ-4, 			 
 	DEFAULT_TORQ,
@@ -650,13 +478,11 @@ stWaveTorqSet stWaveTorqVal = {
 	90																		 
 	};
 
- 
-
 #define DEFAULT_BBN		9		 
 
 stWaveTorqSet stWaveBdutyVal = {
 	9, 9 , 400, 1700, 				 
-	
+
 	0,							 
 	DEFAULT_BBN,			 
 	DEFAULT_BBN+(2*1), 
@@ -667,7 +493,6 @@ stWaveTorqSet stWaveBdutyVal = {
 	15, 15					 
 	};	 
 
- 
 typedef struct _stWavePower
 {
 	unsigned int pwr[WAVE_PWR_MAX];
@@ -675,7 +500,7 @@ typedef struct _stWavePower
 typedef stWavePower *stWavePwrPtr;
 stWavePower stWavePwrBbn = {
 	0, 			 
- 
+
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*0),  
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*1),  
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*2),  
@@ -686,15 +511,11 @@ stWavePower stWavePwrBbn = {
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*5),  
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*5),  
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*5),  
- 
+
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*5),  
 	DEFAULT_BBN_PWR+(WAVE_ADD_BBN_PWR*5),  
 	};
 
-
- 
-
- 
 int biteTestCase = 2;		 
 int biteTorqCase = 3;	 
 int biteCnt = 3;		 
@@ -708,7 +529,7 @@ typedef struct _biteTorqSet
 	int incInterval;
 	int decTorq;
 	int decInterval;
-	 
+
 	int shallowTorq;
 	int shallowInterval;
 	int deepTorq;
@@ -717,31 +538,20 @@ typedef struct _biteTorqSet
   	int torqType[1+8];	 
 }biteTorqSet;
 
-
 #define DEEP_ADD_TORQ	25
 #define DEEP_STEP_TORQ	6
- 
- 
- 
- 
- 
- 
- 
+
 biteTorqSet stBiteTorqVal = 
 { 
-	 
 
-	 
 	DEFAULT_TORQ+30, 700,	  
 	 15, 200,	 
 	 15, 200,	 
-	 
-	 
+
 	DEFAULT_TORQ+20, 500,	 
-	 
-	 
+
 	DEFAULT_TORQ+40, 1500,	 
-	
+
 	DEFAULT_TORQ,			 
 	DEFAULT_TORQ+DEEP_ADD_TORQ+(DEEP_STEP_TORQ*0),	 
 	DEFAULT_TORQ+DEEP_ADD_TORQ+(DEEP_STEP_TORQ*1), 
@@ -764,10 +574,7 @@ biteTorqSet stBiteTorqVal =
 #define HIT_END_TORQ    DEFAULT_TORQ+20		 
 
 #define BITE_WAIT_TIME	300  
- 
 
-
- 
 int hitServoAngle = 10;			 
 int hitServoInterval = 200;		 
 
@@ -780,7 +587,7 @@ typedef struct _hitTorqSet
 
 	int holdonTorq;
 	int holdonInterval;
-	
+
 	int lowTorq;
 	int lowInterval;
 
@@ -796,12 +603,12 @@ typedef struct _hitTorqSet
 hitTorqSet stHitTorqVal = 
 { 
 	 DEFAULT_TORQ+10, 1500,		 
-	  
+
 	 DEFAULT_TORQ+20, 1000,		 
 
 	 DEFAULT_TORQ,	  1000,		 
 	 DEFAULT_TORQ+15, 1500,		 
-		
+
 	0,				 
 	DEFAULT_TORQ + (HIT_TORQ_STEP_VAL*0),
 	DEFAULT_TORQ + (HIT_TORQ_STEP_VAL*1),
@@ -815,15 +622,11 @@ hitTorqSet stHitTorqVal =
 	DEFAULT_TORQ + (HIT_TORQ_STEP_VAL*9),
 	DEFAULT_TORQ + (HIT_TORQ_STEP_VAL*10),
 	DEFAULT_TORQ + (HIT_TORQ_STEP_VAL*11),		
-	 
+
 };
 
 #define HIT_WAIT_TIME	50  
 
-	
- 
-
- 
 typedef struct _stBreakSet
 {
 	int val[9];
@@ -831,7 +634,7 @@ typedef struct _stBreakSet
 
 stBreakSet stBreakVal[1+3] =
 {
-	 
+
 	{0, },											 
 	{0,     215, 220, 225, 230, 235, 240, 245, 245 }, 	 
 	{0,		205, 210, 215, 220, 225, 230, 235, 235 },		 
@@ -844,18 +647,10 @@ int outBreakVal = 100;
 
 int decBreakCnt = 0;
 
-
- 
-
- 
 long lpCnt = 0;
 
-
- 
 int DiagInMonitor = 0;
 
-
- 
 int diagInFlag_ResetSwc = 0;
 int diagInFlag_BootSwc = 0;
 int diagInFlag_WdtLbSig = 0;
@@ -871,10 +666,6 @@ int diagInFlag_PonSwc = 0;
 int diagInFlag_PcUsb5V = 0;
 int diagInFlag_Interlock = 0;
 
-
-
-
- 
 int sensorResetSwc = 0;
 int oldsensorResetSwc = 0;
 int sensorBootSwc = 1;
@@ -905,9 +696,8 @@ int oldsensorUsb5V = 0;
 int sensorDoorIlk = 0;
 int oldsensorDoorIlk = 0;
 
- 
 #define DIAG_SEN_XXX	0
- 
+
 #define DIAG_SEN_LS01	7
 #define DIAG_SEN_LS02	8
 #define DIAG_SEN_LS03	9
@@ -930,9 +720,6 @@ STDIAGSEN stDiagSen[SEN_MAX_SIZE];
 
 unsigned int oldDiaglmEncPulse = 0;
 
-
- 
-
 int diagOutFlag_WDToff = 0;
 
 int diagOutFlag_LedCent_R = 0;
@@ -951,15 +738,9 @@ unsigned long bbnTokTok_OnTime = 200;
 int bbnTokTok_OffDuty = 0;			 
 unsigned long bbnTokTok_OffTime = 200;		 
 
-
-
- 
 int continueTorq = DEFAULT_TORQ;  
 int currTorq = DEFAULT_TORQ;  
 int oldTorq = DEFAULT_TORQ;  
-
- 
-
 
 int rdy_outTorq		= DEFAULT_TORQ;  
 int rdy_eachTime	= 1000;			 
@@ -967,16 +748,12 @@ int rdy_cnt			= 0;
 int rdy_incTorq		= 10;
 int rdy_reqCnt		= 0;
 
- 
 int		gLevel	= 1;
 int		gZone	= 1;
 int		gStage	= 1;
 String	rdyMsg;
 
- 
 int recvMainConn_Pwr1stCnt = 0;
-
- 
 
 typedef struct _paraCheck
 {
@@ -989,15 +766,13 @@ typedef struct _paraCheck
 #define GAME_STS_LVL	11
 #define MAX_PARA_CNT	20
 
- 
 stParaCheck paraCheck[MAX_PARA_CNT] =
 {
-    
+
 	{ 0, 			},	 
    	{ 1,			},	 
-   	
+
 	{ GAME_STS_LVL,	1,	3	},	 
-	
 
 };
 
@@ -1006,12 +781,10 @@ int oldmainMode = 0;
 
 int ledControlMode = 1;	 
 
- 
 unsigned int bbnActKind = 0; 			 
 unsigned int bbnOpKind = 1;				 
 unsigned int bbnTokCnt = 0;
 
- 
 int exeFlag_bldcWave = 0;
 int exeFlag_bldcBite = 0;
 int exeFlag_bldcHit = 0;
@@ -1026,14 +799,10 @@ int exeFlag_biteBldcTokTokEnd = 0;
 
 int exeFlag_holonBldcTokTokEnd = 0;
 
-
 int exeFlag_torqMotorStop = 0;	 
 
- 
 int restPowerDist = 0;
 
-
- 
 unsigned long bbnTokTO = 0;
 unsigned int oldbbnTokStep = 0x00;
 
@@ -1063,32 +832,22 @@ enum
 BBN_ACT sBbnActTbl[BBNACT_TBLMAX] =	 
 {
 
-					 
-	 
 	{  ( DEFAULT_BBN_PWR+(13*MUL_BBN_PWR)),  1000,   0,   1000 },		 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(13*MUL_BBN_PWR)),  2000,   0,   2000 },		 
-	 
-	 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(15*MUL_BBN_PWR)),    70,   0,     70 },		 
-	 
-	 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(40-DEFAULT_BBN_PWR)),   300,   0,    100 },		 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(12*MUL_BBN_PWR)),   100,   0,     70 },		 
-	 
-	 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(46-DEFAULT_BBN_PWR)),   150,   0,     50 },		 
-	 
-	 
+
 	{  ( DEFAULT_BBN_PWR+(14*MUL_BBN_PWR)),   100,   0,     70 },		 
 
 };
 
- 
 int bbnReqCnt[BBNACT_TBLMAX] = {
 		10,			 
 		10,			 
@@ -1100,8 +859,6 @@ int bbnReqCnt[BBNACT_TBLMAX] = {
 };
 
 int bbnRptCnt = 0;
-
- 
 
 String strFishKind;
 float 	fishKg_flt;
@@ -1118,7 +875,6 @@ int randingPtn = 0;
 #define LEVEL_MIN 1			 
 #define LEVEL_MAX 3			 
 
- 
 BBN_ACT	sBbnBiteVal = 
 {
 	( DEFAULT_BBN_PWR+(15*MUL_BBN_PWR)),		 
@@ -1127,7 +883,6 @@ BBN_ACT	sBbnBiteVal =
 	70		 
 };
 
- 
 unsigned long sBbnHoldVal_onTime = 100;
 unsigned long sBbnHoldVal_offTime = 50;
 
@@ -1154,9 +909,9 @@ typedef sLEDRGB *ptrRGB;
 
 sLEDRGB sRGB[LED_IDX_MAX] = 
 {
-	 
+
 	{0,},			 
-	 
+
 	{255,255,255},	 
 	{0,	0,	255},	 
 	{0,	0,	255},	 
@@ -1165,9 +920,9 @@ sLEDRGB sRGB[LED_IDX_MAX] =
 
 sLEDRGB outRGB[LED_IDX_MAX] = 
 {
-	 
+
 	{0,},			 
-	 
+
 	{255,255,255},	 
 	{0,	0,	255},	 
 	{0,	0,	255},	 
@@ -1184,19 +939,18 @@ extern const sLEDRGB sColorTBL[COLOR_MAX_NO]
 	 		{255,	255,	0},		 
 	 		{0,	255,	255},		 
 	 		{255,	0,	255},		 
-	 
+
 	 		{128,	0,	0},			 
 	 		{128,	128,	0},		 
 	 		{0,	128,	0},			 
 	 		{128,	0,	128},		 
 	 		{0,	128,	128},		 
 	 		{0,	0,	128},			 
-	 
+
 	 		{192,	192,	192},	 
 	 		{128,	128,	128},	 
 	 		{0,	0,	0},				 
 };
-
 
 unsigned long bbnDiagTO = 0;
 
@@ -1209,24 +963,18 @@ unsigned long bbnDiagTO = 0;
 #define BBN_RPT_CNT_MIN	1
 #define BBN_RPT_CNT_MAX	255
 
- 
 #define ROD_RESP_OVER_CNT 		(5)  
 unsigned int rodAlive_SendCnt = 0;
 
- 
 int imu_conn_status = UNKNOWN;
 int oldimu_conn_status = UNKNOWN;
 
- 
 int exeResistOnceComp = 0;
 
- 
 int dimming_time = SIPPAGOE;
 int olddimming_time = -1;
 unsigned int ledoffHoldTimeCnt = (100/10);		 
 
-
- 
 typedef struct _sensor
 {
 	unsigned int old2;
@@ -1238,7 +986,6 @@ typedef struct _sensor
 }sensor;
 typedef sensor* ptrSensor;
 
- 
 #define SENSOR_1	0
 #define SENSOR_2	1
 #define SENSOR_3	2
@@ -1246,7 +993,6 @@ typedef sensor* ptrSensor;
 
 #define SENSOR_MAX	4	 
 
- 
 sensor sensor1ms[SENSOR_MAX] = 
 	{ 
 		{0,0,0,0,0,0 },		 
@@ -1255,7 +1001,6 @@ sensor sensor1ms[SENSOR_MAX] =
 		{0,0,0,0,0,0 }		 
 	};
 
- 
 sensor sensor10ms[SENSOR_MAX] = 
 	{ 
 		{0,0,0,0,0,0 },		 
@@ -1281,14 +1026,13 @@ sensor sensor10ms[SENSOR_MAX] =
 #define BIT_14	14
 #define BIT_15	15
 
-
 #define SNS_boot		BIT_0  
 #define SNS_usb5V		BIT_1  
 #define SNS_PwrOffSwc	BIT_2  
 #define SNS_AcOff		BIT_3  
- 
+
 #define SNS_RSV04		BIT_4	 
- 
+
 #define SNS_bbnMotFg	BIT_5  
 #define SNS_bbnEncA		BIT_6  
 #define SNS_bbnEncB		BIT_7  
@@ -1297,126 +1041,77 @@ sensor sensor10ms[SENSOR_MAX] =
 #define SNS_RSV12		BIT_12	 
 #define SNS_RSV14		BIT_14	 
 
-
-
-
 #define BIT_SNS_BOOT	0x0001	 
 #define BIT_SNS_USB5V	0x0002	 
 #define BIT_SNS_PWRSWC	0x0004	 
 #define BIT_SNS_ACOFF	0x0008	 
 #define	BIT_SNS_PWRALL	(BIT_SNS_USB5V|BIT_SNS_PWRSWC|BIT_SNS_ACOFF)		 
- 
+
 #define BIT_SNS_RSV4	0x0010	 
- 
+
 #define BIT_SNS_BBNFG	0x0020	 
 #define BIT_SNS_BBNENCA	0x0040	 
 #define BIT_SNS_BBNENCB	0x0080	 
 #define BIT_SNS_BBNALL	(BIT_SNS_BBNFG|BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)		 
 #define BIT_SNS_ENCAB	(BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)					 
- 
-
 
 #define SNS_ON		1
 #define SNS_OFF		0
 
- 
 #define	LVL01_BBNALL	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNALL))		 
 #define LVL01_BBNFG		(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNFG))
 #define LVL01_BBNENCA	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCA))
 #define LVL01_BBNENCB	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
 
-
 #define LE01_BBNFG		(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNFG))
 #define LE01_BBNENCA	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCA))
 #define LE01_BBNENCB	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCB))
-
 
 #define TE01_BBNFG		(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 #define TE01_BBNENCA	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCA))
 #define TE01_BBNENCB	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCB))
 
-
-
- 
 #define LVL10_BOOT		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BOOT))
 #define LVL10_USB5V		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_USB5V))
 #define LVL10_PWROFF_SWC (sensor10ms[SENSOR_1].lvl & (BIT_SNS_PWRSWC))		 
 #define LVL10_ACOFF		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_ACOFF))		 
 #define	LVL10_PWRALL	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_PWRALL))		 
- 
+
 #define LVL10_BBNFG		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BBNFG))
 #define LVL10_BBNENCA	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BBNENCA))
 #define LVL10_BBNENCB	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
 #define	LVL10_ENCAB		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_ENCAB))		 
 
-
 #define LVL10_LMMOTFG	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
 #define LVL10_LMENC		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMENC))
 
- 
 #define LE10_BBNFG		(sensor10ms[SENSOR_1].le & (BIT_SNS_BBNFG))
 
 #define LE10_USB5V		(sensor10ms[SENSOR_1].le & (BIT_SNS_USB5V))
 #define LE10_PWROFF_SWC	(sensor10ms[SENSOR_1].le & (BIT_SNS_PWRSWC))
 
-
-
- 
 #define TE10_BBNFG		(sensor10ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 
 #define TE10_USB5V		(sensor10ms[SENSOR_1].te & (BIT_SNS_USB5V))
 #define TE10_PWROFF_SWC	(sensor10ms[SENSOR_1].te & (BIT_SNS_PWRSWC))
 
-
-
- 
 int recvPwrOffExec_Resp = 0;
-
-
- 
-
-
- 
 
 unsigned int	motTestAct = 0;		 
 unsigned int	motTestMainIdx = 20;	 
 unsigned int	motTestBbnIdx = 20;		 
 
-
- 
 uint8_t rcv_src_addr_back[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };		 
 uint8_t rcv_dest_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };	 
- 
+
 uint8_t broad_cast_addr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };	 
 
 volatile int rodRegistMode = 0;		 
-
-
- 
-
-
-
-
-
- 
-
- 
-
 
 short endTmReqDuty = DEFAULT_TORQ;	 
 short leftEndTmReqDuty = DEFAULT_TORQ;	 
 short rightEndTmReqDuty = DEFAULT_TORQ;	 
 
-
-
- 
-
-
- 
- 
- 
- 
- 
 typedef struct _motdutyTbl
 {
 	short lm;
@@ -1439,96 +1134,77 @@ typedef STLMOTDUTYTBL *ptrSTMOTDUTYTBL;
 #define MOT_PWR_LVL_c	3
 #define MOT_PWR_LVL_MAX	(1 + MOT_PWR_LVL_c)
 
- 
 STLMOTDUTYTBL stLmWireDutyTbl[2][MOT_PWR_LVL_MAX] =
 {
-	 
+
 	{
 		{0, },
 	},
-	 
+
 	{
 		{0,},	 
-		 
+
 		{ 10, 10, 10, 40,  60, 40},	 
 		{ 80,100,  5,100,  70,100},	 
 		{ 80,200, 20, 50,  80, 50},	 
 	},
 };
 
- 
 STLMOTDUTYTBL stLmDutyTbl[FISH_LVL_MAX][MOT_PWR_LVL_MAX] =
 {
- 
-	 
+
 	{
 		{0, },
 	},
-	 
+
 	{
 		{0,},	 
-		 
+
 		{ 10, 10, 13,100,  67,100},  
 		{ 80,100,  5,100,  67,100},  
 		{ 80,200, 13,200,  67,200},  
 	},
-	 
+
 	{
 		{0,},	 
-		 
+
 		{ 10, 10, 19,100,  67,100},
 		{150,100,  5,100,  67,100},
 		{150,200, 13,200,  80,200},
 	},
-	 
+
 	{
 		{0,},	 
-		 
+
 		{ 10, 10, 25,100,  67,100},
 		{200,100,  5,100,  67,100},
 		{200,200, 13,200,  90,200},
 	},
- 
+
 };
 
- 
 STLMOTDUTYTBL stLmHomeTbl =
 {
-	 
+
 	40,100, 15,100, 60,100		 
 };
 
 STLMOTDUTYTBL stLmReturnTbl =
 {
-	 
+
 	60,100, 20,100, 60,100		 
 };
 
 volatile int nvm01_home_stopWait_time = 1;
-
- 
- 
- 
- 
-
-
 
 #define LM_START_WAIT_TIME 10  
 
 #define LM_MOVE_ERR_TO_TIME		3000	 
 #define LM_MOVE_TO_TIME	3000
 
- 
 short fishLevel = FISH_LVL_1;
 short rcvlmPwr = MOT_PWR_LVL_b;
 
- 
-
-
- 
- 
-
- 
 short fishPwr = 1;			 
 short gmWatStatus = 0;		 
 short oldGmWatStatus = 0;		 
@@ -1536,7 +1212,6 @@ short oldGmWatStatus = 0;
 #define	TIME_SLEEP_LIGHT		60
 #define	TIME_SLEEP_DEEP			120
 
- 
 #define	SS_NONE			0		 
 #define	SS_WAIT			1		 
 #define	SS_EXIT			2		 
@@ -1546,71 +1221,47 @@ int   gRodSleepStat = 0;
 int   gRodSleepMode = 0;		 
 int   gRodSleepTime = 0;		 
 
- 
 volatile unsigned short wireLongCheck_Flag = 0;		 
 volatile unsigned short lmWireControl_Flag = 0;		 
 volatile unsigned int targetWirePulse = 0;
 volatile unsigned int currWirePulse = 0;
 volatile unsigned int oldcurrWirePulse = 0;
 
- 
 #define DF_CONFIG_UNKNOWN		0
 #define DF_CONFIG_STAND_ALONE	1
 
 short dfConfig = DF_CONFIG_UNKNOWN;
 
- 
 unsigned short apType = AP_IS_DF;
 unsigned short dfMainAdcDiagnosticEnabled = 0;
 
 String strImuInterval = "0000";	 
 
-
-
- 
-	 
 unsigned short devReadychkFlag = 0;
 unsigned short devCheckAllFlag = 0;					 
 
 unsigned short devCheckBbnMotFlag = 0;
 unsigned short devCheckBbnEncFlag = 0;
- 
+
 unsigned short devCheckTorqFlag = 0;
 
 unsigned short devCheckBldc24VFlag = 0;
- 
 
-unsigned short mainMotAutoSet_Flag = 0;
-
-
-	 
 unsigned short devBbnAllChkStep = 0;					 
 unsigned short devBbnMotChkStep = 0;
 unsigned short devBbnEncChkStep = 0;
- 
+
 unsigned short devTorqChkStep = 0;
 
 unsigned short devBldc24VChkStep = 0;	 
- 
-
 
 unsigned short mainMotAutoSet_Step = 0;	 
 
-
-
-	 
 unsigned short devChkErrOccure = 0;
- 
 
- 
 unsigned short stbyTorqOffControl_Req_Flag = 0;
-unsigned short stbyTorqOffControl_Flag = 0;
+
 unsigned short stbyTorqOffControlStep = 0;			 
-
- 
-
-
- 
 
 volatile unsigned short sSys100UsCnt = 0;		 
 volatile unsigned long lSys100UsTime = 0;		 
@@ -1634,22 +1285,18 @@ encIsrDataBuff stEncIntvBuff[ENC_INTV_BUFF_SIZE] =
 {
 	{0,0,0,0,0},
 };
- 
+
 volatile unsigned short sEncBuffIdx=0;
 
 volatile bool bIsrEncInterruptFlag = false;   
 volatile unsigned int	iIsrEncInterruptCnt = 0;
 
- 
- 
 portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;   
 
- 
 double dLastDiff = 0;
 double dIntegral = 0;
 double dIsrOutDuty = 0;
 
- 
 #define PID_EXEC_ENC_MIN_TIME_1MS	15		 
 #define PID_EXEC_ENC_MIN_TIME_100US	(15*10)		 
 
@@ -1661,7 +1308,6 @@ bool bHookRandingCheckOnce = 0;
 unsigned short pidExecFlag = 0;	 
 unsigned short pidExecOutLog = 0;	 
 
- 
 double Kp = 0.5;   
 double Ki = 0.2;   
 double Kd = 0.1;   
@@ -1671,27 +1317,15 @@ short sMotorSpeed = 0;
 int iIsrbbnEncCnt = (WIRE_HOME_BBN_CNT);			 
 unsigned short sIsrEncBdata;
 unsigned short sIsrBbnEncDir;
- 
+
 #define	MAX_SAVE_LEN	4096
 int	g_SavePtr = 0;
 int	g_ProcPtr = 0;
 unsigned char g_readBuf[MAX_SAVE_LEN];
 
-
 volatile unsigned int g_idleCountCore0 = 0;
 #define	MAX_IDLE_CORE	11893125
- 
- 
- 
 
- 
- 
- 
- 
- 
- 
-
- 
 void esp_soft_reset();
 void esp_hard_reset();
 void SerialPortEnable();
@@ -1888,7 +1522,6 @@ void esp_hard_reset()
 		esp_soft_reset();
 }
 
- 
 void SerialPortEnable()
 {
 	Serial.begin(115200);			 
@@ -1917,14 +1550,10 @@ void SerialPortPinInput()
 {
 	pinMode(USB_DM, INPUT_PULLDOWN);	 
 	pinMode(USB_DP, INPUT_PULLDOWN);	 
- 
- 
 
 	LogPrintln(" LG] USBCDC SerialPortPinInput()");
 }
- 
 
- 
 char	hextbl[] = { "0123456789ABCDEF" };
 struct	Lins {
 	char	toff[8];
@@ -1966,11 +1595,6 @@ void HexDump(unsigned long toff, unsigned char* buff, int len)
 	}
 }
 
- 
- 
- 
- 
-
 void debugPort_Off()
 {
 	digitalWrite(FW_DEBUG_PIN, LOW);
@@ -1986,41 +1610,36 @@ void debugPort_On()
 #define PWR_ON	1
 #define PWR_OFF	0
 int pwrMode = PWR_ON;	 
- 
+
 void subAC_Off()
 {
 	digitalWrite(SUB_ACOFF_PIN, SUBAC_OFF_LVL);
 	pwrMode = PWR_OFF;
 
-
 }
 
 void subAC_On()
 {
-	 
+
 	digitalWrite(SUB_ACOFF_PIN, SUBAC_ON_LVL);
 	pwrMode = PWR_ON;
 
-
 }
-
 
 void DC24V_B_off()
 {
-	 
+
 }
 
- 
 void ledoff_BoardLedAllOff()
 {
 	digitalWrite(BD_LED2_PIN, LOW);
 
 		digitalWrite(BD_LED3_PIN, LOW);
 		digitalWrite(BD_LED4_PIN, LOW);
-	
+
 }
 
- 
 void ledOff_MbCent()
 {
 	extLed.off(LEDPOS_CENT_RGB);
@@ -2041,7 +1660,6 @@ void ledOff_OptRight()
 	extLed.off(LEDPOS_RIGHT);
 }
 
- 
 void extLed_AllOff()
 {
 	ledOff_MbCent();
@@ -2050,7 +1668,6 @@ void extLed_AllOff()
 	ledOff_OptRight();
 }
 
- 
 void extLed_controlOff()
 {
 	unsigned int i;
@@ -2060,14 +1677,11 @@ void extLed_controlOff()
 	}
 }
 
- 
 void ledOn_MbBtm()
 {
 	extLed.on(LEDPOS_BTM, (int)LED_MAX_DUTY);
 }
 
-
- 
 void torqOff()
 {
 	torqMotor.setValue(0);
@@ -2075,11 +1689,10 @@ void torqOff()
 
 void torqDefault()
 {
-	 
+
 	torqMotor.setValue(DEFAULT_TORQ);
 }
 
- 
 int GetDefValue4torqMotor()
 {
 	return (recv_TorqMotor_Flag ? reqTorqueMotor : defaultTorqueMotor);
@@ -2094,26 +1707,23 @@ void bbnBldcOff()
 	bbnMotor.offBldc();
 }
 
- 
-
-
 #define ROD_BREAK_OFF_STR_DATA	"000"
 void breakMotorOff()
 {
 	if(ROD_BOARD_V1 == rodBoardType)		 
 	{
-		 
+
 		eNow.write(DF_Protocol_MainToRod_Break, ROD_BREAK_OFF_STR_DATA);	   
 	}
 }
 
 void motor_AllOff()
 {
-	 
+
   	torqOff();
   	servoDefault();
   	bbnBldcOff();
-	 
+
 }
 
 void motor_AllDefault()
@@ -2121,27 +1731,26 @@ void motor_AllDefault()
 	torqDefault();
 	servoDefault();
 	bbnBldcOff();
-	 
+
 }
 
 void led_AllOff()
 {
-	 
+
 	extLed_AllOff();
-	 
+
 	ledoff_BoardLedAllOff();
 }
 
 void output_AllOff()
 {
-	 
+
   torqOff();
   servoDefault();
   bbnBldcOff();
 
-	 
   extLed_AllOff();
-   
+
   ledoff_BoardLedAllOff();
 }
 
@@ -2149,20 +1758,15 @@ volatile int reelOut_AllOff_Flag = 0;
 volatile int reelAlloffStep = 0;			 
 void reelOut_AllOff()
 {
-	 
+
 	eNow.write(DF_Protocol_MainToRod_AllOutputsOff, "00");		 
 }
 
- 
 #define SEND_NOW_STEP_TIME	10		 
 
- 
 void reelOut_AllOff_ForceStep()
 {
 }
-
- 
-
 
 String fillZero2String5Char(int _int)
 {
@@ -2191,10 +1795,6 @@ String fillZero2String5Char(int _int)
   return str;
 }
 
-
- 
- 
- 
 String stringSign6Char(long _int)
 {
 	String str;
@@ -2217,34 +1817,11 @@ String stringSign6Char(long _int)
   return str;
 }
 
- 
 String fillZero2String3Char(unsigned int uint)
 {
   String str;
   if(0)	{ }
-  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
   else if (10 > uint)	 
   {
     str = "00" + String(uint);
@@ -2260,15 +1837,12 @@ String fillZero2String3Char(unsigned int uint)
   return str;
 }
 
- 
-
-
 String fillZero2StringSign4Char(int _int)
 {
   String str;
   if(-999 > _int) { _int = -999; }
   else if( 999 < _int) { _int =  999; }
-  
+
   if(-99 >  _int )	 
   {
   	str = "-" + String(_int*-1);
@@ -2300,13 +1874,11 @@ String fillZero2StringSign4Char(int _int)
   return str;
 }
 
-
 String fillZero4Char(unsigned int _val)
 {
-	 
+
  	if(9999 < _val) { _val = 9999; }
-	
-	 
+
   if(0) {}	 
   else if (  10 > _val) { return "000" + String(_val); }
   else if ( 100 > _val) { return "00" + String(_val); }
@@ -2315,15 +1887,12 @@ String fillZero4Char(unsigned int _val)
 
 }
 
- 
-
-
 String fillZero2StringSign6Char(int _int)
 {
   String str;
   if(-99999 > _int) { _int = -99999; }
   else if( 99999 < _int) { _int =  99999; }
-  
+
   if(-9999 >  _int )	 
   {
   	str = "-" + String(_int*-1);
@@ -2377,7 +1946,3 @@ String StringFormat(char *fmt, int val)
 	snprintf(buf, sizeof(buf), fmt, val);
 	return buf;
 }
-
- 
-
-

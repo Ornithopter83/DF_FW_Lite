@@ -1,61 +1,47 @@
- 
+
 #include "../DF_Rod_Internal.h"
 #include "DF_Rod_SchedulerAndInput.h"
 void t100ms_Process()
 {
 
-	 
 	if(rodPowerOnFlag)
 	{
 		rodPowerOnFlag = 0;	 
 		sendInfo_boardType();
 	}
-	
-	 
+
 	if(recvInfoSeqStep)	 
 	{
 		sendRodInfo_forStep();
 	}
-	 
 
- 
-
- 
 	#define L_BTN_LONG_TIME	2500	 
- 
+
 	if(btn_L_DownCnt)
 	{
 		btn_L_DownCnt++;
 		if((L_BTN_LONG_TIME/100) < btn_L_DownCnt)	 
 		{
-			
+
 			rodRegistMode = 55;		 
 
 			btn_L_DownCnt = 0;
-			
 
-			 
 			eNow.addPeerAddress(broad_cast_addr);
 
 			String rodAddr = eNow.getMyAddress();
-			 
+
 			eNow.writeBC(DF_Protocol_RodToMain_RodAddress, rodAddr); 	 
 
-			 
 			rodRegistToStart();
-			
-			 
+
 			AddrWrite_LedBlink = 1;	 
 
-			 
-
-			 
 		}
 	}
 
- 
 	#define ROD_REGI_LED_BLINK_TIME	1000	 
-	 
+
 	if(AddrWrite_LedBlink)
 	{
 		led1Grn_OutSts = !led1Grn_OutSts;
@@ -63,67 +49,41 @@ void t100ms_Process()
 		AddrWrite_LedBlink++;
  		if((ROD_REGI_LED_BLINK_TIME/100) < AddrWrite_LedBlink)
 		{
-			 
+
 			AddrWrite_LedBlink = 0;
 		}		 
 
 	}
 
- 
 	if(rodRegistMode)
 	{
 		rodRegistToControl();
 	}
-	
+
 }
-
- 
-
 
 void t500ms_Process()
 {
 
-	 
-	 
-	
 	battery.scanAvgInteg();
-
-	 
 
 }
 
- 
-
-
 void t1sec_Process()
 {
-	 
-   
 
-
-
-
-	 
 	rodAliveRecvTOCheck();
 
-
-	 
 	imuConnectCheck();
 
-	 
 	battChangeCheckSend();
 
-	 
 	batteryDiagnosticSend();
 
-	 
 	rodLed1SecControl();
 
 }
 
- 
- 
- 
 void rodLed1SecControl()
 {
 	if(rodAliveRcv_LedBlinkFlag)
@@ -148,11 +108,6 @@ void rodLed1SecControl()
 	}
 }
 
- 
-
-
-
-
 unsigned int system_delay_cnt = 0;
 
 void run_timer()
@@ -162,7 +117,7 @@ void run_timer()
 	curr_ms_tick = millis();
 	if(oldcurr_ms_tick != curr_ms_tick)
 	{
-		 
+
 		if(curr_ms_tick > oldcurr_ms_tick)
 		{
 			add_tick = (int)(curr_ms_tick - oldcurr_ms_tick);
@@ -175,21 +130,21 @@ void run_timer()
 		sys_1ms_cnt += add_tick;		 
 
 		run_time_1ms += add_tick;
-		
+
 gotoSystemTimer:
-	
+
 		if( 9 < run_time_1ms)	 
 		{
-			 
+
 			run_time_1ms -= 10;
-			
+
 			sys_10ms_cnt++;
 
 			run_time_10ms++;
 			if( 9 < run_time_10ms)	 
 			{
 				run_time_10ms -= 10;
-				
+
 				sys_100ms_cnt++;
 
 				run_time_100ms++;
@@ -202,11 +157,11 @@ gotoSystemTimer:
 				if( 9 < run_time_100ms)	 
 				{
 					run_time_100ms -= 10;
-					
+
 					sys_1sec_cnt++;		 
-					 
+
 				}
-				
+
 			}
 		}
 
@@ -214,13 +169,10 @@ gotoSystemTimer:
 		{
 			goto gotoSystemTimer;
 		}
-		
-		 
-		 
+
 		if(2 < add_tick)
 		{
-			 
-			 
+
 			system_delay_cnt++;
 			LogPrintln(" LG] SYSTIK ROD Delay " + String(add_tick) + "ms ,cnt:" + String(system_delay_cnt));
 		}
@@ -231,24 +183,14 @@ gotoSystemTimer:
 
 }
 
- 
- 
- 
- 
 void ioPinSetting()
 {
 
-	 
-
-	 
 	pinMode(SETUP_MODE_PIN, INPUT);
 
-	 
-	 
 	pinMode(LED1_GRN_PIN, OUTPUT);
 	pinMode(LED2_RED_PIN, OUTPUT);
 
-	 
 	pinMode(BTN_LED_LF_RED_PIN, OUTPUT);
 	pinMode(BTN_LED_RT_BLUE_PIN, OUTPUT);
 
@@ -257,35 +199,21 @@ void ioPinSetting()
 
 }
 
- 
- 
- 
 void checkFileSystem()
 {
-	 
+
 	if (!SPIFFS.begin())		 
 	{
 			LogPrintln(" LG] FS Format Start");
-		
+
     	SPIFFS.format();	 
-		
-		
-		 
+
 		delay(10);		 
-		
-    	 
+
 		ESP_Soft_Reset();
 	}
 
-	 
 }
-
-
- 
-
 
 static int pwrOn1st_loop = 0;
 int resp_imu = 0;
- 
-
-

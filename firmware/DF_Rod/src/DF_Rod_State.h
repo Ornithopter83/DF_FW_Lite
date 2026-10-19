@@ -1,12 +1,6 @@
 
 #pragma once
 
-
-
- 
-
-
-
 #include <Arduino.h>
 
 #include "Common.h"
@@ -65,10 +59,6 @@ extern String STX_SETUP_EXIT;
 
 extern String STX_IMU_INTVAL_CHK;
 
-extern String STX_SET_FILE;
-
-extern String STX_SET_DATA;
-
 #define RESP_STX_IMU_CONN "$05"
 
 #define RESP_STX_IMU_CONN_OK "$0511111111%"
@@ -78,10 +68,6 @@ extern String STX_SET_DATA;
 #define RESP_STX_IMU_CONN_NG_SLEEP "$0500000009%"
 
 #define RESP_STX_SLEEP_ENT "009"
-
-#define GAME_ENABLE     "11111111"
-
-#define GAME_DISABLE    "00000000"
 
 #define RUN_TIMEOUT_ALIVE_CNT   10
 
@@ -197,12 +183,6 @@ extern String R_BTN_UP;
 extern String R_BTN_DN;
 
 extern String ROD_ENC_CNT;
-
-#define TESTROD_START_STEP	9
-
-extern unsigned short iocStep;
-
-extern unsigned long rod_ImuCycleCnt;
 
 extern unsigned short recvInfoSeqStep;
 

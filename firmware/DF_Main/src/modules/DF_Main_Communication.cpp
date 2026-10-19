@@ -1,9 +1,9 @@
- 
+
 #include "../DF_Main_Internal.h"
 #include "DF_Main_Communication.h"
 void rotateChangeCallback(int _dir, int _cnt)
 {
-   
+
   String dir = (_dir)? "CW_":"CCW";
   LogPrintln(" LG] BBENC " +  dir + ", cnt: " + String(_cnt));
 }
@@ -124,67 +124,31 @@ int DF_Main_Communication_TakeReceived(char *data, unsigned int capacity, unsign
 	return 1;
 }
 
-
- 
- 
- 
 void battLevelSet( String msg)
 {
-	   
+
 	  battLvlStr = msg.substring(1,(1+2)); 	  			 
 	  ibatteryLvl = battLvlStr.substring(0, 3).toInt();	 
-	   
-	  
 
 }
 
- 
- 
- 
 void setRod_Connected()
 {
 	rodAlive_SendCnt = 0;		 
 	rod_conn_status = ROD_CONN;	 
 }
 
-
- 
- 
- 
 void uartRecvHandlerImp()
 {
 }
 
-
 bool isParaCheckOk(int idx, int val)
 {
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
-
-
- 
- 
 static unsigned int torqMotorStop_Step = 0x00;
 static unsigned long torqMotor_StopTimeOut = 0;
- 
 
 void torqMot_OffControlStart(unsigned int onTime)
 {
@@ -193,28 +157,26 @@ void torqMot_OffControlStart(unsigned int onTime)
 	exeFlag_torqMotorStop = 1;		 
 }
 
-
 void torqMot_OffControlStop()
 {
 	exeFlag_torqMotorStop = 0;		 
 	torqMotorStop_Step = 0;	 
 }
 
-
 void torqMotor_OffTime_Control()
 {
 	static unsigned long to;
-	
+
 	switch(torqMotorStop_Step)
 	{
 		case 0x00:
 			break;	 
-			
+
 		case 0x10:	 
 			setTO(to);
 			torqMotorStop_Step = 0x20;
 			break;
-			
+
 		case 0x20:	 
 			if(checkTO(to, torqMotor_StopTimeOut))
 			{
@@ -223,35 +185,28 @@ void torqMotor_OffTime_Control()
 				torqMotorStop_Step = 0x90;
 			}
 			break;
-			
+
 		case 0x30:	 
 			break;
-			
+
 		case 0x40:	 
 			break;
 
-			
 		case 0x90:	 
 			exeFlag_torqMotorStop = 0;
 			torqMotorStop_Step = 0x00;
 			break;
-		
+
 		default:
 			LogPrintln(" LG] TORQM OffTime Control Step NG!!!");
 			break;
 	}
 }
 
-
-
-
- 
- 
 unsigned int bbnMotorStop_Step = 0x00;
 static unsigned long bbnMotor_StopTimeOut = 0;
 unsigned int gBbnHallCount = 0;							 
 
- 
 void bbnMotor_OffTime_Start(unsigned int time)
 {
 	bbnMotor_StopTimeOut = (unsigned long)time;
@@ -259,23 +214,22 @@ void bbnMotor_OffTime_Start(unsigned int time)
 	exeFlag_bbnMotorStop = 1;		 
 }
 
- 
 void bbnMotor_OffTime_Control()
 {
 	static unsigned long to;
 	static unsigned long _oldSen;				 
-	
+
 	switch(bbnMotorStop_Step)
 	{
 		case 0x00:
 			break;	 
-			
+
 		case 0x10:	 
 			setTO(to);
 			bbnMotorStop_Step = 0x20;
 			_oldSen = LVL01_BBNFG;				 
 			break;
-			
+
 		case 0x20:	 
 			if(checkTO(to, bbnMotor_StopTimeOut))
 			{
@@ -289,54 +243,48 @@ void bbnMotor_OffTime_Control()
 				gBbnHallCount++;				 
 			}
 			break;
-			
+
 		case 0x30:	 
 			break;
-			
+
 		case 0x40:	 
 			break;
 
-			
 		case 0x90:	 
 			exeFlag_bbnMotorStop = 0;
 			bbnMotorStop_Step = 0x00;
 			break;
-		
+
 		default:
 			LogPrintln(" LG] BBNMT OffTime Control Step NG!!!");
 			break;
 	}
 }
 
-
- 
- 
 void SetIMU_Measure_Out_OnOff(unsigned int _setClr)
 {
 	String msg;
-	 
+
 	if(0 == _setClr)
 	{
-		 
+
 		msg = "00";
 	}
 	else
 	{
-		 
+
 		msg = "01";
 	}
 	eNow.write(DF_Protocol_MainToRod_ImuDataControl, msg);		 
 	reqImuMeasFlag = _setClr;
 }
 
-
- 
 #define GS_PROG_START	1
- 
+
 #define GS_RSV_02		2
 #define GS_RSV_03		3
 #define GS_WIRE_RDY		4	 
- 
+
 #define GS_LVL_SEL		11
 #define GS_ZONE_SEL		21
 #define GS_CAST_WAIT	31
@@ -351,9 +299,8 @@ void SetIMU_Measure_Out_OnOff(unsigned int _setClr)
 #define GS_SUCCESS		91
 #define GS_CONTINUE		92
 #define GS_GAME_OVER	98
- 
+
 #define GS_PROG_END		99
- 
 
 void sendSleepEnable(int Mode, int Time, int Id)
 {
@@ -364,17 +311,13 @@ void sendSleepEnable(int Mode, int Time, int Id)
 	LogPrintln(" LG] SLEEP_ENABLE[" + String(Id) + "]: " + strMsg);
 }
 
- 
- 
- 
 void sendCurrentStatus()
 {
 	String respMsg;
-	
-		   
+
 		  if(ROD_CONN == rod_conn_status)   
 		  {
-			   
+
 			  respMsg = RESP_STX_ROD_CONN + STATE_CONNECTED;	   
 			  respMsg += "%";
 		  }
@@ -384,10 +327,9 @@ void sendCurrentStatus()
 			  respMsg += "%"; 	   
 		  }
 		  Resp2ApPrintln(respMsg);		   
-		  
+
 		  LogPrintln(" LG] RODCN "+respMsg);
-		
-		   
+
 		  if( CONNECT == imu_conn_status)	   
 		  {
 			  respMsg = RESP_STX_IMU_CONNECT + STATE_CONNECTED;	   
@@ -399,32 +341,20 @@ void sendCurrentStatus()
 			  respMsg += "%";
 		  }
 		  Resp2ApPrintln(respMsg);		   
-		  
+
 		  LogPrintln(" FW] IMUCN " + respMsg);		 
 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
-		 
 		respMsg = STX_BAT_LVL + battLvlStr + "%";	 
 	  	Resp2ApPrintln(respMsg);		   
-	  	
-		 
+
 		if(ROD_CONN == rod_conn_status)   
 		{
 			respMsg = STX_BAT_LVL + BAT_STR_CHAGER_NOCHANGE;    
 			Resp2ApPrintln(respMsg);			 
 		}
-	  	
-	  	
+
 		  LogPrintln(" FW] BATLV " + respMsg); 	   
 
-		 
 		respMsg = STX_INFO_REQ + ROD_BOARD_TYPE;
 		respMsg += strRodBoardType;		 
 		respMsg += "%";
@@ -432,17 +362,10 @@ void sendCurrentStatus()
 
 			LogPrintln(" FW] INFOR " + respMsg);	   
 
-		 
 		respMsg = STX_INFO_REQ + ROD_REGIST_TO_SEC;
 		respMsg += String(ROD_REGI_CANCEL_TO/1000);	
 		respMsg += "%";
 		Resp2ApPrintln(respMsg);
-		
+
 		LogPrintln(" FW] INFOR wt" + respMsg);
 }
-
- 
-
- 
- 
- 
