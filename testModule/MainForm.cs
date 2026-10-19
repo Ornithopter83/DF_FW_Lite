@@ -14,6 +14,10 @@ internal sealed class MainForm : Form
     private readonly Label imuLabel = new() { Text = "IMU: ?", AutoSize = true };
     private readonly Label versionLabel = new() { Text = "버전: ?", AutoSize = true };
     private readonly Label inputLabel = new() { Text = "입력: ?", AutoSize = true };
+    private readonly Label batteryLabel = new() { Text = "배터리: ?", AutoSize = true };
+    private readonly Label adcLabel = new() { Text = "ADC: ?", AutoSize = true };
+    private readonly Label calibrationLabel = new() { Text = "엔코더 보정: ?", AutoSize = true };
+    private readonly Label deviceLabel = new() { Text = "장치검사: ?", AutoSize = true };
     private readonly NumericUpDown torqueDuty = new() { Minimum = 0, Maximum = 255, Value = 60, Width = 70 };
     private readonly NumericUpDown bldcDuty = new() { Minimum = 0, Maximum = 255, Value = 60, Width = 70 };
     private readonly TextBox manualCommand = new() { Width = 160, Text = "$10%" };
@@ -70,7 +74,7 @@ internal sealed class MainForm : Form
         AddButton(motorRow, "BLDC 정지", () => TrySend(DeviceProtocol.BldcOff()));
         motorGroup.Controls.Add(motorRow);
 
-        var rodGroup = new GroupBox { Text = "Rod 기본 출력", Height = 87, Dock = DockStyle.Top };
+        var rodGroup = new GroupBox { Text = "Rod 기본 출력", Height = 135, Dock = DockStyle.Top };
         var rodRow = NewRow();
         rodRow.Dock = DockStyle.Fill;
         AddButton(rodRow, "진동 ON", () => TrySend(DeviceProtocol.ReelVibration(true)));
@@ -81,6 +85,11 @@ internal sealed class MainForm : Form
         AddButton(rodRow, "오른쪽 LED OFF", () => TrySend(DeviceProtocol.ReelRightLed(false)));
         AddButton(rodRow, "IMU ON", () => TrySend(DeviceProtocol.Imu(true)));
         AddButton(rodRow, "IMU OFF", () => TrySend(DeviceProtocol.Imu(false)));
+        AddButton(rodRow, "보정 시작", () => TrySend("$37S%"));
+        AddButton(rodRow, "측정 완료", () => TrySend("$37C%"));
+        AddButton(rodRow, "보정 적용", () => TrySend("$37A%"));
+        AddButton(rodRow, "보정 취소", () => TrySend("$37X%"));
+        AddButton(rodRow, "보정 조회", () => TrySend("$37Q%"));
         rodGroup.Controls.Add(rodRow);
 
         var statusRow = NewRow();
@@ -88,6 +97,11 @@ internal sealed class MainForm : Form
         statusRow.Controls.Add(imuLabel);
         statusRow.Controls.Add(versionLabel);
         statusRow.Controls.Add(inputLabel);
+        statusRow.Controls.Add(batteryLabel);
+        statusRow.Controls.Add(adcLabel);
+        statusRow.Controls.Add(calibrationLabel);
+        statusRow.Controls.Add(deviceLabel);
+        AddButton(statusRow, "장치 검사", () => TrySend("$1501%"));
         statusRow.Controls.Add(manualCommand);
         AddButton(statusRow, "명령 전송", SendManualCommand);
         AddButton(statusRow, "모터 정지", () => _ = StopMotorsAsync());
@@ -195,6 +209,11 @@ internal sealed class MainForm : Form
             MessageBox.Show("ASCII $...% 형식이며 120자 이하여야 합니다.");
             return;
         }
+        string[] allowed = { "$00", "$02", "$04", "$08", "$10", "$15", "$23", "$24", "$27", "$30", "$37" };
+        if (!allowed.Any(prefix => command.StartsWith(prefix, StringComparison.Ordinal))) {
+            MessageBox.Show("허용된 Lite 명령(모터, Rod, ADC/상태, 장치 검사, 엔코더 보정)만 수동 송신할 수 있습니다.");
+            return;
+        }
         TrySend(command);
     }
 
@@ -233,11 +252,17 @@ internal sealed class MainForm : Form
             imuLabel.Text = "IMU: " + (frame.Substring(3, 2) == "01" ? "연결" : "미연결");
         else if (frame.StartsWith("$10", StringComparison.Ordinal))
             versionLabel.Text = "버전: " + frame.Substring(3).TrimEnd('%');
+        else if (frame.StartsWith("$12", StringComparison.Ordinal))
+            batteryLabel.Text = "배터리: " + frame.Substring(3).TrimEnd('%');
+        else if (frame.StartsWith("$31", StringComparison.Ordinal))
+            adcLabel.Text = "ADC: " + frame.Substring(3).TrimEnd('%');
+        else if (frame.StartsWith("$37", StringComparison.Ordinal))
+            calibrationLabel.Text = "엔코더 보정: " + frame.Substring(3).TrimEnd('%');
+        else if (frame.StartsWith("$15", StringComparison.Ordinal))
+            deviceLabel.Text = "장치검사: " + frame.Substring(3).TrimEnd('%');
         else if (frame.StartsWith("$13", StringComparison.Ordinal) || frame.StartsWith("$14", StringComparison.Ordinal)
-            || frame.StartsWith("$09", StringComparison.Ordinal) || frame.StartsWith("$12", StringComparison.Ordinal))
+            || frame.StartsWith("$09", StringComparison.Ordinal))
             inputLabel.Text = "입력: " + frame.Substring(0, Math.Min(40, frame.Length));
-        else if (frame == "$1800%")
-            Append("WARN", "Main의 AP 종료 요청: TM Lite는 ACK/PC 종료를 자동 수행하지 않습니다.");
     }
 
     private void Append(string direction, string message)
