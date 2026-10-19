@@ -1,54 +1,54 @@
-// Rod setup protocol implementation.
+ 
 #include "../DF_Rod_Internal.h"
 #include "DF_Rod_SetupProtocol.h"
 void uartPcHandler_NormalMode()
 {
 
-  if (Serial.available())	// if Recv Recv Length
+  if (Serial.available())	 
   {
-    String msg = Serial.readStringUntil('%');	// Wait ETX Char(%)
-    msg.trim();									// Delete [ Space Char ]
+    String msg = Serial.readStringUntil('%');	 
+    msg.trim();									 
     if (msg == "")
     {
       return;
     }
 
-  //== Recv Cmd Ana & Exec
-	if(0) {}	// dummy
+   
+	if(0) {}	 
 
-	// 
+	 
 	else if (msg.startsWith(STX_IMU_SETUP) )
 	{
-		//msg = msg.substring(3);	// from PC Normal
+		 
 		String setMsg = imu.convert_oldSetup(msg);
-		imu.setConfig(setMsg);		// From PC _NORMAL
+		imu.setConfig(setMsg);		 
 	}
 	
-	// ($11)-Get Address
+	 
     else if (msg.startsWith(STX_GET_ADDR) || msg.startsWith(STX_SETUP_ENTRY) )
 	{
-		// [Get Address ] 1st Button Click
+		 
 		String str = STX_GET_ADDR + "S" + eNow.getMyAddress() + "," + eNow.getTargetAddress() + "%";
 		RespPrintln(str);
 
-		// ENTRY SETUP MODE
+		 
 		imu.setStartStop(IMU_CONF_STOP);
 		flagIMUSTOP = 1;
 
-		Entry_SetupMode();		// 위치 이동하지 말것, 마지막 처리
+		Entry_SetupMode();		 
     }
 	
-	// ($9002) SETUP EXIT, NA - Normal Mode
+	 
 	else if (msg.startsWith(STX_SETUP_EXIT) )
   	{
-  		// NA - Normal Exit No Effetive
+  		 
 	}
 	
   	else if (msg.startsWith(STX_IMU_INTVAL_CHK))
 	{
 	  imuIntervalCheckCnt = 1;
     }
-	else if (msg.startsWith(STX_VERSION_READ))// 2. VER at NORMAL
+	else if (msg.startsWith(STX_VERSION_READ)) 
 	{
 	 	if(IMU_CONN == imuStatus)
 		{
@@ -62,14 +62,14 @@ void uartPcHandler_NormalMode()
 		LogPrintln(" LG] Ver__ " + rodVer + "," + msg + "%");
 	}
 	
-	else if (msg.startsWith(STX_DEV_INFO_REQ))	// 
+	else if (msg.startsWith(STX_DEV_INFO_REQ))	 
 	{
 		int reqKind = msg.substring(3,(3+2)).toInt();
 		switch(reqKind)
 		{
-			case 0:		// IF_VER
+			case 0:		 
 				break;
-			case 1:		// BOARD TYPE
+			case 1:		 
 				LogPrintln(" LG] INFO__ Board Type: " + String(rodBoardType));
 				break;
 			default:
@@ -77,23 +77,23 @@ void uartPcHandler_NormalMode()
 		}
 	}
 
-	// ($F0) - FILE CONTROL 
+	 
   	else if (msg.startsWith(STX_SET_FILE))
 	{
-		//fileControl_test(msg);
+		 
 		eNow.fsFormat();
   	}
 	
 
-	//($F6) - POWER AGEING TEST PROGRAM
+	 
   	else if (msg.startsWith(STX_SET_DATA))
 	{
 	  msg = msg.substring(3, msg.length());
 	  setData_RodCycleTest(msg);
-	  //LogPrintln(" LG] IMUSET" + msg);
+	   
     }
 	
-	//=== NOT DEFINE CMD
+	 
 	else
 	{
 		LogPrintln(" lg] ERROR_ NOT DEFINE CMD");		
@@ -102,25 +102,25 @@ void uartPcHandler_NormalMode()
   }
 }
 
-//-------------------------------------------------
-//	타겟주소 FS에 저장
-//	WRITE_OK 1000
-//	WRITE_FAIL 1001
-//	LENGTH_ERR  0~16
-//-------------------------------------------------
+ 
+ 
+ 
+ 
+ 
+ 
 int targetAddrWrite(String msg)
 {
-	int rts = 1000;	// OK
+	int rts = 1000;	 
 	
 	  int len = msg.length();
-	  //if(16 < len)
+	   
       if((DF_Protocol_MacAddressTextLength - 1) < len)
-	  //if((MAC_ADDR_OK_LEN) != len)
+	   
 	  {
-		  // TBD  at FAIL ( SET NG )
+		   
       	if(false == eNow.setTargetAddress(msg))
       	{
-      		rts = 1001;	//Write Error
+      		rts = 1001;	 
       		LogPrintln(" LG] Error_ T_ADDR Write NG");
       	}
 		else
@@ -130,23 +130,23 @@ int targetAddrWrite(String msg)
 	  }
 	  else
 	  {
-	  	rts = len;		// ㅣLength Error : 0 ~ 16
+	  	rts = len;		 
 	  	LogPrintln(" LG] T_ADDR Set Address NG, LESS 17 ");
 	  }
 
 	  return rts;
 }
 
-/*  =====================================
-        (Uart) Recv Data Hanlder, from PC, Only SetUp Mode
-  ===================================== */
+ 
+
+
 void uartPcHandler_Setup()
 {
 
-  if (Serial.available())	// if Recv Recv Length
+  if (Serial.available())	 
   {
-    String msg = Serial.readStringUntil('%');	// Wait ETX Char(%)
-    msg.trim();									// Delete [ Space Char ]
+    String msg = Serial.readStringUntil('%');	 
+    msg.trim();									 
     if (msg == "")
     {
       return;
@@ -154,29 +154,29 @@ void uartPcHandler_Setup()
 
 	String respMsg;
 	
-//=== Recv CMD ANA & EXEC
-	if(0) {}	// dummy
+ 
+	if(0) {}	 
 	
-	// ADD SEUP EXIT by Command PC
+	 
 	else if (msg.startsWith(STX_SETUP_EXIT))
 	{
 		Exit_SetupMode();
 	}
 
-	// ($11)-Get Address
+	 
     else if (msg.startsWith(STX_GET_ADDR))
 	{
       respMsg = STX_GET_ADDR + "S" + eNow.getMyAddress() + "," + eNow.getTargetAddress() + "%";
       RespPrintln(respMsg);
     }
 	
-	//($12)-Set Address
+	 
     else if (msg.startsWith(STX_SET_ADDR))
 	{
-		msg = msg.substring(3);		// Address Only(17개 문자)
-		//targetAddrWrite(msg);
+		msg = msg.substring(3);		 
+		 
   		int ret = targetAddrWrite(msg);
-	  	if((1000 != ret) && (!isSetupMode) )	// NG & NORMAL = LOG출력, SETUP = LOG X
+	  	if((1000 != ret) && (!isSetupMode) )	 
 	  	{
 			String logMsg = "";
 	  		if(1001 == ret)	logMsg = "Write Fail";
@@ -186,19 +186,19 @@ void uartPcHandler_Setup()
 
 
     }
-	//($08Axxxx)-IMU Setting
+	 
     else if (msg.startsWith(STX_IMU_SETUP))
 	{
-		//msg = msg.substring(3);
+		 
 		respMsg = imu.convert_oldSetup(msg);
-      	imu.setConfig(respMsg);	// from PC SETUP Progam
+      	imu.setConfig(respMsg);	 
     }
 
-  	//($91)-Set IMU config With RECV STRING
+  	 
   	else if (msg.startsWith(STX_IMU_SETSTRING))
 	{
 	  respMsg = msg.substring(3, msg.length());
-	  //LogPrintln(msg);
+	   
 	  imu.setConfigString(respMsg);
     }
 
@@ -206,10 +206,10 @@ void uartPcHandler_Setup()
 	{
 	  imuIntervalCheckCnt = 1;
     }
-	// NOT DEFINE CMD
+	 
 	else
 	{
-		// Error
+		 
 	}
 	
   }
@@ -219,34 +219,34 @@ void uartPcHandler_Setup()
 
 static int pwrOn_1st_imuRecv =0;
 static int imuIntervalTime = 0;
-/*-------------------------------------------------------------------
-	Set Flag IMU Data Recved, for IMU Connetion
---------------------------------------------------------------------*/
+ 
+
+
 void setRecvImuData()
 {
-	//-- 1)  IMU RCV FLAG SET
-	fRecvImuData = 1;		// SET Flag IMU Data RECVED
+	 
+	fRecvImuData = 1;		 
 
-	//-- 2) IMU Interval측정,  IMU Interval LOG OUT, CMD=$92
-	// 3번 측정하여 평균 시간을 응답
+	 
+	 
   	if(imuIntervalCheckCnt)
   	{
   		imuIntervalCheckCnt++;
 		if(0) {}
-  		else if(2 == imuIntervalCheckCnt) { measureCnt = curr_ms_tick;	}// 1st
-  		else if(3 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	}// 2nd
-  		else if(4 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	}// 3rd
-		else						// 2nd
+  		else if(2 == imuIntervalCheckCnt) { measureCnt = curr_ms_tick;	} 
+  		else if(3 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
+  		else if(4 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
+		else						 
 		{
-			imuIntervalTime += (int)(curr_ms_tick - measureCnt);		// 4th
+			imuIntervalTime += (int)(curr_ms_tick - measureCnt);		 
 			imuIntervalTime = imuIntervalTime/3;
 			String strImuIntv = zeroFill4Char((unsigned int)imuIntervalTime);
-			// Send to PC
-			//if(AP_IS_TM == apType)
-			//{
-			//	eNow.write(DF_Protocol_RodToMain_Sleep, (IMU_INTERVAL_TIME + strImuIntv));
-			//}
-			RespPrintln(STX_IMU_INTVAL_CHK + strImuIntv +"%");	// ms
+			 
+			 
+			 
+			 
+			 
+			RespPrintln(STX_IMU_INTVAL_CHK + strImuIntv +"%");	 
 			
 			imuIntervalCheckCnt = 0;
 			imuIntervalTime = 0;
@@ -255,62 +255,62 @@ void setRecvImuData()
   	}
 }
 
-//---------------------------------------------------------
-//
+ 
+ 
 int isRodNewBoard()
 {
-	return (rodBoardType);		// 0-OLD ROD, 1-NEW ROD
+	return (rodBoardType);		 
 }
 
-//---------------------------------------------------------
-//	PowerOn후 제일먼저 실행할 것.
-//	- PinMode설정전에 실행할 것.
-//---------------------------------------------------------
-//	구보드(V1) -NC : Open(HIGH)
-//	신보드(V2) - GND : LOW
-//---------------------------------------------------------
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 int setBoardType()
 {
 	return NEW_BOARD_2;
 }
 
 
-// Button Type
+ 
 int getButtonType()
 {
 	return (buttonType);
 }
 
-// Reel ENCODERType
+ 
 int getBreakType()
 {
 	return (breakType);
 }
 
-// Reel ENCODERType
+ 
 int getEncType()
 {
 	return (reelEncType);
 }
 
 
-// BATT Type
+ 
 int getBattType()
 {
 	return (battType);
 }
 
-//----------------------------------------------------------------
-//
-//
-//----------------------------------------------------------------
+ 
+ 
+ 
+ 
 void settingIOtype()
 {
-	// Current Rod configuration is fixed in DF_Rod_Foundation.inc.
+	 
 }
 
-//----------------------------------------------------------------
-//
+ 
+ 
 void setSlaveMode()
 {
 	int i =0;
@@ -333,7 +333,7 @@ int isSlaveSetupMode()
 	return rodMode;
 }
 
-// SET PC CMD SET
+ 
 void Entry_SetupMode()
 {
 	rodMode = SETUP_MODE;
@@ -344,24 +344,24 @@ void Entry_SetupMode()
 }
 void Exit_SetupMode()
 {
-	//rodMode = NORMAL_MODE;
-	//digitalWrite(LED2_RED_PIN, LOW);
+	 
+	 
 
-	// Setup -> Reset(=Normal) 
-	//ESP.restart();
+	 
+	 
 	ESP_Soft_Reset();
 }
 
 void ESP_Soft_Reset()
 {
-	// Setup -> Reset(=Normal) 
+	 
 	ESP.restart();
-	//esp_restart();
+	 
 }
 
-//-------------------------------------------------------
-//	1. Change Check ( -2 ~ +2 )
-//	2. Send to MAIN
-//
-//	CALL, 1 SEC =>, 100ms =>  1 SEC
-//-------------------------------------------------------
+ 
+ 
+ 
+ 
+ 
+ 

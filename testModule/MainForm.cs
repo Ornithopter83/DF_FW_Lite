@@ -2,7 +2,7 @@ using System.Drawing;
 
 namespace DFTestModule;
 
-// Stage 1: 최소 제어/수신 창. 장비 통합 검증 및 기능 축소는 추후 작업.
+ 
 internal sealed class MainForm : Form
 {
     private readonly SerialConnection serial = new();
@@ -166,7 +166,7 @@ internal sealed class MainForm : Form
         finally { if (!IsDisposed) connectionButton.Enabled = true; }
     }
 
-    // 원본 TM의 단계별 초기 명령 및 60/500ms 간격을 보존한다.
+     
     private async Task InitializeMainAsync()
     {
         string[][] groups = {
@@ -238,7 +238,7 @@ internal sealed class MainForm : Form
                 if (IsHandleCreated && !IsDisposed)
                     BeginInvoke(new Action(() => ProcessFrame(frame)));
             }
-            catch (InvalidOperationException) { /* 창 종료 중 */ }
+            catch (InvalidOperationException) {   }
         }
     }
 

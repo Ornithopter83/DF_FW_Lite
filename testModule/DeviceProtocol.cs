@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace DFTestModule;
 
-// Main/Rod의 기존 wire format을 그대로 사용한다. Lite 신규 PID를 추가하지 않는다.
+ 
 internal static class DeviceProtocol
 {
     public static string Torque(int duty, int timeMs)
