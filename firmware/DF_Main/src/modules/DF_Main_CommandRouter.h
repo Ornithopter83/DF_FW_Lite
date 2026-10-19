@@ -9,8 +9,6 @@ void anaFastHold(String msg);
 void anaFastComboBtn(String msg);
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
-short lmFish_3Level_Set(short pwr);
-void lmReturnOrHome_Start();
 void wireHomeControl_Start();
 void wireHomeControl_Stop();
 void wireHome_Control();

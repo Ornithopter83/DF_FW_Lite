@@ -20,8 +20,6 @@ void torqMot_OffControlStop();
 void torqMotor_OffTime_Control();
 void bbnMotor_OffTime_Start(unsigned int time);
 void bbnMotor_OffTime_Control();
-void lmMotor_OffTime_Start(unsigned int time);
-void lmMotor_OffTime_Control();
 void clear_ExecFlag();
 void execGameOver();
 void setVal_Hit_MainPwr(String msg);

@@ -1,4 +1,4 @@
-// Main diagnostics implementation.
+ 
 #include "../DF_Main_Internal.h"
 #include "DF_Main_Diagnostics.h"
 void diagInput_AllOff()
@@ -10,13 +10,13 @@ void diagInput_AllOff()
 	
 }
 
-// Clear All Input Exec Flag
+ 
 
-#define DIAG_CHAGE_VAL	3		// 값의 변화가 있도록 OLD값을 갱신
+#define DIAG_CHAGE_VAL	3		 
 
 void diagInput_BoardInAllOff()
 {
-	// Board Input All Off
+	 
 	diagInFlag_ResetSwc = 0; 	
 	diagInFlag_BootSwc = 0; 	
 	diagInFlag_WdtLbSig = 0; 	
@@ -24,12 +24,12 @@ void diagInput_BoardInAllOff()
 }
 void diagInput_BoardInAllOn()
 {
-	// Board Input All Off
-	//diagInFlag_ResetSwc = 1; 	
+	 
+	 
 	diagInFlag_BootSwc = 1; 	
 	oldsensorBootSwc = sensorBootSwc + DIAG_CHAGE_VAL;
-	//diagInFlag_WdtLbSig = 1; 	
-	//diagInFlag_SelectBoard = 1;
+	 
+	 
 }
 
 void DiagInput_MotInAllOff()
@@ -62,7 +62,7 @@ void DiagInput_MainEcoderInAllOn()
 		oldsensorBbnEncCnt= sensorBbnEncCnt + DIAG_CHAGE_VAL;
 	}
 
-	//agInFlag_AngleHomeSns = 1;
+	 
 
 }
 
@@ -70,7 +70,7 @@ void DiagInput_MainEcoderInAllOn()
 
 void DiagInput_MechaInAllOff()
 {
-	// Reserve
+	 
 }
 
 
@@ -78,7 +78,7 @@ void DiagInput_ElecInAllOff()
 {
 	diagInFlag_PonSwc = 0;
 	diagInFlag_PcUsb5V = 0;
-	//diagInFlag_Interlock = 0;
+	 
 }
 void DiagInput_ElecInAllOn()
 {
@@ -86,13 +86,13 @@ void DiagInput_ElecInAllOn()
 	oldsensorPonSwc = sensorPonSwc + DIAG_CHAGE_VAL;
 	diagInFlag_PcUsb5V = 1;
 	oldsensorUsb5V = sensorUsb5V + DIAG_CHAGE_VAL;
-	//diagInFlag_Interlock = 1;
-	//oldsensorDoorIlk = sensorDoorIlk + DIAG_CHAGE_VAL;
+	 
+	 
 }
 
 void diagInput_Cat0(String _msg)
 {
-	// 5 th : "-"
+	 
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
 	switch(iItemNo)
 	{
@@ -109,14 +109,14 @@ void diagInput_Cat0(String _msg)
 
 }
 
-// BOARD IN 
+ 
 void diagIput_Cat1(String _msg)
 {
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
-		   // 8th : ","
+		    
 	int iAct = _msg.substring(9,(9+1)).toInt();
-		   // 10th : ","
-	int iPara = _msg.substring(11,(11+3)).toInt();	// NOT USE
+		    
+	int iPara = _msg.substring(11,(11+3)).toInt();	 
 
 		   switch(iItemNo)
 		   {
@@ -135,13 +135,13 @@ void diagIput_Cat1(String _msg)
 			   case 1:
 				   if(DAIG_OFF == iAct)
 				   {
-					   diagInFlag_ResetSwc = 0; 		   // Monitor OFF
+					   diagInFlag_ResetSwc = 0; 		    
 					   
 					   LogPrintln(" LG] IO_in Reset SWC mon ON");
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
-					   diagInFlag_ResetSwc = 1; 		   // Moniot ON
+					   diagInFlag_ResetSwc = 1; 		    
 					   oldsensorResetSwc = sensorResetSwc + DIAG_CHAGE_VAL;
 					   
 					   LogPrintln(" LG] IO_in Reset SWC mon ON");
@@ -155,13 +155,13 @@ void diagIput_Cat1(String _msg)
 			   case 2:
 				   if(DAIG_OFF == iAct)
 				   {
-					   diagInFlag_BootSwc = 0;			   // Monitor OFF
+					   diagInFlag_BootSwc = 0;			    
 					   
 					   LogPrintln(" LG] IO_in Boot SWC mon OFF");
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
-					   diagInFlag_BootSwc = 1;			   // Moniot ON
+					   diagInFlag_BootSwc = 1;			    
 					   oldsensorBootSwc = sensorBootSwc + DIAG_CHAGE_VAL;
 					   
 					   LogPrintln(" LG] IO_in Boot SWC mon ON");
@@ -173,11 +173,11 @@ void diagIput_Cat1(String _msg)
 			   case 3:
 				   if(DAIG_OFF == iAct)
 				   {
-					   diagInFlag_WdtLbSig = 0; 		   // Monitor OFF
+					   diagInFlag_WdtLbSig = 0; 		    
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
-					   diagInFlag_WdtLbSig = 1; 		   // Moniot ON
+					   diagInFlag_WdtLbSig = 1; 		    
 					   oldsensorWdtFbSig = sensorWdtFbSig + DIAG_CHAGE_VAL;
 					   
 					   LogPrintln(" LG] IO_in WDT LB Signal mon ON");
@@ -189,7 +189,7 @@ void diagIput_Cat1(String _msg)
 			   case 4: 
 				   if(DAIG_OFF == iAct)
 				   {
-					   diagInFlag_SelectBoard = 0;			   // Monitor CW Mon OFF
+					   diagInFlag_SelectBoard = 0;			    
 				   }
 				   else if(DAIG_ON == iAct)
 				   {
@@ -198,7 +198,7 @@ void diagIput_Cat1(String _msg)
 					   
 					   LogPrintln(" LG] IO_in Door Interlock mon ON");
 				   }
-				   break; // Input Monitor Start
+				   break;  
 			   default: 
 				   
 				   LogPrintln(" LG] IO_in Can't Find Item No");
@@ -206,17 +206,17 @@ void diagIput_Cat1(String _msg)
 		   	}
 }
 
-// MOTOR IN
+ 
 void diagInput_Cat3(String _msg)
 {
 
 	String logmsg;
 	
 	int iItemNo = _msg.substring(6,(6+2)).toInt();
-	// 8th : ","
+	 
 	int iAct = _msg.substring(9,(9+1)).toInt();
-	// 10th : ","
-	int iPara = _msg.substring(11,(11+3)).toInt();	 // NOT USE
+	 
+	int iPara = _msg.substring(11,(11+3)).toInt();	  
 
 	switch(iItemNo)
 	{
@@ -235,7 +235,7 @@ void diagInput_Cat3(String _msg)
 		case 1: 
 			if(DAIG_OFF == iAct)
 			{
-				 diagInFlag_BobbinEncA = 0; 		// BBN Enc A
+				 diagInFlag_BobbinEncA = 0; 		 
 				 
 				 LogPrintln(" LG] IO_in Main Enc_A mon OFF");
 			}
@@ -246,12 +246,12 @@ void diagInput_Cat3(String _msg)
 				
 				LogPrintln(" LG] IO_in Main Enc_A mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 
 		case 2: 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_BobbinEncB = 0;			// BBN ENC B
+				diagInFlag_BobbinEncB = 0;			 
 			}
 			else if(DAIG_ON == iAct)
 			{
@@ -260,12 +260,12 @@ void diagInput_Cat3(String _msg)
 				
 				LogPrintln(" LG] IO_in Main Enc_B mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 
-		case 3: 					// Main Encoder Direction
+		case 3: 					 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_BobbinEncDir = 0;			// BBN ENC DIR
+				diagInFlag_BobbinEncDir = 0;			 
 			}
 			else if(DAIG_ON == iAct)
 			{
@@ -274,12 +274,12 @@ void diagInput_Cat3(String _msg)
 				
 				LogPrintln(" LG] IO_in Main Enc Dir/Cnt ON");
 			}
-			break; // Input Monitor Start
+			break;  
 
-		case 4: 					// Main Encoder Direction
+		case 4: 					 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_AngleHomeSns = 0;			// ANGLE HOME SNS
+				diagInFlag_AngleHomeSns = 0;			 
 				LogPrintln(" LG] IO_in Angle HomeSensor mon OFF");
 			}
 			else if(DAIG_ON == iAct)
@@ -289,12 +289,12 @@ void diagInput_Cat3(String _msg)
 				
 				LogPrintln(" LG] IO_in Angle HomeSensor mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 
-		case 5: 					// Main Encoder Direction
+		case 5: 					 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_BbnBldcFG = 0;			// BBN FG
+				diagInFlag_BbnBldcFG = 0;			 
 				LogPrintln(" LG] IO_in BBN BLDC FG mon OFF");
 			}
 			else if(DAIG_ON == iAct)
@@ -304,10 +304,10 @@ void diagInput_Cat3(String _msg)
 				
 				LogPrintln(" LG] IO_in BBN BLDC FG mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 	
-		 //case 6:		 // IN3-6 1ms 불필요(DIAG는 10로 변화만 CHECK)
-		 //  break;
+		  
+		  
 			 
 	
 		default:
@@ -317,15 +317,15 @@ void diagInput_Cat3(String _msg)
 
 }
 
-// ELEC IN
+ 
 void diagInput_Cat5(String _msg)
 {
-	   // 5 th : "-"
+	    
 	   int iItemNo = _msg.substring(6,(6+2)).toInt();
-	   // 8th : ","
+	    
 	   int iAct = _msg.substring(9,(9+1)).toInt();
-	   // 10th : ","
-	   int iPara = _msg.substring(11,(11+3)).toInt();	// NOT USE
+	    
+	   int iPara = _msg.substring(11,(11+3)).toInt();	 
 
 	switch(iItemNo)
 	{
@@ -342,7 +342,7 @@ void diagInput_Cat5(String _msg)
 		case 1: 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_PonSwc = 0;			// Monitor CW Mon OFF
+				diagInFlag_PonSwc = 0;			 
 			}
 			else if(DAIG_ON == iAct)
 			{
@@ -351,11 +351,11 @@ void diagInput_Cat5(String _msg)
 				
 				LogPrintln(" LG] IO_in Power On Switch mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 		case 2: 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_PcUsb5V = 0; 			// Monitor CW Mon OFF
+				diagInFlag_PcUsb5V = 0; 			 
 			}
 			else if(DAIG_ON == iAct)
 			{
@@ -364,11 +364,11 @@ void diagInput_Cat5(String _msg)
 				
 				LogPrintln(" LG] IO_in Usb 5V mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 		case 3: 
 			if(DAIG_OFF == iAct)
 			{
-				diagInFlag_Interlock = 0;			// Monitor CW Mon OFF
+				diagInFlag_Interlock = 0;			 
 			}
 			else if(DAIG_ON == iAct)
 			{
@@ -377,7 +377,7 @@ void diagInput_Cat5(String _msg)
 				
 				LogPrintln(" LG] IO_in Door Interlock mon ON");
 			}
-			break; // Input Monitor Start
+			break;  
 			
 		default: 
 			LogPrintln(" LG] IO_in Can't Find Item No");
@@ -386,9 +386,9 @@ void diagInput_Cat5(String _msg)
 
 }
 
-/*-------------------------------------------------------------------
-$DIxx-yy,A%
--------------------------------------------------------------------*/
+ 
+
+
 void diagInputTest(String _msg)
 {
 	   int iCatNo = 0;
@@ -398,64 +398,64 @@ void diagInputTest(String _msg)
 
 	   String logmsg = "";
 	   
-	   //int dir = 0;
-	   //int dutyPercent = 0;
+	    
+	    
 
-	   //------------------------------------------------------
-	   //  $DIxx-xx,A%
-	   //------------------------------------------------------
-	   iCatNo = _msg.substring(3,(3+2)).toInt();	//xx-
-	   // 5 th : "-"
-	   iItemNo = _msg.substring(6,(6+2)).toInt();	//yy,
-	   // 8th : ","
-	   iAct = _msg.substring(9,(9+1)).toInt();		//A,
-	   // 10th : ","
-	   iPara = _msg.substring(11,(11+3)).toInt();	// NOT USE
+	    
+	    
+	    
+	   iCatNo = _msg.substring(3,(3+2)).toInt();	 
+	    
+	   iItemNo = _msg.substring(6,(6+2)).toInt();	 
+	    
+	   iAct = _msg.substring(9,(9+1)).toInt();		 
+	    
+	   iPara = _msg.substring(11,(11+3)).toInt();	 
 	   
 	   if( 0 == iCatNo)
 	   {
 			diagInput_Cat0(_msg);
 	   }
-	   else if( 1 == iCatNo)	   // 보드1 Board In
+	   else if( 1 == iCatNo)	    
 	   {
 	   		diagIput_Cat1(_msg);
 
 	   }
-	   else if( 2 == iCatNo)		   // Reserve (OP)
+	   else if( 2 == iCatNo)		    
 	   {
-		   // RSV
+		    
 		   LogPrintln(" LG] IO_in Can't Find Cat No");
 	   }
-	   else if( 3 == iCatNo)		   // Motor IN
+	   else if( 3 == iCatNo)		    
 	   {
 	   		diagInput_Cat3(_msg);
 	   }
 
-	   // "04" - Reserve
-	   else if( 4 == iCatNo)	   // 
+	    
+	   else if( 4 == iCatNo)	    
 	   {
-	   	// RSV
+	   	 
 	   }
 
-	   // "05" - Board Input
-	   else if( 5 == iCatNo)	   // 
+	    
+	   else if( 5 == iCatNo)	    
 	   {
 	   		diagInput_Cat5(_msg);
 
 	   }
-	   else if( 11 == iCatNo)	   // 
+	   else if( 11 == iCatNo)	    
 	   {
 	   }
-	   else if( 12 == iCatNo)	   // 
+	   else if( 12 == iCatNo)	    
 	   {
 	   }
-	   else if( 14 == iCatNo)	   // 
+	   else if( 14 == iCatNo)	    
 	   {
 	   }
-	   else if( 15 == iCatNo)	   // 
+	   else if( 15 == iCatNo)	    
 	   {
 	   }
-	   else if( 20 == iCatNo)	   // 
+	   else if( 20 == iCatNo)	    
 	   {
 	   }
 	   else
@@ -464,13 +464,13 @@ void diagInputTest(String _msg)
 		   LogPrintln(" LG] IO_in Can't Find Cat No");
 	   }
 
-   // TBD,	Responce - Return Value
-   // Diag ON - Input - Chaned then Responce Always!!!
+    
+    
 }
 
-//===============================\
-//  Diag Output Functins
-//===============================
+ 
+ 
+ 
 
 void diagOutput_AllOff()
 {
@@ -511,117 +511,59 @@ void setOutRGBcolor(int pos, int Color)
 	}
 }
 
-// LM MOT DIAG OUT
-//
-static int lmMotTimeout_step = 0;
-int diagOutflag_lmMotTimeOut = 0;
-static unsigned long lmMotTimeout_Val = 0;
-
-void diagLmMotor_TimeoutStart(unsigned int _time)
-{
-	lmMotTimeout_Val = _time;
-	lmMotTimeout_step = 10;			// Start
-	diagOutflag_lmMotTimeOut = 1;		// monitor SET
-}
-
-void diagLmMotor_TimeOutStop()
-{
-	diagOutflag_lmMotTimeOut = 0;		// monitor SET
-	lmMotTimeout_step = 0;			// Start
-}
-
-//
-void diagLmMotor_TimeoutControl()
-{
-	static long _to;
-	switch(lmMotTimeout_step)
-	{
-		case 0:	// IDLE
-			break;
-			
-		case 10:	// START
-			setTO(_to);
-			lmMotTimeout_step = 20;
-			break;
-		case 20:	// TIMEOUT Check
-			if(checkTO(_to, lmMotTimeout_Val))
-			{
-				lmMotTimeout_step = 30;
-			}
-			break;
-		case 30:	// MOT OFF
-			lmMotOff();
-			lmMotTimeout_step = 40;
-			break;
-		case 40:	// END
-			_to = 0;
-			lmMotTimeout_step = 0;
-			break;
-		default:
-			// ERROR (unknown Step)
-			break;
-	}
-}
-
-
-/*
-==========================================================
-	DIAG BBN Motor Control
-		for DIAG
-==========================================================
-*/
-// Auto Time Out  Control
+ 
+ 
 void diagBbnMotor_TimeoutStart(unsigned int _time)
 {
 	bbnTimeout_Val = _time;
-	bbnTimeout_step = 0x10;			// Start
-	diagOutflag_bbnTimeOut = 1;		// monitor SET
+	bbnTimeout_step = 0x10;			 
+	diagOutflag_bbnTimeOut = 1;		 
 }
 
-// TBD, 
-/*
-	Diag_Exit함수에 아래 추가 필요.
-
-	1. (조작) Diag나가기, Cat별 All Off하기등 
-	 Step중에 종료되는 경우, Flag/Step처리 추가할 것.
-*/
+ 
+ 
 
 
-//
+
+
+
+
+
+ 
 void diagBbnMotor_TimeoutControl()
 {
 	
 	switch(bbnTimeout_step)
 	{
-		case 0x00:	// IDLE
+		case 0x00:	 
 			break;
-		case 0x10:	// START
+		case 0x10:	 
 			setTO(bbnDiagTO);
 			bbnTimeout_step = 0x20;
 			break;
-		case 0x20:	// TIMEOUT Check
+		case 0x20:	 
 			if(checkTO(bbnDiagTO, bbnTimeout_Val))
 			{
 				bbnTimeout_step = 0x30;
 			}
 			break;
-		case 0x30:	// MOT OFF
+		case 0x30:	 
 			bbnBldcOff();
 			bbnTimeout_step = 0x40;
 			break;
-		case 0x40:	// END
+		case 0x40:	 
 			diagOutflag_bbnTimeOut = 0;
 			bbnTimeout_step = 0x00;
 			break;
 		default:
-			// ERROR (unknown Step)
+			 
 			break;
 	}
 }
 
-//=============================================
-//	TOK TOK Control
-//=============================================
+ 
+ 
+ 
 void daigBbnMotor_TokTokEnd()
 {
 	diagBbnflag_TokTokControl = 0;
@@ -633,109 +575,109 @@ void daigBbnMotor_TokTokEnd()
 void diagBbnMotor_TokTokStart(unsigned int _ackKind, unsigned int _cnt)
 {
 
-/*
-	bbnTokTok_OnDuty = _onduty;
-	bbnTokTok_OnTime = _ontime;
-	bbnTokTok_OffDuty = _offduty;
-	bbnTokTok_OffTime = _offtime;
-*/
+ 
+
+
+
+
+
 	bbnActKind = _ackKind;
-	// bbnOpKind = _opKind;
+	 
   	bbnReqCnt[bbnActKind] = _cnt;
 
 
 	bbnTokTok_step = 0x10;
-	diagBbnflag_TokTokControl = 1;		// Start
+	diagBbnflag_TokTokControl = 1;		 
 }
 
 
-//
-void diagBbnMotor_TokTokControl(unsigned _opKind)		//_ak : Action Kind
+ 
+void diagBbnMotor_TokTokControl(unsigned _opKind)		 
 {
-	//static unsigned long to;
-  /*
-	if(oldbbnTokStep != bbnTokTok_step)
-	{
-		oldbbnTokStep = bbnTokTok_step;
-		
-		LogPrintln(" LG] StepC bbn toktok step: " + String(bbnTokTok_step) );
-	}
-  */
+	 
+   
+
+
+
+
+
+
+
 	
 	switch(bbnTokTok_step)
 	{
-		case 0x00:	// IDLE
+		case 0x00:	 
 			break;
 			
-		case 0x10:	// START
+		case 0x10:	 
 			bbnRptCnt = 0;
 			setTO(bbnTokTO);
 			bbnTokTok_step = 0x20;
 			break;
 			
-		case 0x20:	// TIMEOUT Check
-			bbnMotor.onBldc(BBN_MOT_CW, sBbnActTbl[bbnActKind].onDuty);	// MOT CW ON
+		case 0x20:	 
+			bbnMotor.onBldc(BBN_MOT_CW, sBbnActTbl[bbnActKind].onDuty);	 
 			setTO(bbnTokTO);
 			bbnTokTok_step = 0x30;
 			break;
 		case 0x30:
 			if(checkTO(bbnTokTO, sBbnActTbl[bbnActKind].onTime))
 			{
-				bbnMotor.offBldc();				// MOT OFF
+				bbnMotor.offBldc();				 
 				setTO(bbnTokTO);
 				bbnTokTok_step = 0x40;
 			}
 			break;
-		case 0x40:	// MOT OFF WAIT
+		case 0x40:	 
 			if(checkTO(bbnTokTO, sBbnActTbl[bbnActKind].offTime))
 			{
 				bbnRptCnt++;
 				if( bbnReqCnt[bbnActKind] < bbnRptCnt)
 				{
-					bbnTokTok_step = 0x70;		// END
+					bbnTokTok_step = 0x70;		 
 				}
 				else
 				{
-					bbnTokTok_step = 0x20;			// REPEAT
+					bbnTokTok_step = 0x20;			 
 				}
 			}
 			break;
 
-		case 0x50:	// DUMMY
+		case 0x50:	 
 			break;
 
-		case 0x60:	// DUMMY
+		case 0x60:	 
 			break;
 			
 
-		case 0x70:	// END
-			bbnMotor.offBldc(); 			// MOT OFF
-			// Flage CLR & VAR Clear
+		case 0x70:	 
+			bbnMotor.offBldc(); 			 
+			 
 			bbnRptCnt = 0;
 			
 			bbnTokTok_step = 0x00;
 			break;
 		default:
-			// ERROR (unknown Step)
+			 
 			break;
 	}
 }
 
-//
+ 
 void diagOut_Cat1(String _msg)
 {
-	int iCatNo = _msg.substring(3,(3+2)).toInt();	// cat(2)
-	//5th : "-"
-	int iItemNo = _msg.substring(6,(6+2)).toInt();	// item(2)
-	// 8th : ","
-	int iAct = _msg.substring(9,(9+1)).toInt(); 	// Act(1)
-	// 10th : ","
-	int iPara = _msg.substring(11,(11+3)).toInt();	// para_1(3)
-	//14th : ","
-	//iPara2 = _msg.substring(15).toInt();	// para_2(4)
-	int iPara2 = _msg.substring(15,(15+4)).toInt(); // para_2(4)
-	// 19th : ","
-	int iPara3 = _msg.substring(20,(20+5)).toInt(); // para_3(5)
+	int iCatNo = _msg.substring(3,(3+2)).toInt();	 
+	 
+	int iItemNo = _msg.substring(6,(6+2)).toInt();	 
+	 
+	int iAct = _msg.substring(9,(9+1)).toInt(); 	 
+	 
+	int iPara = _msg.substring(11,(11+3)).toInt();	 
+	 
+	 
+	int iPara2 = _msg.substring(15,(15+4)).toInt();  
+	 
+	int iPara3 = _msg.substring(20,(20+5)).toInt();  
 
 	switch(iItemNo)
 	{
@@ -745,7 +687,7 @@ void diagOut_Cat1(String _msg)
 			LogPrintln(" LG] IOout Board Output All OFF");
 			break;
 		case 1:
-			diagOutFlag_WDToff = 1; 		// WDT OFF
+			diagOutFlag_WDToff = 1; 		 
 			
 			LogPrintln(" LG] IOout WDT OFF");
 			break;
@@ -800,8 +742,8 @@ void diagOut_Cat1(String _msg)
 			else
 			{
 			}
-			break; // Input Monitor Start
-		case 5 :	// DEBUG PORT
+			break;  
+		case 5 :	 
 			if(DAIG_OFF == iAct)
 			{
 				debugPort_Off();
@@ -815,7 +757,7 @@ void diagOut_Cat1(String _msg)
 	
 			else
 			{
-				// Error
+				 
 			}
 			break;
 	
@@ -825,32 +767,32 @@ void diagOut_Cat1(String _msg)
 
 }
 
-// DIAG OUT 03-XX
+ 
 void diagOut_Cat3(String _msg)
 {
-	int iCatNo = _msg.substring(3,(3+2)).toInt();	// cat(2)
-	//5th : "-"
-	int iItemNo = _msg.substring(6,(6+2)).toInt();	// item(2)
-	// 8th : ","
-	int iAct = _msg.substring(9,(9+1)).toInt(); 	// Act(1)
-	// 10th : ","
-	int iPara = _msg.substring(11,(11+3)).toInt();	// para_1(3)
-	//14th : ","
-	//iPara2 = _msg.substring(15).toInt();	// para_2(4)
-	int iPara2 = _msg.substring(15,(15+4)).toInt(); // para_2(4)
-	// 19th : ","
-	int iPara3 = _msg.substring(20,(20+5)).toInt(); // para_3(5)
+	int iCatNo = _msg.substring(3,(3+2)).toInt();	 
+	 
+	int iItemNo = _msg.substring(6,(6+2)).toInt();	 
+	 
+	int iAct = _msg.substring(9,(9+1)).toInt(); 	 
+	 
+	int iPara = _msg.substring(11,(11+3)).toInt();	 
+	 
+	 
+	int iPara2 = _msg.substring(15,(15+4)).toInt();  
+	 
+	int iPara3 = _msg.substring(20,(20+5)).toInt();  
 
 	switch(iItemNo)
 	{
-		case 0 :	// TBD Mot All Off
+		case 0 :	 
 			torqMotor.setValue(0);
 			bbnMotor.offBldc();
 			
 			LogPrintln(" LG] IOout Motot ALL OFF");
 			break;
 			
-		case 1 :	// TORQ
+		case 1 :	 
 			if(DAIG_MOT_OFF == iAct)
 			{
 				torqMotor.setValue(0);
@@ -869,22 +811,22 @@ void diagOut_Cat3(String _msg)
 			}
 			break;
 			
-		case 2 :	// TBD , Angle Motor
+		case 2 :	 
 			break;
 	
-		case 3 :	// BBN BLDC
-			// Para Check
-			/*
-			if((DAIG_MOT_OFF != iAct ) && ( 1 > iPara || 100 < iPara))
-			{
-				
-				LogPrintln(" LG] Duty Range Over : " + String(iPara));
-	
-				// END
-				//iPara = 5;
-				break;
-			}
-			*/
+		case 3 :	 
+			 
+			 
+
+
+
+
+
+
+
+
+
+
 			
 			if(DAIG_MOT_OFF == iAct)
 			{
@@ -912,71 +854,71 @@ void diagOut_Cat3(String _msg)
 			break;
 			
 			
-		case 4 :	// TBD	BLDC_24V_OFF
+		case 4 :	 
 			if(DAIG_MOT_OFF == iAct)
 			{
-				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VOFF);	// BLDC_24V_ON OFF
+				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VOFF);	 
 				
 				LogPrintln(" LG] IOout BBN24 OFF");
 			}
-			else			// ON
+			else			 
 			{
-				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VON);	  // BLDC_24V_ON ON
+				digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VON);	   
 				
 				LogPrintln(" LG] IOout BBN24 ON");
 			}
 			break;
 	
-		case 5 :	// BBN BLDC TOKTOK
-			// Para Check
-			/*
-			if((DAIG_MOT_OFF != iAct ) && ( 1 > iPara || 100 < iPara))
-			{
-				
-				LogPrintln(" LG] Duty Range Over : " + String(iPara));
-	
-				// END
-				//iPara = 5;
-				break;
-			}
-			*/
+		case 5 :	 
+			 
+			 
+
+
+
+
+
+
+
+
+
+
 			
 			if(DAIG_MOT_OFF == iAct)
 			{
-				//bbnMotor.offBldc();
+				 
 				daigBbnMotor_TokTokEnd();
 				
 				LogPrintln(" LG] IOout BBNTK OFF");
 			}
 			else if(DAIG_MOT_CW == iAct)
 			{
-				//bbnMotor.onBldc(BBN_MOT_CW, iPara);
-				//diagBbnMotor_TokTokStart(bbnTokTok_OnDuty, bbnTokTok_OnTime, bbnTokTok_OffDuty, bbnTokTok_OffTime);
-				//iPara = _msg.substring(9,(9+1)).toInt();	// // ActKind
-				if ( (BBNACT_TBLMAX) <= iPara)	{ iPara = 0; }		// OP_kind (Wave,...)
-				//iPara2 = _msg.substring(10,(10+1)).toInt();	// Repeat CNT
-				//if (	<= iPara2)	{ iPara2 =	}
-				//iPara2 = _msg.substring(10).toInt();	// Repeat CNT  (Repeat)
+				 
+				 
+				 
+				if ( (BBNACT_TBLMAX) <= iPara)	{ iPara = 0; }		 
+				 
+				 
+				 
 				if ( (10000) <= iPara2) { iPara2 = 10000; }
-			//TBD Cnt or TIME
-			/*
-				iPara2 = _msg.substring(10).toInt();	// Total Time
-				if ( (30000) <= iPara2) { iPara2 = 30000; }
-			*/
-				diagBbnMotor_TokTokStart(iPara, iPara2);			// (ActKind=OpKind, RPT CNT) 
-				//String tokStr = String(bbnTokTok_OnDuty) + ", " + String(bbnTokTok_OnTime) + ", " + String(bbnTokTok_OffDuty) + ", " + String(bbnTokTok_OffTime);
+			 
+			 
+
+
+
+				diagBbnMotor_TokTokStart(iPara, iPara2);			 
+				 
 				
 				LogPrintln(" LG] IOout BBNTK ON, AckKind : " + String(iPara) + ", opKind: " + String(iPara2) + ", Repeat CNT: " + String(iPara3)+ ", On/Time/Off/Time: " + String(bbnTokTok_OnDuty) + ", " + String(bbnTokTok_OnTime) + ", " + String(bbnTokTok_OffDuty) + ", " + String(bbnTokTok_OffTime));
 			}
-		/*
-			else if(DAIG_MOT_CCW == iAct)
-			{
-				bbnMotor.onBldc(BBN_MOT_CCW, dutyPercent);
-				//daigBbnMotor_TimeoutStart(3000);
-				
-				LogPrintln(" LG] IOout Bobbin CCW ON, Duty : " + String(iPara));
-			}
-		*/
+		 
+
+
+
+
+
+
+
+
 			else
 			{
 			}
@@ -989,12 +931,12 @@ void diagOut_Cat3(String _msg)
 
 }
 
-/*
-=================================================================
-	DIAG OUTPUT Control
-$DOxx-yy,A,pppp,PPPPP
-=================================================================
-*/
+ 
+
+
+
+
+
 void diagOutputTest(String _msg)
 {
 		int iCatNo = 0;
@@ -1007,44 +949,44 @@ void diagOutputTest(String _msg)
 		int dir = 0;
 		int dutyPercent = 0;
 		
-		iCatNo = _msg.substring(3,(3+2)).toInt();	// cat(2)
-		//5th : "-"
-		iItemNo = _msg.substring(6,(6+2)).toInt();	// item(2)
-		// 8th : ","
-		iAct = _msg.substring(9,(9+1)).toInt();		// Act(1)
-		// 10th : ","
-		iPara = _msg.substring(11,(11+3)).toInt();	// para_1(3)
-		//14th : ","
-		//iPara2 = _msg.substring(15).toInt();	// para_2(4)
-		iPara2 = _msg.substring(15,(15+4)).toInt();	// para_2(4)
-		// 19th : ","
-		iPara3 = _msg.substring(20,(20+5)).toInt();	// para_3(5)
+		iCatNo = _msg.substring(3,(3+2)).toInt();	 
+		 
+		iItemNo = _msg.substring(6,(6+2)).toInt();	 
+		 
+		iAct = _msg.substring(9,(9+1)).toInt();		 
+		 
+		iPara = _msg.substring(11,(11+3)).toInt();	 
+		 
+		 
+		iPara2 = _msg.substring(15,(15+4)).toInt();	 
+		 
+		iPara3 = _msg.substring(20,(20+5)).toInt();	 
 		
 	
 		dutyPercent = iPara;
 
-		//LogPrintln(" LG] IOout " );
+		 
 		if( 0 == iCatNo && 0 == iItemNo )
 		{
-			// DiagInMonitor = 0;
+			 
 			diagOutput_AllOff();
 			
 			LogPrintln(" LG] IOout All Output ALL OFF");
 		}
 
-		// " 1" - BD_OUT
-		else if( 1 == iCatNo)		// 보드1 Board Out
+		 
+		else if( 1 == iCatNo)		 
 		{
 			diagOut_Cat1(_msg);
 		}
 
-		// "02"- Ext LED
-		else if( 2 == iCatNo)			// Reserve (OP)
+		 
+		else if( 2 == iCatNo)			 
 		{
 			switch(iItemNo)
 			{
-				case 0:	// TBD
-					//diagInput_BoardInAllOff();
+				case 0:	 
+					 
 					extLed_AllOff();					
 					
 					LogPrintln(" LG] IOout Ext LED All OFF");
@@ -1052,15 +994,15 @@ void diagOutputTest(String _msg)
 				case 1:
 					if(DAIG_OFF == iAct)
 					{
-						diagOutFlag_LedCent_R = 0;			// Monitor OFF
-						extLed.off(LEDPOS_CENT_R);		// Position, Duty
+						diagOutFlag_LedCent_R = 0;			 
+						extLed.off(LEDPOS_CENT_R);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_R OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
-						diagOutFlag_LedCent_R = 1;			// Moniot ON
-						extLed.on(LEDPOS_CENT_R, iPara);		// Position, Duty
+						diagOutFlag_LedCent_R = 1;			 
+						extLed.on(LEDPOS_CENT_R, iPara);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_R ON");
 					}
@@ -1071,15 +1013,15 @@ void diagOutputTest(String _msg)
 				case 2:
 					if(DAIG_OFF == iAct)
 					{
-						diagOutFlag_LedCent_G = 0;			// Monitor OFF
-						extLed.off(LEDPOS_CENT_G);		// Position, Duty
+						diagOutFlag_LedCent_G = 0;			 
+						extLed.off(LEDPOS_CENT_G);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_G OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
-						diagOutFlag_LedCent_G = 1;			// Moniot ON
-						extLed.on(LEDPOS_CENT_G, iPara);		// Position, Duty
+						diagOutFlag_LedCent_G = 1;			 
+						extLed.on(LEDPOS_CENT_G, iPara);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_G ON");
 					}
@@ -1090,15 +1032,15 @@ void diagOutputTest(String _msg)
 				case 3:
 					if(DAIG_OFF == iAct)
 					{
-						diagOutFlag_LedCent_B = 0;			// Monitor OFF
-						extLed.off(LEDPOS_CENT_B);		// Position, Duty
+						diagOutFlag_LedCent_B = 0;			 
+						extLed.off(LEDPOS_CENT_B);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_B OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
-						diagOutFlag_LedCent_B = 1;			// Moniot ON
-						extLed.on(LEDPOS_CENT_B, iPara);		// Position, Duty
+						diagOutFlag_LedCent_B = 1;			 
+						extLed.on(LEDPOS_CENT_B, iPara);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_B ON");
 					}
@@ -1109,18 +1051,18 @@ void diagOutputTest(String _msg)
 				case 4: 
 					if(DAIG_OFF == iAct)
 					{
-						diagOutFlag_LedCent_RGB = 0; 			// Monitor CW Mon OFF
-						extLed.off(LEDPOS_CENT_R);		// Position, Duty
-						extLed.off(LEDPOS_CENT_G);		// Position, Duty
-						extLed.off(LEDPOS_CENT_B);		// Position, Duty
+						diagOutFlag_LedCent_RGB = 0; 			 
+						extLed.off(LEDPOS_CENT_R);		 
+						extLed.off(LEDPOS_CENT_G);		 
+						extLed.off(LEDPOS_CENT_B);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB OFF");
 					}
 					else if(DAIG_ON == iAct)
 					{
 						diagOutFlag_LedCent_RGB = 1;
-						//setRGBcolor(sRGB, iPara);				// Color N -> R,G,B
-						setRGBcolor(LEDPOS_CENT_RGB, iPara);				// Color N -> R,G,B
+						 
+						setRGBcolor(LEDPOS_CENT_RGB, iPara);				 
 						extLed.RGBon(LEDPOS_CENT_RGB, sRGB[LEDPOS_CENT_RGB].r, sRGB[LEDPOS_CENT_RGB].g, sRGB[LEDPOS_CENT_RGB].b);
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
@@ -1128,25 +1070,25 @@ void diagOutputTest(String _msg)
 					else
 					{
 					}
-					break; // Input Monitor Start
+					break;  
 
-				// TBD Color item, Dimming
+				 
 				case 5:
 					break;
 					
 				case 6: 
 					if(DAIG_OFF == iAct)
 					{
-						//diagOutFlag_LedCent_RGB = 0; 			// Monitor CW Mon OFF
-						extLed.off(LEDPOS_BTM);		// Position, Duty
+						 
+						extLed.off(LEDPOS_BTM);		 
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
 					}
 					else if(DAIG_ON == iAct)
 					{
-						//diagOutFlag_LedCent_RGB = 1;
-						//setRGBcolor(sRGB, iPara);				// Color N -> R,G,B
-						//setRGBcolor(iPara);				// Color N -> R,G,B
+						 
+						 
+						 
 						extLed.on(LEDPOS_BTM, iPara);
 						
 						LogPrintln(" LG] IOout diagOutFlag_LedCent_RGB ON");
@@ -1154,38 +1096,38 @@ void diagOutputTest(String _msg)
 					else
 					{
 					}
-					break; // Input Monitor Start
+					break;  
 					
 				default: 
 					break;
 			}
 		}
 
-		// "03"- MOTOR
+		 
 		else if( 3 == iCatNo )
 		{
 			diagOut_Cat3(_msg);
 		}
 
-		// "04 - Reserved"
+		 
 		else if( 4 == iCatNo )
 		{
 		}
 
-		// "05" - Elec Out
+		 
 		else if( 5 == iCatNo )
 		{
 			switch(iItemNo)
 			{
-				case 0 : 	// TBD Mot All Off
-					// Board_1 Out ALL OFF					
+				case 0 : 	 
+					 
 					LogPrintln(" LG] IOout Board_1 ALL OFF");
 					break;
 					
-				case 1 : 	// SUB_AC
+				case 1 : 	 
 					if(DAIG_OFF == iAct)
 					{
-						//subAC_Off();
+						 
 						subAcOff_WithOtherOff();
 					}
 					else if(DAIG_ON == iAct)
@@ -1195,7 +1137,7 @@ void diagOutputTest(String _msg)
 
 					else
 					{
-						// Error
+						 
 					}
 					break;
 					
@@ -1206,37 +1148,37 @@ void diagOutputTest(String _msg)
 
 		else
 		{
-			// Error
+			 
 		}
 }
 
-// NOT USE
+ 
 void findDiagCode(String msg, stDiagCode code)
 {
-	code.catNo = msg.substring(3,5).toInt();	// 2 char	XX
-												// 1char Skip "-" -
-	code.itemNo = msg.substring(6,8).toInt(); 	// 2 char	YY
+	code.catNo = msg.substring(3,5).toInt();	 
+												 
+	code.itemNo = msg.substring(6,8).toInt(); 	 
 	
-	code.act = msg.substring(8,9).toInt();		// 1 char	A
+	code.act = msg.substring(8,9).toInt();		 
 	
-	code.para = msg.substring(9).toInt();		// 3 char ~	PPP ~ PPPPPPPPPPPPP
+	code.para = msg.substring(9).toInt();		 
 }
 
-// NOT USE
+ 
 int controlDiagInput(String msg)
 {
-	stDiagCode diag_code;		// item, actno
+	stDiagCode diag_code;		 
 	findDiagCode(msg, diag_code);
 
 }
 
-// NOT USE
+ 
 int controlDiagOutput(String msg)
 {
-	stDiagCode diag_code;		// item, actno
+	stDiagCode diag_code;		 
 	findDiagCode(msg, diag_code);
 	
-	// execOutAct(diag_code);
+	 
 
 }
 
@@ -1250,125 +1192,125 @@ void diagOutAllOff()
 
 
 
-/*---------------------------------------------------------------------------------------------
-	각 값들의 설정
-	방법 - LOG SERIAL포트로 명령 송신
-	처리 - 각 Control등의 설정값을 세팅
----------------------------------------------------------------------------------------------*/
+ 
 
-// Wave Val SET ( $F0 )
+
+
+
+
+ 
 void Set_WaveData( String msg)
 {
 	int val = 0;
 	char ch = msg.charAt(3);
 	
-	if( '0' == ch ) 		// Control SET
+	if( '0' == ch ) 		 
 	{
-		// Log OUT
+		 
 	}
-	else if( '1' == ch ) 		// Control Case
+	else if( '1' == ch ) 		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 7 < val ) val = 7;
 		waveControlCase = val;
-		//
-		//LogPrintln(" LG] waveControlCase: " + String(waveControlCase);
+		 
+		 
 	}
-	else if( '2' == ch )		// Angle SET
+	else if( '2' == ch )		 
 	{
-		val = msg.substring(4,7).toInt();	// angle 1
+		val = msg.substring(4,7).toInt();	 
 		if( -90 > val ) val = -90;
 		if( 90 < val ) val = 90;
 		stWaveServoVal.angle1 = val;
 	
-		val = msg.substring(7,10).toInt();	// angle 2
+		val = msg.substring(7,10).toInt();	 
 		if( -90 > val ) val = -90;
 		if( 90 < val ) val = 90;
 		stWaveServoVal.angle2 = val;
 	
-		val = msg.substring(10).toInt();	// Interval
+		val = msg.substring(10).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stWaveServoVal.interval = val;
 	}
-	else if( '3' == ch )		// Torq SET
+	else if( '3' == ch )		 
 	{
-		val = msg.substring(4,7).toInt();	// Return Torq
+		val = msg.substring(4,7).toInt();	 
 		if( 20 > val ) val = 20;
 		if( 80 < val ) val = 80;
 		stWaveTorqVal.rtTorq = val;
 	
-		val = msg.substring(7,10).toInt();	// Target Torq
+		val = msg.substring(7,10).toInt();	 
 		if( 20 > val ) val = 20;
 		if( 99 < val ) val = 99;
 		stWaveTorqVal.tgTorq = val;
 	
-		val = msg.substring(10,(10+4)).toInt();	//on Time
+		val = msg.substring(10,(10+4)).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stWaveTorqVal.onInterval = val;
 
-		val = msg.substring(14,(14+4)).toInt();	//Off Interval
+		val = msg.substring(14,(14+4)).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stWaveTorqVal.offInterval = val;
 	}
 	
-	else if( '5' == ch )		// Wave Type SET
+	else if( '5' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( (WAVE_PWR_MAX-1) < val ) val = (WAVE_PWR_MAX-1);
 		waveType = val;
 		waveType_TorqSet();
 	}
-	else if( '6' == ch )		// Wave Type  Torq SET
+	else if( '6' == ch )		 
 	{
-		val = msg.substring(4,(4+3)).toInt();	// Torq 1
+		val = msg.substring(4,(4+3)).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 200 < val ) val = 200;
 		stWaveTorqVal.pwr[1] = val;
 	
-		val = msg.substring(7,(7+3)).toInt();	// Torq 2
+		val = msg.substring(7,(7+3)).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 200 < val ) val = 200;
 		stWaveTorqVal.pwr[2]  = val;
 	
-		val = msg.substring(10,(10+3)).toInt();	// Tprq 3
+		val = msg.substring(10,(10+3)).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 200 < val ) val = 200;
 		stWaveTorqVal.pwr[3]  = val;
 
-		val = msg.substring(13,(13+3)).toInt();	// Tprq 3
+		val = msg.substring(13,(13+3)).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 200 < val ) val = 200;
 		stWaveTorqVal.pwr[4]  = val;
 
-		val = msg.substring(16,(16+3)).toInt();	// Tprq 3
+		val = msg.substring(16,(16+3)).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 200 < val ) val = 200;
 		stWaveTorqVal.pwr[5]  = val;
 		
 	}
-	else if( '7' == ch )		// Torq SET
+	else if( '7' == ch )		 
 	{
-		val = msg.substring(4,7).toInt();	// Return Torq
+		val = msg.substring(4,7).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 80 < val ) val = 80;
 		stWaveBdutyVal.rtTorq = val;
 	
-		val = msg.substring(7,10).toInt();	// Target Torq
+		val = msg.substring(7,10).toInt();	 
 		if( 5 > val ) val = 5;
 		if( 80 < val ) val = 80;
 		stWaveBdutyVal.tgTorq = val;
 	
-		val = msg.substring(10,(10+4)).toInt();	//on Time
+		val = msg.substring(10,(10+4)).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stWaveBdutyVal.onInterval = val;
 
-		val = msg.substring(14,(14+4)).toInt();	//Off Interval
+		val = msg.substring(14,(14+4)).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stWaveBdutyVal.offInterval = val;
@@ -1376,17 +1318,17 @@ void Set_WaveData( String msg)
 
 	
 	
-	else if( '9' == ch )		// Wave Type  Torq SET
+	else if( '9' == ch )		 
 	{
-		val = msg.substring(4,(4+1)).toInt();	// Torq 1
-		if( 0 == val)			// WAVE FUNCTION STOP
+		val = msg.substring(4,(4+1)).toInt();	 
+		if( 0 == val)			 
 		{
 			exeWave = 0;
 			wave_bbn_step = WAVE_BBN_TORQ_START;
 			torqMotor.setValue(DEFAULT_TORQ);
 			bbnMotor.offBldc();
 		}
-		else				// Wave Function Start
+		else				 
 		{
 			waveType_TorqSet();
 			wave_bbn_step = WAVE_BBN_TORQ_START;
@@ -1394,7 +1336,7 @@ void Set_WaveData( String msg)
 		}
 	}
 	
-	if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) || ('9'==ch) )	//
+	if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) || ('9'==ch) )	 
 	{
 		
 		LogPrintln(" LG] Wave_ContCase: " + String(waveControlCase));
@@ -1413,112 +1355,112 @@ void Set_WaveData( String msg)
 
 }
 
-//
-//	SET BITE VAL ($F1 K~)  K: Kind
-//
+ 
+ 
+ 
 void Set_BiteData( String msg)
 {
 	int val = 0;
 	char ch = msg.charAt(3);
 	
-	if( '0' == ch ) 		// View Set Value [ LOG ]
+	if( '0' == ch ) 		 
 	{
 		biteLogOut = 1;
 	}
-	else if( '1' == ch )		// Bite Control Cobination SET
+	else if( '1' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 3 < val ) val = 3;
 		biteTestCase = val;
 	}
-	else if( '2' == ch )		// Toq Control	SET ( NotControl / Just/ IncDec/ withFloats)
+	else if( '2' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 3 < val ) val = 3;
 		biteTorqCase = val;
 		biteLogOut = 1;
 	}
-	else if( '3' == ch )		// Control SET
+	else if( '3' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 1 > val ) val = 1;
 		if( 3 < val ) val = 3;
 		biteCnt = val;
 	}
-	else if( '4' == ch )		// Torq SET
+	else if( '4' == ch )		 
 	{
-		val = msg.substring(4,7).toInt();	// Torq 1
+		val = msg.substring(4,7).toInt();	 
 		if( 60 > val ) val = 60;
 		if( 100 < val ) val = 100;
 		stBiteTorqVal.shallowTorq = val;
 	
-		val = msg.substring(7,11).toInt();	// time
+		val = msg.substring(7,11).toInt();	 
 		if( 300 > val ) val = 300;
 		if( 5000 < val ) val = 5000;
 		stBiteTorqVal.shallowInterval = val;
 	
-		val = msg.substring(11,14).toInt(); // Torq 2
+		val = msg.substring(11,14).toInt();  
 		if( 80 > val ) val = 80;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.deepTorq = val;
 	
-		val = msg.substring(14).toInt();	// Interval
+		val = msg.substring(14).toInt();	 
 		if( 500 > val ) val = 500;
 		if( 5000 < val ) val = 5000;
 		stBiteTorqVal.deepInterval = val;
 	}
 	
-	else if( '5' == ch )		// BITEStrong Type SET
+	else if( '5' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 5 < val ) val = 5;
 		biteType = val;
 	}
-	else if( '6' == ch )		// BITE Type  Torq SET
+	else if( '6' == ch )		 
 	{
-		val = msg.substring(4,7).toInt();	// Torq 1
+		val = msg.substring(4,7).toInt();	 
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[1] = val;
 	
-		val = msg.substring(7,10).toInt();	// Torq 2
+		val = msg.substring(7,10).toInt();	 
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[2] = val;
 	
-		val = msg.substring(10,13).toInt(); // Torq 3
+		val = msg.substring(10,13).toInt();  
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[3] = val;
 	
-		val = msg.substring(13,16).toInt(); // Torq 4
+		val = msg.substring(13,16).toInt();  
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[4] = val;
 	
-		val = msg.substring(16,19).toInt(); // Torq 5
+		val = msg.substring(16,19).toInt();  
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[5] = val;
 	
-		val = msg.substring(19,22).toInt(); // Torq 6
+		val = msg.substring(19,22).toInt();  
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[6] = val;
 	
-		val = msg.substring(22).toInt(); // Torq 7
+		val = msg.substring(22).toInt();  
 		if( 60 > val ) val = 60;
 		if( 150 < val ) val = 150;
 		stBiteTorqVal.torqType[7] = val;
 		
 	}
 	
-	else if( 'A' == ch )		// Servo DEC Angle
+	else if( 'A' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 50 < val ) val = 50;
 		
@@ -1526,12 +1468,12 @@ void Set_BiteData( String msg)
 		LogPrintln(" LG] Servo - DEC Angle: " + String(val));
 	}
 	
-	if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) )	//
+	if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) )	 
 	{
 		
 		LogPrintln(" LG] BiteConbi: " + String(biteTestCase) + ", BiteTorqControl: " + String(biteTorqCase) + ", BiteCount: " + String(biteCnt));
-		//
-		// LogPrintln(" LG] Angle1: " + String(stWaveServoVal.angle1) + ",Angle2: " + String(stWaveServoVal.angle2) + ",sInterval: " + String(stWaveServoVal.interval));
+		 
+		 
 		
 		LogPrintln(" LG] shallow_Torq: " + String(stBiteTorqVal.shallowTorq) + ", sh_Intval: " + String(stBiteTorqVal.shallowInterval) +", deep_Torq: " + String(stBiteTorqVal.deepTorq) + ", deep_Intval: " + String(stBiteTorqVal.deepInterval));
 		
@@ -1546,7 +1488,7 @@ void Set_BiteData( String msg)
 }
 
 
-//
+ 
 void Set_HitData(String msg)
 {
 
@@ -1555,62 +1497,62 @@ void Set_HitData(String msg)
 		
 			int i = 0;
 		
-			if( '0' == ch ) 		// View Set Value [ LOG ]
+			if( '0' == ch ) 		 
 			{
-				// LOG OUT
+				 
 			}
-			else if( '2' == ch )		//Servo Angle
+			else if( '2' == ch )		 
 			{
-				val = msg.substring(4).toInt(); // 4th 2 char
+				val = msg.substring(4).toInt();  
 				if( 0 > val ) val = 0;
 				if( 90 < val ) val = 90;
 				hitServoAngle = val;
 			}
-			// TARGET & RESIST
-			else if( '3' == ch )		// Target SET
+			 
+			else if( '3' == ch )		 
 			{
-				val = msg.substring(4,7).toInt();	// Taget Torq
+				val = msg.substring(4,7).toInt();	 
 				if( 60 > val ) val = 60;
 				if( 250 < val ) val = 250;
 				stHitTorqVal.targetTorq = val;
 				stHitTorqVal.holdonTorq = val;
 		
-				val = msg.substring(7,11).toInt();	// Target Interval
+				val = msg.substring(7,11).toInt();	 
 				if( 100 > val ) val = 100;
 				if( 9000 < val ) val = 9000;
 				stHitTorqVal.targetInterval = val;
 				stHitTorqVal.holdonInterval = val;
 		
 			}
-			else if( '4' == ch )		// Low & Mid SET
+			else if( '4' == ch )		 
 			{
-				val = msg.substring(4,7).toInt();	// low Torq
+				val = msg.substring(4,7).toInt();	 
 				if( 60 > val ) val = 60;
 				if( 250 < val ) val = 250;
 				stHitTorqVal.lowTorq = val;
 		
-				val = msg.substring(7,11).toInt();	// Low Interval
+				val = msg.substring(7,11).toInt();	 
 				if( 100 > val ) val = 100;
 				if( 9000 < val ) val = 9000;
 				stHitTorqVal.lowInterval = val;
 		
-				val = msg.substring(11,14).toInt(); //Mid Torq
+				val = msg.substring(11,14).toInt();  
 				if( 60 > val ) val = 60;
 				if( 250 < val ) val = 250;
 				stHitTorqVal.midTorq = val;
 		
-				val = msg.substring(14).toInt();	// Mid Interval
+				val = msg.substring(14).toInt();	 
 				if( 100 > val ) val = 100;
 				if( 9000 < val ) val = 9000;
 				stHitTorqVal.midInterval = val;
 			}
 			
 		  
-			else if( '6' == ch )		// BITE Type  Torq SET
+			else if( '6' == ch )		 
 			{
 				for(i = 0; i < 12; i++)
 				{
-					val = msg.substring((3*i)+4,(3*i)+7).toInt();	// Torq 
+					val = msg.substring((3*i)+4,(3*i)+7).toInt();	 
 					if( 60 > val ) val = 60;
 					if( 250 < val ) val = 250;
 					stHitTorqVal.torqType[i+1] = val;
@@ -1622,28 +1564,28 @@ void Set_HitData(String msg)
 				}
 			}
 		
-			else if( 'S' == ch )		// Resist & HoldOn Servo Control ENB/DIS
+			else if( 'S' == ch )		 
 			{
-				val = msg.substring(4,6).toInt(); // 4th 2 char
-				if( 0 != val ) val = 1; 	// 0 = 0(DIS), else =1(ENB)
-				//sMotor.saveDecAngle(val);
+				val = msg.substring(4,6).toInt();  
+				if( 0 != val ) val = 1; 	 
+				 
 				exeResistServoENB = val;
-				val = msg.substring(6).toInt(); // 6th 2 char
-				if( 0 != val ) val = 1; 	// 0 = 0(DIS), else =1(ENB)
+				val = msg.substring(6).toInt();  
+				if( 0 != val ) val = 1; 	 
 				exeHoldonServoENB = val;
 				
 				LogPrintln(" LG] Servo - Resist ServoENB: " + String(exeResistServoENB) + ", HoldOn ServoENB: " + String(exeHoldonServoENB) );
 			}
 			
-			else if( 'K' == ch )		// Finsh KIND SET ( AUTO or SEL)
+			else if( 'K' == ch )		 
 			{
-				val = msg.substring(4,6).toInt(); // 4th 2 char
-				if( 0 != val ) val = 1; 	// 0 = 0(Auto), else =1(Fix)
-				//sMotor.saveDecAngle(val);
+				val = msg.substring(4,6).toInt();  
+				if( 0 != val ) val = 1; 	 
+				 
 				fishTypeFixENB = val;
-				if(fishTypeFixENB)		// if Not Auto = FIX SEL
+				if(fishTypeFixENB)		 
 				{
-					val = msg.substring(6).toInt(); // 6th 2 char
+					val = msg.substring(6).toInt();  
 					if( 1 > val ) val = 1;
 					if( 15 < val ) val = 15;
 					fishTypeFix = val;
@@ -1652,7 +1594,7 @@ void Set_HitData(String msg)
 				LogPrintln(" LG] Fish Auto(0)Fix(1): " + String(fishTypeFixENB) + ", FishType(Fix): " + String(fishTypeFix) + ", FishType(Auto): " + String(fishTypeAuto) );
 			}
 		
-			if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) )	//
+			if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) )	 
 			{
 				
 				LogPrintln(" LG] HitAngle: " + String(hitServoAngle) );
@@ -1670,13 +1612,13 @@ void Set_HitData(String msg)
 }
 
 
-//
+ 
 void Set_BreakData( String msg)
 {
 	int val = 0;
 	char ch = msg.charAt(3);
 	
-	if( '0' == ch ) 		// View Set Value [ LOG ]
+	if( '0' == ch ) 		 
 	{
 		
 		LogPrintln(" LG] WaveType(1~3): " + String(waveType));
@@ -1689,9 +1631,9 @@ void Set_BreakData( String msg)
 		
 		LogPrintln(" LG] Hit_Break, Break_Type: " + String(breakType) );
 	}
-	else if( '1' == ch )		// SET Break Type
+	else if( '1' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( 1 > val ) val = 1;
 		if( 3 < val ) val = 3;
 		breakType = val;
@@ -1700,24 +1642,24 @@ void Set_BreakData( String msg)
 		LogPrintln(" LG] Hit_Break, Break_Type: " + String(breakType) );
 	}
 
-/*
-	else if( 'A' == ch )		// Resist Auto & FIX
-	{
-		val = msg.substring(4).toInt(); //
-		if( 0 > val ) val = 0;
-		if( 1 < val ) val = 1;
-		torqResistFix = val;	// Auto(0), Fix(1)
-	}
-*/
+ 
+
+
+
+
+
+
+
+
 
 }
 
-//
-// $F5 : STX_EXTLED_SET
-//	$F5 1x - LED CONT ENB/DIS
-//	$F5 2xxxx - Dimmming Time
-//	$F5 3xxxx - HoldCount
-//
+ 
+ 
+ 
+ 
+ 
+ 
 void Set_ExtledData(String msg)
 {
 			int val = 0;
@@ -1726,92 +1668,92 @@ void Set_ExtledData(String msg)
 	
 			int i = 0;
 		
-			if( '0' == ch ) 		// View Set Value [ LOG ]
+			if( '0' == ch ) 		 
 			{
-				// LogPrintln();
+				 
 			}
-		//
-		//
-			else if( '1' == ch )		//
+		 
+		 
+			else if( '1' == ch )		 
 			{
-				val = msg.substring(4).toInt(); // 4th 2 char
+				val = msg.substring(4).toInt();  
 				if( 0 > val ) val = 0;		
-				 ledControlMode = val;	// LED CONTROL ENB/DIS
+				 ledControlMode = val;	 
 			}
-			else if( '2' == ch )		// 
+			else if( '2' == ch )		 
 			{
-				val = msg.substring(4).toInt(); // 4th 2 char
+				val = msg.substring(4).toInt();  
 				if( 1 > val ) val = 1;
 				if( 60 < val ) val = 60;
-				dimming_time = val;			// [sec]
+				dimming_time = val;			 
 			}
-			else if( '3' == ch )		//
+			else if( '3' == ch )		 
 			{
-				val = msg.substring(4).toInt(); // 4th 2 char
+				val = msg.substring(4).toInt();  
 				if( 100 > val ) val = 100;
 				if( 5000 < val ) val = 5000;
 				ledoffHoldTimeCnt = (unsigned int)(val/10);
 			}
-		/*
-			else if( '4' == ch )		//
-			{
-				val = msg.substring(4).toInt(); // 4th 2 char
-				if( BBN_WAIT_TIME_MIN > val ) val = BBN_WAIT_TIME_MIN;
-				if( BBN_WAIT_TIME_MAX < val ) val = BBN_WAIT_TIME_MAX;
-				sBbnActTbl[bbnActKind].offTime = (unsigned long)val;
-			}
-	
-			else if( '5' == ch )		// TOKTOK KIND
-			{
-				val = msg.substring(4).toInt(); // 4th 2 char
-				if( 0 > val ) val = 0;
-				if( BBNACT_TBLMAX <= val ) val = 0; 	// default (SETTING)
-				bbnActKind = (unsigned long)val;
-			}
-	
-			else if( '6' == ch )		// RPT CNT
-			{
-				para1 = msg.substring(4,(4+1)).toInt(); // 4th 2 char
-				if((BBNACT_TBLMAX-1) < para1) { para1 = (BBNACT_TBLMAX-1); }
-				val = msg.substring(5).toInt(); // 5th 3 char
-				if( BBN_RPT_CNT_MIN > val ) { val = BBN_RPT_CNT_MIN; }
-				if( BBN_RPT_CNT_MAX < val ) { val = BBN_RPT_CNT_MAX; }
-				bbnReqCnt[para1] = (unsigned long)val;
-			}
-			else if( '7' == ch )		// Motor WAT SET
-			{
-				val = msg.substring(4).toInt(); // 4th 2 char
-				if(1 > val ) val = 1;
-				if( 6 < val ) val = 6;
-				torqMotor.torqWattAdj = val;
-			}
-			else
-			{
-				// Error
-			}
-		*/
+		 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
-			if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) ) //
+			if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) )  
 			{
 				
 				LogPrintln(" LG] EXTLED_SET ENB : " + String(ledControlMode) + " [sec]");
 				LogPrintln(" LG] EXTLED_SET dimm : " + String(dimming_time) + " [sec]");
 				LogPrintln(" LG] EXTLED_SET hold : " + String(ledoffHoldTimeCnt*10) + " [ms]");
-			/*	
-				LogPrintln(" LG] BBN TokTok ACT KIND: " + String(bbnActKind) + " [ 0~6 ]");
-				
-				LogPrintln(" LG] BBN TokTok Rpt REQ CNT: " + String(bbnReqCnt[bbnActKind]) + " [ 1 ~ 100 ] Times");
-	
-				
-				LogPrintln(" LG] BLDC TokTok On Duty: " + String(sBbnActTbl[bbnActKind].onDuty) + " / 255 Max");
-				
-				LogPrintln(" LG] BLDC TokTok On Time: " + String(sBbnActTbl[bbnActKind].onTime) + " ms");
-				
-				
-				LogPrintln(" LG] BLDC TokTok Off Duty: " + String(sBbnActTbl[bbnActKind].offDuty) + "  / 255 Max");
-				
-				LogPrintln(" LG] BLDC TokTok Off Time: " + String(sBbnActTbl[bbnActKind].offTime) + " ms");
-			*/
+			 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			}
 			else
 			{
@@ -1821,7 +1763,7 @@ void Set_ExtledData(String msg)
 	
 }
 
-//
+ 
 void Set_BbnTokTokData( String msg)
 {
 		int val = 0;
@@ -1830,71 +1772,71 @@ void Set_BbnTokTokData( String msg)
 
 		int i = 0;
 	
-		if( '0' == ch ) 		// View Set Value [ LOG ]
+		if( '0' == ch ) 		 
 		{
-			// LogPrintln();
+			 
 		}
-	//
-		else if( '5' == ch )		// TOKTOK KIND
+	 
+		else if( '5' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if( 0 > val ) val = 0;
-			if( BBNACT_TBLMAX <= val ) val = 0;		// default (SETTING)
+			if( BBNACT_TBLMAX <= val ) val = 0;		 
 			bbnActKind = (unsigned long)val;
 		}
 
-		else if( '6' == ch )		// RPT CNT
+		else if( '6' == ch )		 
 		{
-			para1 = msg.substring(4,(4+1)).toInt(); // 4th 2 char
+			para1 = msg.substring(4,(4+1)).toInt();  
 			if((BBNACT_TBLMAX-1) < para1) { para1 = (BBNACT_TBLMAX-1); }
-			val = msg.substring(5).toInt(); // 5th 3 char
+			val = msg.substring(5).toInt();  
 			if( BBN_RPT_CNT_MIN > val ) { val = BBN_RPT_CNT_MIN; }
 			if( BBN_RPT_CNT_MAX < val ) { val = BBN_RPT_CNT_MAX; }
 			bbnReqCnt[para1] = (unsigned long)val;
 		}
-	//
-		else if( '1' == ch )		// 
+	 
+		else if( '1' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if( BBN_PWM_DUTY_MIN > val ) val = BBN_PWM_DUTY_MIN;
 			if( BBN_PWM_DUTY_MAX < val ) val = BBN_PWM_DUTY_MAX;
 			sBbnActTbl[bbnActKind].onDuty = val;
 		}
-		else if( '2' == ch )		//
+		else if( '2' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if( BBN_WAIT_TIME_MIN > val ) val = BBN_WAIT_TIME_MIN;
 			if( BBN_WAIT_TIME_MAX < val ) val = BBN_WAIT_TIME_MAX;
 			sBbnActTbl[bbnActKind].onTime = (unsigned long)val;
 		}
-		else if( '3' == ch )		//
+		else if( '3' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if( BBN_PWM_DUTY_MIN > val ) val = BBN_PWM_DUTY_MIN;
 			if( BBN_PWM_DUTY_MAX < val ) val = BBN_PWM_DUTY_MAX;
 			sBbnActTbl[bbnActKind].offDuty = val;
 		}
-		else if( '4' == ch )		//
+		else if( '4' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if( BBN_WAIT_TIME_MIN > val ) val = BBN_WAIT_TIME_MIN;
 			if( BBN_WAIT_TIME_MAX < val ) val = BBN_WAIT_TIME_MAX;
 			sBbnActTbl[bbnActKind].offTime = (unsigned long)val;
 		}
 
-		else if( '7' == ch )		// Motor WAT SET
+		else if( '7' == ch )		 
 		{
-			val = msg.substring(4).toInt(); // 4th 2 char
+			val = msg.substring(4).toInt();  
 			if(1 > val ) val = 1;
 			if( 6 < val ) val = 6;
 			torqMotor.torqWattAdj = val;
 		}
 		else
 		{
-			// Error
+			 
 		}
 	
-		if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) )	//
+		if( ('0'==ch) || ('1'==ch)	|| ('2'==ch) || ('3'==ch) || ('4'==ch) || ('5'==ch) || ('6'==ch) || ('7'==ch) )	 
 		{
 			LogPrintln(" LG] TORQ MOT WATT : " + String(torqMotor.torqWattAdj) + " [ 1:10W,2:20W,3:30W]");
 			LogPrintln(" LG] BBN TokTok ACT KIND: " + String(bbnActKind) + " [ 0~6 ]");
@@ -1910,24 +1852,24 @@ void Set_BbnTokTokData( String msg)
 		}
 }
 
-/*
+ 
 
-*/
+
 void Set_TorqAdjValData( String msg)
 {
 		int val = 0;
 		char ch = msg.charAt(3);
 		
-		if( '0' == ch ) 		// View Set Value [ LOG ]
+		if( '0' == ch ) 		 
 		{
 			
 			LogPrintln(" LG] Type: " + String(ch) + ",	");
 			
 			LogPrintln(" LG] *Torq Adj Curr Val: " + String(torqMotor.setAdjTorq));
 		}
-		else if( '1' == ch )		// SET Torq Default Val
+		else if( '1' == ch )		 
 		{
-			val = msg.substring(4,6).toInt(); // 4th 2 char
+			val = msg.substring(4,6).toInt();  
 			if( 30 > val ) val = 30;
 			if( 80 < val ) val = 80;
 			torqMotor.defaultVal = val;
@@ -1937,9 +1879,9 @@ void Set_TorqAdjValData( String msg)
 			LogPrintln(" LG] *ADJ Set Val : " + String(val) );
 		}
 	
-		else if( '2' == ch )		// SET Torq Adj(Dec) Val
+		else if( '2' == ch )		 
 		{
-			val = msg.substring(4,6).toInt(); // 4th 2 char
+			val = msg.substring(4,6).toInt();  
 			if( 1 > val ) val = 1;
 			if( 50 < val ) val = 50;
 			
@@ -1948,15 +1890,15 @@ void Set_TorqAdjValData( String msg)
 			LogPrintln(" LG] *ADJ Set Val : " + String(val) );
 			torqMotor.setAdjTorq = val;
 		}
-	/*
-		else if( 'A' == ch )		// Resist Auto & FIX
-		{
-			val = msg.substring(4).toInt(); //
-			if( 0 > val ) val = 0;
-			if( 1 < val ) val = 1;
-			torqResistFix = val;	// Auto(0), Fix(1)
-		}
-	*/
+	 
+
+
+
+
+
+
+
+
 		else
 		{
 			
@@ -1966,71 +1908,71 @@ void Set_TorqAdjValData( String msg)
 }
 
 
-//
-//	$FAA~
-//	A - Action
-//		0 - Log View
-//		1 - Light
-//			~ : xxx : Light 10~100 [%]
-//
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 void Set_LedValue( String msg)
 {
 		unsigned int val = 0;
 		int pos = 0;
 		char ch = msg.charAt(3);
 		
-		if( '0' == ch ) 		// View Set Value [ LOG ]
+		if( '0' == ch ) 		 
 		{
 			
 		}
-		else if( '1' == ch )		// SET Led Light
+		else if( '1' == ch )		 
 		{
-			val = (unsigned int)msg.substring(5,(5+3)).toInt(); // 4th 2 char
+			val = (unsigned int)msg.substring(5,(5+3)).toInt();  
 			if( 1 > val ) val = 1;
 			if( 100 < val ) val = 100;
 			ledLight = val;
 		}
 
 		
-		else if( '2' == ch )		// SET HoldTIme $FA2xZZZZ
+		else if( '2' == ch )		 
 		{
-			pos = (unsigned int)msg.substring(4,(4+1)).toInt(); // 4th 1 char, led Pos
+			pos = (unsigned int)msg.substring(4,(4+1)).toInt();  
 			if( 0> pos) { pos=0; } if( 4<pos ) { pos =0; }
 			
-			val = (unsigned int)msg.substring(5,(5+4)).toInt();	// 5th~9th 4_Char = Hold TIme
+			val = (unsigned int)msg.substring(5,(5+4)).toInt();	 
 			if( 10 > val ) val = 10;
 			if( 9999 < val ) val = 9999;
 
 			ledDimmHoldTime[pos] = val;
 			
 		}
-	/*
-		else if( 'A' == ch )		// Resist Auto & FIX
-		{
-			val = msg.substring(4).toInt(); //
-			if( 0 > val ) val = 0;
-			if( 1 < val ) val = 1;
-			torqResistFix = val;	// Auto(0), Fix(1)
-		}
-	*/
+	 
+
+
+
+
+
+
+
+
 		else
 		{
 			
 			LogPrintln(" LG] Set Torq Undefine Val, " + String(msg) );
 		}
 
-	if( '0' == ch || '1'==ch || '2'==ch || '3'==ch) 		// View Set Value [ LOG ]
+	if( '0' == ch || '1'==ch || '2'==ch || '3'==ch) 		 
 	{
 		LogPrintln(" LG] Set LED Light= " + String(ledLight) + "/%" );
 		LogPrintln(" LG] Set LED HoldTime 1234: " + String(ledDimmHoldTime[1]) + "," + String(ledDimmHoldTime[2]) + "," + String(ledDimmHoldTime[3]) + "," + String(ledDimmHoldTime[4]) + ","  );
 	}
 }
 
-// MKT TUN HIT & HOLD
-// $F9aXXXyy
-//	a : 0- Val view, 1-hit, 2-hold, 3-Test Stop
-// XXX : Main Mot Power ( 60 ~ 255)
-// yy : Bobbin Mot Power (10 ~ 70)
+ 
+ 
+ 
+ 
+ 
 void Set_TorqHitHoldOn( String msg)
 {
 
@@ -2042,17 +1984,17 @@ void Set_EnbData( String msg)
 	int val = 0;
 	char ch = msg.charAt(3);
 	
-	if( '0' == ch ) 		// View Set Value [ LOG ]
+	if( '0' == ch ) 		 
 	{
 		LogPrintln(" LG] WaveType(1~3): " + String(waveType));
 		LogPrintln(" LG] Fish Auto(0)Fix(1): " + String(fishTypeFixENB) + ", FishType(Fix): " + String(fishTypeFix) + ", FishType(Auto): " + String(fishTypeAuto) );
 		LogPrintln(" LG] Hit Servo - Resist ENB: " + String(exeResistServoENB) + ", HoldOn ENB: " + String(exeHoldonServoENB) + ", Hit_Angle: " + String(hitServoAngle));
 		LogPrintln(" LG] Hit_Resist_FIX: " + String(torqResistFix) + ", Torq Target: " + String(stHitTorqVal.targetTorq) + ", Resist: " + String(stHitTorqVal.holdonTorq) + ", low: " + String(stHitTorqVal.lowTorq) + ", Mid: " + String(stHitTorqVal.midTorq) );
-//		LogPrintln(" LG] Hit_Break, Break_Type: " + String(breakType) );
+ 
 	}
-	else if( '1' == ch )		// SET Level (Easy/Normal/Hard)
+	else if( '1' == ch )		 
 	{
-		val = msg.substring(4).toInt(); // 4th 2 char
+		val = msg.substring(4).toInt();  
 		if( LEVEL_MIN > val ) val = LEVEL_MIN;
 		if( LEVEL_MAX < val ) val = LEVEL_MAX;
 		gameLevel = val;
@@ -2060,32 +2002,32 @@ void Set_EnbData( String msg)
 		LogPrintln(" LG] game Level, gameLevel: " + String(gameLevel) );
 	}
 
-	else if( 'A' == ch )		// Resist Auto & FIX
+	else if( 'A' == ch )		 
 	{
-		val = msg.substring(4).toInt(); //
+		val = msg.substring(4).toInt();  
 		if( 0 > val ) val = 0;
 		if( 1 < val ) val = 1;
-		torqResistFix = val;	// Auto(0), Fix(1)
+		torqResistFix = val;	 
 	}
 }
 
 
-//=== TEST Seral Event ===
+ 
 
 
-// TO 10SEC Force AC OFF
-#define POWER_ON_WAIT		(DEF_PWRON_DELAY_TIME*1000)	// 10 SEC
-#define BOOTING_WAIT		(DEF_USB_SAFE_TIME*1000)	// 28 SEC
-#define FORCE_OFF_2MIN		(2*60*1000)				// 2 MIN ( with Windows Update)
-#define RESP_WAIT_TIME		(500)					// 500ms After USB5VOFF
-#define AUTO_REBOOT_TIME	(14*1000)				// 14초 After AP Running
-#define APP_CHECK_TIME		(18*1000)				// APP 커맨드 체크 타임(18초동안 폴커맨드등 없을 때) 
-#define ACOFF_500MS_AFTER_USB5VOFF	(500)			// 500ms After USB5VOFF
-#define TO_EDGE_FILTER_CNT	5						// 50 ms ( 20ms + 30 ms After LE/TE Occure]
+ 
+#define POWER_ON_WAIT		(DEF_PWRON_DELAY_TIME*1000)	 
+#define BOOTING_WAIT		(DEF_USB_SAFE_TIME*1000)	 
+#define FORCE_OFF_2MIN		(2*60*1000)				 
+#define RESP_WAIT_TIME		(500)					 
+#define AUTO_REBOOT_TIME	(14*1000)				 
+#define APP_CHECK_TIME		(18*1000)				 
+#define ACOFF_500MS_AFTER_USB5VOFF	(500)			 
+#define TO_EDGE_FILTER_CNT	5						 
 #define	PWR_SW_ON		1
 #define	PWR_SW_OFF		2
 
-int	g_ProcStatus = 0;					// INIT
+int	g_ProcStatus = 0;					 
 static unsigned long	g_TmRTM = 0;
 static unsigned long	g_TmNTM = 0;
 static unsigned long	g_TmFTM = 0;
@@ -2093,28 +2035,28 @@ static unsigned long	g_TmBTM = 0;
 static unsigned int	g_PSON_Count = 0;
 static unsigned int	g_PSOF_Count = 0;
 static unsigned int	g_USB5V_Count = 0;
-//
+ 
 void subAcOff_WithOtherOff()
 {
-	subAC_Off();		// OFF Output
-	// LED OFF
+	subAC_Off();		 
+	 
 	ledOff_MbCent();
 	ledOff_MbBtm();
 	ledOff_OptLeft();
 	ledOff_OptRight();
 	g_RecvCmdCount = 0;
-//	g_FlagCmdStop = 0;
+ 
 }
 
 int CheckAppCmd()
 {
-//	if (g_FlagCmdStop && (g_RecvCmdCount < 2))							// 종료 커맨드 수신이고 커맨드 개수가 2미만이면
-//		return PS_STOPPING;												// AP 종료중 리턴
-//	else
+ 
+ 
+ 
 	{
-		if ((g_RecvCmdCount > 2) && !checkTO(g_LastCmdTick, 4000)) {	// 커맨드 수신 카운트가 2보다 크고 최종수신 시간이 4초이내이면
-//			g_FlagCmdStop = 0;											// AP 종료중 플래그 클리어
-			return 1;													// AP 실행중 리턴
+		if ((g_RecvCmdCount > 2) && !checkTO(g_LastCmdTick, 4000)) {	 
+ 
+			return 1;													 
 		}
 	}
 	return 0;
@@ -2122,19 +2064,19 @@ int CheckAppCmd()
 
 int CheckPowerSwitch()
 {
-	if (LVL10_PWROFF_SWC)						// 전원스위치 OFF(HIGH-OFF) 이면
+	if (LVL10_PWROFF_SWC)						 
 	{
-		g_PSON_Count=0;							// On Count clear
-		g_PSOF_Count++;							// Off Count +1
-		if (g_PSOF_Count > TO_EDGE_FILTER_CNT)	// Off Count가 5보다 큰가
-			return PWR_SW_OFF;					// 전원 스위치 OFF 리턴
+		g_PSON_Count=0;							 
+		g_PSOF_Count++;							 
+		if (g_PSOF_Count > TO_EDGE_FILTER_CNT)	 
+			return PWR_SW_OFF;					 
 	}
 	else
 	{
-		g_PSON_Count++;							// On Count +1
-		g_PSOF_Count=0;							// Off Count clear
-		if (g_PSON_Count > TO_EDGE_FILTER_CNT)	// On Count가 5보다 큰가
-			return PWR_SW_ON;					// 전원 스위치 ON 리턴
+		g_PSON_Count++;							 
+		g_PSOF_Count=0;							 
+		if (g_PSON_Count > TO_EDGE_FILTER_CNT)	 
+			return PWR_SW_ON;					 
 	}
 	return 0;
 }
@@ -2155,101 +2097,101 @@ void check_PowerSwitch_Change_10ms()
 	}
 	switch (g_ProcStatus)
 	{
-	case PS_INITIAL :		// 초기 상태
-		if (CheckPowerSwitch() == PWR_SW_ON) {		// 전원 스위치 ON이면
-			initSet_LedContVal(1);					// LED VAL INIT
-			ledOn_MbBtm();							//
-			pwrMode = PWR_ON;						// LED를 켠다.
-			g_ProcStatus = PS_ON_WAIT;				// PC 안정화 시간(10초) 보장 PC ON 대기로 상태 전환
+	case PS_INITIAL :		 
+		if (CheckPowerSwitch() == PWR_SW_ON) {		 
+			initSet_LedContVal(1);					 
+			ledOn_MbBtm();							 
+			pwrMode = PWR_ON;						 
+			g_ProcStatus = PS_ON_WAIT;				 
 		}
 		else {
-			if ((g_SerialEnable == 0) && 			// USB CDC가 disable 이면서
-				checkTO(g_TmBTM, BOOTING_WAIT)) {	// 부팅 안정화 시간이 지났으면
-				SerialPortEnable();					// USB CDC Enable
+			if ((g_SerialEnable == 0) && 			 
+				checkTO(g_TmBTM, BOOTING_WAIT)) {	 
+				SerialPortEnable();					 
 			}
 		}
 		break;
-	case PS_ON_WAIT :		// PC ON 대기
-		if (CheckPowerSwitch() == PWR_SW_OFF) {		// 전원 스위치 OFF이면
-		//	initSet_LedContVal();					// LED VAL INIT
+	case PS_ON_WAIT :		 
+		if (CheckPowerSwitch() == PWR_SW_OFF) {		 
+		 
 			extLed_AllOff();
 			extLed_controlOff();
-			pwrMode = PWR_OFF;						// LED를 끈다.
-			g_ProcStatus = PS_INITIAL;				// PC 안정화 시간(10초) 보장 PC ON 대기로 상태 전환
+			pwrMode = PWR_OFF;						 
+			g_ProcStatus = PS_INITIAL;				 
 		}
-		else if (checkTO(g_TmNTM, POWER_ON_WAIT)) {	// 안정화 시간이 지났으면
+		else if (checkTO(g_TmNTM, POWER_ON_WAIT)) {	 
 			if (g_SerialEnable) {
-				SerialPortDisable();				// USB CDC Disable
+				SerialPortDisable();				 
 			}
-			subAC_On();								// PC 등 AC 전원 ON
-			setTO(g_TmBTM);							// PC 부팅 타이머 설정
-			g_ProcStatus = PS_BOOTING;				// PC 부팅중으로 상태 전한
+			subAC_On();								 
+			setTO(g_TmBTM);							 
+			g_ProcStatus = PS_BOOTING;				 
 		}
 		break;
-	case PS_BOOTING :		// PC 부팅중
-		if (g_SerialEnable || checkTO(g_TmBTM, BOOTING_WAIT)) {		// 부팅 안정화 시간이 지났으면
+	case PS_BOOTING :		 
+		if (g_SerialEnable || checkTO(g_TmBTM, BOOTING_WAIT)) {		 
 			if (g_SerialEnable == 0) {
-				SerialPortEnable();					// USB CDC Enable
+				SerialPortEnable();					 
 			}
-			g_ProcStatus = PS_RUNNING;				// PC 부팅중으로 상태 전한
+			g_ProcStatus = PS_RUNNING;				 
 		}
 		break;
-	case PS_RUNNING :		// AP 실행중
-		if ((CheckPowerSwitch() == PWR_SW_OFF) ||	// 
-			(g_AutoReboot && CheckAppCmd() && checkTO(g_TmFTM, AUTO_REBOOT_TIME))) {	// TEST AUTO REBOOT
-			recvPwrOffExec_Resp = 0;				// 수신 플래그 클리어
-			setTO(g_TmFTM);							// FTM(2분) 설정(강제종료 타이머)
-			setTO(g_TmRTM);							// RTM(500ms) 설정(응답 타이머)
-			g_ProcStatus = PS_RSPWAIT;				// 응답 대기로 상태 전환
+	case PS_RUNNING :		 
+		if ((CheckPowerSwitch() == PWR_SW_OFF) ||	 
+			(g_AutoReboot && CheckAppCmd() && checkTO(g_TmFTM, AUTO_REBOOT_TIME))) {	 
+			recvPwrOffExec_Resp = 0;				 
+			setTO(g_TmFTM);							 
+			setTO(g_TmRTM);							 
+			g_ProcStatus = PS_RSPWAIT;				 
 		}
 		break;
-	case PS_RSPWAIT :		// 응답 대기
-		if(recvPwrOffExec_Resp)						// PC off 커맨드 응답 수신이면
+	case PS_RSPWAIT :		 
+		if(recvPwrOffExec_Resp)						 
 		{
-			recvPwrOffExec_Resp = 0;				// 수신 플래그 클리어
-			g_ProcStatus = PS_USBWAIT;				// USB 5V LOW 대기
+			recvPwrOffExec_Resp = 0;				 
+			g_ProcStatus = PS_USBWAIT;				 
 		}
-		else if (checkTO(g_TmFTM, FORCE_OFF_2MIN))	// 강제 종료 시간(2분) 경과이면
+		else if (checkTO(g_TmFTM, FORCE_OFF_2MIN))	 
 		{
-			subAcOff_WithOtherOff();				// AC 전원등 전부 Off 처리
-			setTO(g_TmNTM);							// PC 안정화 타이머 설정
-			g_ProcStatus = PS_INITIAL;				// 초기 상태로 전환
+			subAcOff_WithOtherOff();				 
+			setTO(g_TmNTM);							 
+			g_ProcStatus = PS_INITIAL;				 
 		}
-		else if (checkTO(g_TmRTM, RESP_WAIT_TIME))	// 응답 시간(500ms) 경과이면
+		else if (checkTO(g_TmRTM, RESP_WAIT_TIME))	 
 		{
-			if ((CheckPowerSwitch() == PWR_SW_ON)	// 전원 스위치가 다시 On이고
-				&& (CheckAppCmd() == 0)) {			// AP가 실행 안되고 있으면
-				g_ProcStatus = PS_RUNNING;			// 초기 상태로 전환
+			if ((CheckPowerSwitch() == PWR_SW_ON)	 
+				&& (CheckAppCmd() == 0)) {			 
+				g_ProcStatus = PS_RUNNING;			 
 			}
 			else {
-				setTO(g_TmRTM);						// RTM(500ms) 설정(응답 타이머)
+				setTO(g_TmRTM);						 
 			}
 		}
 		break;
-	case PS_USBWAIT :		// USB 5V LOW 대기
-		if(LOW == LVL10_USB5V)						// USB 5V가 LOW 인가
+	case PS_USBWAIT :		 
+		if(LOW == LVL10_USB5V)						 
 		{
-			setTO(g_TmRTM);							// RTM(500ms) 설정(전원OFF 대기 시간)
-			g_ProcStatus = PS_OFFWAIT;				// 전원 OFF 대기 상태로 전환
+			setTO(g_TmRTM);							 
+			g_ProcStatus = PS_OFFWAIT;				 
 		}
-		else if (checkTO(g_TmFTM, FORCE_OFF_2MIN))	// 강제 종료 시간(2분) 경과이면
+		else if (checkTO(g_TmFTM, FORCE_OFF_2MIN))	 
 		{
-			subAcOff_WithOtherOff();				// AC 전원등 전부 Off 처리
-			setTO(g_TmNTM);							// PC 안정화 타이머 설정
-			g_ProcStatus = PS_INITIAL;				// 초기 상태로 전환
-		}
-		break;
-	case PS_OFFWAIT :		// 전원 OFF 대기
-		if (checkTO(g_TmRTM, RESP_WAIT_TIME))		// 전원OFF 대기 시간(500ms) 경과이면
-		{
-			subAcOff_WithOtherOff();				// AC 전원등 전부 Off 처리
-			setTO(g_TmNTM);							// PC 안정화 타이머 설정
-			g_ProcStatus = PS_INITIAL;				// 초기 상태로 전환
+			subAcOff_WithOtherOff();				 
+			setTO(g_TmNTM);							 
+			g_ProcStatus = PS_INITIAL;				 
 		}
 		break;
-	default :				// 디폴트(정의 안된 상태의 경우)
+	case PS_OFFWAIT :		 
+		if (checkTO(g_TmRTM, RESP_WAIT_TIME))		 
+		{
+			subAcOff_WithOtherOff();				 
+			setTO(g_TmNTM);							 
+			g_ProcStatus = PS_INITIAL;				 
+		}
+		break;
+	default :				 
 		LogPrintln(" LG] CHKPWR : PS_UNKNOWN("+ String(g_ProcStatus) + ") -> PS_INITIAL");
-		g_ProcStatus = PS_INITIAL;					// 초기 상태로 전환
+		g_ProcStatus = PS_INITIAL;					 
 		break;
 	}
 	if (SaveStatus != g_ProcStatus) {
@@ -2259,4 +2201,4 @@ void check_PowerSwitch_Change_10ms()
 }
 
 
-// IMU Data START/STOP Cmd Send to ROD
+ 

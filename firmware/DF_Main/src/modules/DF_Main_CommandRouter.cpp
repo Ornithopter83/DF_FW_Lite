@@ -398,34 +398,10 @@ void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, 
  
 
  
-short lmFish_3Level_Set(short pwr)
-{
-	short level;
-	if(0) {}
-	else if(66 < pwr)	{level = FISH_LVL_3; }
-	else if(33 < pwr)	{level = FISH_LVL_2; }
-	else				{level = FISH_LVL_1; }
 
-	return level;
-}
 
  
-void lmReturnOrHome_Start()
-{
-	if(0) {}
-	else if(LM_POSI_RIGHT <= lmPosi)	 
-	{	
-		lmRight_Control_Return();
-	}
-	else if(LM_POSI_LEFT <= lmPosi)		 
-	{
-		lmLeft_Control_Return();
-	}
-	else	 
-	{
-		lmHome_Control_Start(0, reqTorqueMotor);	 
-	}	
-}
+
 
 static volatile short wireHome_Step=0;
 static volatile short wireHomeExe_Flag=0;

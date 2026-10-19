@@ -1,9 +1,9 @@
-// Main communication implementation.
+ 
 #include "../DF_Main_Internal.h"
 #include "DF_Main_Communication.h"
 void rotateChangeCallback(int _dir, int _cnt)
 {
-  //eNow.write(PID_CTRL_NUM, str);
+   
   String dir = (_dir)? "CW_":"CCW";
   LogPrintln(" LG] BBENC " +  dir + ", cnt: " + String(_cnt));
 }
@@ -125,32 +125,32 @@ int DF_Main_Communication_TakeReceived(char *data, unsigned int capacity, unsign
 }
 
 
-//
-// Batt Rest Level Recved
-//
+ 
+ 
+ 
 void battLevelSet( String msg)
 {
-	  //battLvlStr = msg; 	  // Save Battery Level
-	  battLvlStr = msg.substring(1,(1+2)); 	  			// STRING 2 CHAR
-	  ibatteryLvl = battLvlStr.substring(0, 3).toInt();	// INT 3 CHAR
-	  //ibatteryLvl = battLvlStr.substring(1).toInt();	// INT 2 CHAR
+	   
+	  battLvlStr = msg.substring(1,(1+2)); 	  			 
+	  ibatteryLvl = battLvlStr.substring(0, 3).toInt();	 
+	   
 	  
 
 }
 
-//
-//	Recved ROD_ALIVE RESP (eNow RECV)
-//
+ 
+ 
+ 
 void setRod_Connected()
 {
-	rodAlive_SendCnt = 0;		// Count CLR
-	rod_conn_status = ROD_CONN;	// OK Slave Connected
+	rodAlive_SendCnt = 0;		 
+	rod_conn_status = ROD_CONN;	 
 }
 
 
-//-----------------------------------------------------
-// Improve Handle RECV STX From AP
-//-----------------------------------------------------
+ 
+ 
+ 
 void uartRecvHandlerImp()
 {
 }
@@ -158,29 +158,29 @@ void uartRecvHandlerImp()
 
 bool isParaCheckOk(int idx, int val)
 {
-/*
-    int i;
-	for(i=0; i<MAX_PARA_CNT; i++)
-	{
-		if(paraCheck[i] == idx) break;
-	}
-	if(MAX_PARA_CNT <= i)
-	{
-		LogPrintln(" LG] WONG Para IDX)
-    	return false;
-	}
-	else
-	{
-  		if(paraCheck[idx].min > val) 	return false;
-  		if(paraCheck[idx].max < val)	return false;
-		return true;
-	}
-*/
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
-//
-// SET TORW_VAL & BBN_BLDC_VAL
-//
+ 
+ 
+ 
 void waveType_TorqSet()
 {
 	stWavePtr stPtr;
@@ -191,7 +191,7 @@ void waveType_TorqSet()
 	if(0 == i) { stPtr = &stWaveTorqVal; }
 	else       { stPtr = &stWaveBdutyVal; }
 	
-	//switch(waveType)
+	 
 	{
 		if((WAVE_PWR_MAX-1) < waveType) { waveType = (WAVE_PWR_MAX-1); }
 		stPtr->tgTorq = stPtr->pwr[waveType];
@@ -200,11 +200,11 @@ void waveType_TorqSet()
 }
 
 
-// SET Hit Torq
+ 
 int HitType_TorqSet(int _fishKind)
 {
-	if     (  1 > _fishKind ) { _fishKind = 1; }	// 1 ~20
-	else if( 12 < _fishKind ) { _fishKind = 12; }	// Real : 1 ~ 12
+	if     (  1 > _fishKind ) { _fishKind = 1; }	 
+	else if( 12 < _fishKind ) { _fishKind = 12; }	 
 	
 	return stHitTorqVal.torqType[_fishKind];
 }
@@ -232,24 +232,24 @@ int isExecBldc()
 }
 
 
-//-----------------------------------------------------------------
-// 토크모터 시간지정시 OFF제어 
+ 
+ 
 static unsigned int torqMotorStop_Step = 0x00;
 static unsigned long torqMotor_StopTimeOut = 0;
-//
+ 
 
 void torqMot_OffControlStart(unsigned int onTime)
 {
 	torqMotor_StopTimeOut = (unsigned long)onTime;
-	torqMotorStop_Step = 0x10;	// Start
-	exeFlag_torqMotorStop = 1;		// Stop Timer Start
+	torqMotorStop_Step = 0x10;	 
+	exeFlag_torqMotorStop = 1;		 
 }
 
 
 void torqMot_OffControlStop()
 {
-	exeFlag_torqMotorStop = 0;		// Stop Timer 
-	torqMotorStop_Step = 0;	// IDLE
+	exeFlag_torqMotorStop = 0;		 
+	torqMotorStop_Step = 0;	 
 }
 
 
@@ -260,30 +260,30 @@ void torqMotor_OffTime_Control()
 	switch(torqMotorStop_Step)
 	{
 		case 0x00:
-			break;	// IDLE
+			break;	 
 			
-		case 0x10:	// Start
+		case 0x10:	 
 			setTO(to);
 			torqMotorStop_Step = 0x20;
 			break;
 			
-		case 0x20:	// 20 step, WAIT STOP TIMEOVER
+		case 0x20:	 
 			if(checkTO(to, torqMotor_StopTimeOut))
 			{
 				torqOff();
-					Resp2ApPrintln(STX_TORQUE_MOTOR + "000%");	// OFF RESP
+					Resp2ApPrintln(STX_TORQUE_MOTOR + "000%");	 
 				torqMotorStop_Step = 0x90;
 			}
 			break;
 			
-		case 0x30:	// 30 step
+		case 0x30:	 
 			break;
 			
-		case 0x40:	// 40 step
+		case 0x40:	 
 			break;
 
 			
-		case 0x90:	// END
+		case 0x90:	 
 			exeFlag_torqMotorStop = 0;
 			torqMotorStop_Step = 0x00;
 			break;
@@ -297,59 +297,59 @@ void torqMotor_OffTime_Control()
 
 
 
-//
-//
+ 
+ 
 unsigned int bbnMotorStop_Step = 0x00;
 static unsigned long bbnMotor_StopTimeOut = 0;
-unsigned int gBbnHallCount = 0;							// (V108) for BBN Motor Test
+unsigned int gBbnHallCount = 0;							 
 
-//
+ 
 void bbnMotor_OffTime_Start(unsigned int time)
 {
 	bbnMotor_StopTimeOut = (unsigned long)time;
-	bbnMotorStop_Step = 0x10;	// Start
-	exeFlag_bbnMotorStop = 1;		// Stop Timer Start
+	bbnMotorStop_Step = 0x10;	 
+	exeFlag_bbnMotorStop = 1;		 
 }
 
-// (V108) BBN 모터 동작시 FG 센서 변화량 측정
+ 
 void bbnMotor_OffTime_Control()
 {
 	static unsigned long to;
-	static unsigned long _oldSen;				// (V108)
+	static unsigned long _oldSen;				 
 	
 	switch(bbnMotorStop_Step)
 	{
 		case 0x00:
-			break;	// IDLE
+			break;	 
 			
-		case 0x10:	// Start
+		case 0x10:	 
 			setTO(to);
 			bbnMotorStop_Step = 0x20;
-			_oldSen = LVL01_BBNFG;				// (V108) 센서상태 저장
+			_oldSen = LVL01_BBNFG;				 
 			break;
 			
-		case 0x20:	// 20 step, WAIT STOP TIMEOVER
+		case 0x20:	 
 			if(checkTO(to, bbnMotor_StopTimeOut))
 			{
 				bbnMotor.offBldc();
-				Resp2ApPrintln(STX_BBN_MOTOR + "00000000%");	// OFF RESP
+				Resp2ApPrintln(STX_BBN_MOTOR + "00000000%");	 
 				bbnMotorStop_Step = 0x90;
 			}
-			else if(LVL01_BBNFG != _oldSen)		// (V108) FG 신호 변화
+			else if(LVL01_BBNFG != _oldSen)		 
 			{
-				_oldSen = LVL01_BBNFG;			// (V108) 센서상태 저장
-				gBbnHallCount++;				// (V108) 신호변화 cnt 증가
+				_oldSen = LVL01_BBNFG;			 
+				gBbnHallCount++;				 
 			}
 			break;
 			
-		case 0x30:	// 30 step
+		case 0x30:	 
 			break;
 			
-		case 0x40:	// 40 step
+		case 0x40:	 
 			break;
 
 			
-		case 0x90:	// END
+		case 0x90:	 
 			exeFlag_bbnMotorStop = 0;
 			bbnMotorStop_Step = 0x00;
 			break;
@@ -360,20 +360,16 @@ void bbnMotor_OffTime_Control()
 	}
 }
 
-//
-// LM MOT T/O TBD-LM
-//
-void lmMotor_OffTime_Start(unsigned int time)
-{
-}
-
-void lmMotor_OffTime_Control()
-{
-}
+ 
+ 
+ 
 
 
-//
-//
+
+
+
+ 
+ 
 void clear_ExecFlag()
 {
 	exeWave = 0;
@@ -394,12 +390,12 @@ void clear_ExecFlag()
 
 void execGameOver()
 {
-	exeGameOver = 1; //
+	exeGameOver = 1;  
 
 	
 	motor_AllOff();
 
-	// End Process : All Exeute Flag CEAR
+	 
 	clear_ExecFlag();
 	
 	reelOut_AllOff();
@@ -409,46 +405,46 @@ void execGameOver()
 void setVal_Hit_MainPwr(String msg)
 {
 	
-		// Hit Fish Type SET & Targ Torq
-		if( fishTypeFixENB) 	// Fix ?
+		 
+		if( fishTypeFixENB) 	 
 		{
-			if (!torqResistFix) 	// Not FIX = Auto Caculation
+			if (!torqResistFix) 	 
 			{
 				stHitTorqVal.targetTorq = HitType_TorqSet(fishTypeFix);
-				if ( LEVEL_NORMAL == gameLevel) 	// Level 2
+				if ( LEVEL_NORMAL == gameLevel) 	 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		// Level 2 Resist = Target*1.2 +28
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		 
 				}
-				else if ( LEVEL_HARD == gameLevel)	// Level 3
+				else if ( LEVEL_HARD == gameLevel)	 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		// Level 3 Resist = Target*1.4 +21
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		 
 				}
-				else						// Level 1
+				else						 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		// Level 3 Resist = Target*0.9 +41
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		 
 				}
 				stHitTorqVal.midTorq = (stHitTorqVal.holdonTorq + stHitTorqVal.lowTorq)/2; 
 			}
 		}
-		else						// Auto ?
+		else						 
 		{
-			// 6) Find Fish Type AUTO from Break Val
-			if (!torqResistFix) 	// Not FIX = Auto Caculation
+			 
+			if (!torqResistFix) 	 
 			{
-				// TBD, fishKind = by Break, = by AP Info(Kg/Size/ Rare)
+				 
 				
 				stHitTorqVal.targetTorq = HitType_TorqSet(fishTypeAuto); 
-				if ( LEVEL_NORMAL == gameLevel) 	// Level 2
+				if ( LEVEL_NORMAL == gameLevel) 	 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		// Level 2 Resist = Target*1.2 +28
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		 
 				}
-				else if ( LEVEL_HARD == gameLevel)	// Level 3
+				else if ( LEVEL_HARD == gameLevel)	 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		// Level 3 Resist = Target*1.4 +21
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		 
 				}
-				else						// Level 1
+				else						 
 				{
-					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		// Level 3 Resist = Target*0.9 +41
+					stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		 
 				}
 				stHitTorqVal.midTorq = (stHitTorqVal.holdonTorq + stHitTorqVal.lowTorq)/2; 
 			}
@@ -456,34 +452,34 @@ void setVal_Hit_MainPwr(String msg)
 	
 }
 
-//
-//
+ 
+ 
 void SetIMU_Measure_Out_OnOff(unsigned int _setClr)
 {
 	String msg;
-	//String msg = String(_setClr);
+	 
 	if(0 == _setClr)
 	{
-		//msg = STX_IMU_SET + "00000000%";
+		 
 		msg = "00";
 	}
 	else
 	{
-		//msg = STX_IMU_SET + "11111111%";
+		 
 		msg = "01";
 	}
-	eNow.write(DF_Protocol_MainToRod_ImuDataControl, msg);		// Control & LOG , Send TO ROD
+	eNow.write(DF_Protocol_MainToRod_ImuDataControl, msg);		 
 	reqImuMeasFlag = _setClr;
 }
 
 
-//=== Define CMD GAME STATUS--------
+ 
 #define GS_PROG_START	1
-//
+ 
 #define GS_RSV_02		2
 #define GS_RSV_03		3
-#define GS_WIRE_RDY		4	// 22
-//
+#define GS_WIRE_RDY		4	 
+ 
 #define GS_LVL_SEL		11
 #define GS_ZONE_SEL		21
 #define GS_CAST_WAIT	31
@@ -498,88 +494,88 @@ void SetIMU_Measure_Out_OnOff(unsigned int _setClr)
 #define GS_SUCCESS		91
 #define GS_CONTINUE		92
 #define GS_GAME_OVER	98
-//
+ 
 #define GS_PROG_END		99
-//------------------------------
+ 
 
 void sendSleepEnable(int Mode, int Time, int Id)
 {
 	String strMsg = StringFormat("%01d", Mode) + StringFormat("%04d", Time);
 	gRodSleepMode = Mode;
 	gRodSleepTime = Time;
-	eNow.write(DF_Protocol_MainToRod_Sleep, strMsg);	// ROD Sleep enable
+	eNow.write(DF_Protocol_MainToRod_Sleep, strMsg);	 
 	LogPrintln(" LG] SLEEP_ENABLE[" + String(Id) + "]: " + strMsg);
 }
 
-//
-//	Send to AP(FG), Main/Rod/Imu/Batt
-//
+ 
+ 
+ 
 void sendCurrentStatus()
 {
 	String respMsg;
 	
-		  //=== 1) ROD CONN
-		  if(ROD_CONN == rod_conn_status)  // CONN
+		   
+		  if(ROD_CONN == rod_conn_status)   
 		  {
-			  //sndMsgConn = RESP_STX_ROD_CONN + "11111" + battLvlStr + "%";	  // SLAVE CONN, with BAT Level
-			  respMsg = RESP_STX_ROD_CONN + STATE_CONNECTED;	  // SLAVE CONN, with BAT Level
+			   
+			  respMsg = RESP_STX_ROD_CONN + STATE_CONNECTED;	   
 			  respMsg += "%";
 		  }
-		  else			  // DIS CONN
+		  else			   
 		  {
 			  respMsg = RESP_STX_ROD_CONN + STATE_DISCONN;
-			  respMsg += "%"; 	  //eNOW Open, TBD(%삭제)
+			  respMsg += "%"; 	   
 		  }
-		  Resp2ApPrintln(respMsg);		  // Send to AP
+		  Resp2ApPrintln(respMsg);		   
 		  
 		  LogPrintln(" LG] RODCN "+respMsg);
 		
-		  //=== 2) IMU Connetion SEND
-		  if( CONNECT == imu_conn_status)	  // CONN
+		   
+		  if( CONNECT == imu_conn_status)	   
 		  {
-			  respMsg = RESP_STX_IMU_CONNECT + STATE_CONNECTED;	  //
+			  respMsg = RESP_STX_IMU_CONNECT + STATE_CONNECTED;	   
 			  respMsg += "%";
 		  }
-		  else			  // DIS CONN
+		  else			   
 		  {
-			  respMsg = RESP_STX_IMU_CONNECT + STATE_DISCONN;	  //
+			  respMsg = RESP_STX_IMU_CONNECT + STATE_DISCONN;	   
 			  respMsg += "%";
 		  }
-		  Resp2ApPrintln(respMsg);		  // Send to PC, IMU_CONN
+		  Resp2ApPrintln(respMsg);		   
 		  
-		  LogPrintln(" FW] IMUCN " + respMsg);		// LOG-SERIAL1
+		  LogPrintln(" FW] IMUCN " + respMsg);		 
 
-		//=== 3) BAT LEVEL SEND
-		//if(ROD_CONN == rod_conn_status)  // CONN
-		//{
-		//  	sndMsgConn = STX_BAT_LVL + battLvlStr + "%";	//
-		//}
-		//else
-		//{
-		//	sndMsgConn = STX_BAT_LVL + "-1%";	//
-		//}
-		respMsg = STX_BAT_LVL + battLvlStr + "%";	//
-	  	Resp2ApPrintln(respMsg);		  // Send to PC
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		respMsg = STX_BAT_LVL + battLvlStr + "%";	 
+	  	Resp2ApPrintln(respMsg);		   
 	  	
-		//BAT충전상태, 
-		if(ROD_CONN == rod_conn_status)  // CONN
+		 
+		if(ROD_CONN == rod_conn_status)   
 		{
-			respMsg = STX_BAT_LVL + BAT_STR_CHAGER_NOCHANGE;   //
-			Resp2ApPrintln(respMsg);			// Send to PC
+			respMsg = STX_BAT_LVL + BAT_STR_CHAGER_NOCHANGE;    
+			Resp2ApPrintln(respMsg);			 
 		}
 	  	
 	  	
-		  LogPrintln(" FW] BATLV " + respMsg); 	  // LOG-SERIAL1
+		  LogPrintln(" FW] BATLV " + respMsg); 	   
 
-		// ===4) ROD Board Type SEND
+		 
 		respMsg = STX_INFO_REQ + ROD_BOARD_TYPE;
-		respMsg += strRodBoardType;		// Old/New
+		respMsg += strRodBoardType;		 
 		respMsg += "%";
-		Resp2ApPrintln(respMsg); 	  // Send to PC
+		Resp2ApPrintln(respMsg); 	   
 
-			LogPrintln(" FW] INFOR " + respMsg);	  // LOG-SERIAL1
+			LogPrintln(" FW] INFOR " + respMsg);	   
 
-		//=== 5) ROD Regist Wait T/O SEC
+		 
 		respMsg = STX_INFO_REQ + ROD_REGIST_TO_SEC;
 		respMsg += String(ROD_REGI_CANCEL_TO/1000);	
 		respMsg += "%";
@@ -588,8 +584,8 @@ void sendCurrentStatus()
 		LogPrintln(" FW] INFOR wt" + respMsg);
 }
 
-//=== LED CONTROL ===
+ 
 
-//
-// Init Val LED CONTROL
-//
+ 
+ 
+ 
