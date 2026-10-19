@@ -88,6 +88,7 @@ extern String STX_SET_DATA;
 #define RUN_TIMEOUT_SLEEP_CNT   15
 
 extern unsigned short apType;
+extern unsigned short dfRodAdcDiagnosticEnabled;
 
 extern unsigned long curr_ms_tick;
 

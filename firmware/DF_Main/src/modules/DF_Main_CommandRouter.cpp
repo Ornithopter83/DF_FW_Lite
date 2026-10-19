@@ -758,6 +758,7 @@ void anaApInfo(String msg)
 		 
 		case DEF_AP_TYPE:		 
 			apType = act;	 
+			dfMainAdcDiagnosticEnabled = 0;
 			eNow.write(DF_Protocol_MainToRod_ApInfo, send2rodMsg);
 
 			 

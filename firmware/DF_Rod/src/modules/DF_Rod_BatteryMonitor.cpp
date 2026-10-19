@@ -43,7 +43,7 @@ void batteryDiagnosticSend()
 {
 	String payload;
 
-	if (AP_IS_TM != apType)
+	if ((AP_IS_TM != apType) || !dfRodAdcDiagnosticEnabled)
 	{
 		return;
 	}

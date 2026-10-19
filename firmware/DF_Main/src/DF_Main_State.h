@@ -1499,6 +1499,7 @@ extern volatile unsigned int oldcurrWirePulse;
 extern short dfConfig;
 
 extern unsigned short apType;
+extern unsigned short dfMainAdcDiagnosticEnabled;
 
 extern String strImuInterval;
 

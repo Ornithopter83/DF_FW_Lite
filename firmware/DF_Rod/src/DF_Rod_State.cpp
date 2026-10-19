@@ -63,6 +63,7 @@ String STX_SET_DATA	= "$F6";
 #define RUN_TIMEOUT_SLEEP_CNT   15 		 
 
 unsigned short apType = AP_IS_DF;
+unsigned short dfRodAdcDiagnosticEnabled = 0;
 
 
  

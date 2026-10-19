@@ -1561,6 +1561,7 @@ short dfConfig = DF_CONFIG_UNKNOWN;
 
  
 unsigned short apType = AP_IS_DF;
+unsigned short dfMainAdcDiagnosticEnabled = 0;
 
 String strImuInterval = "0000";	 
 

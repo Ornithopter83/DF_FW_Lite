@@ -713,7 +713,7 @@ void nowRecvHandler()
 	 
 	else if (DF_Protocol_Pid_RodToMain_BatteryDiagnostic == now_rcv_id && (!rodRegistMode))
 	{
-		if (AP_IS_TM == apType)
+		if ((AP_IS_TM == apType) && dfMainAdcDiagnosticEnabled)
 		{
 			respMsg = RESP_STX_BATTERY_DIAG + now_cmd_data + "%";
 			StsSendPrintln(respMsg);
@@ -925,6 +925,17 @@ void uartRecvHandler()
 	 
 	 
 	if(0) {   }
+
+	else if (msg == "$31S0" || msg == "$31S1")
+	{
+		if (AP_IS_TM != apType) return;
+		dfMainAdcDiagnosticEnabled = (msg == "$31S1") ? 1 : 0;
+		if ((ROD_CONN == rod_conn_status) && (!rodRegistMode))
+		{
+			eNow.write(DF_Protocol_MainToRod_ApInfo, dfMainAdcDiagnosticEnabled ? "0201" : "0200");
+		}
+		return;
+	}
 
 	else if (msg.startsWith(STX_ENCODER_CALIBRATION))
 	{

@@ -340,6 +340,11 @@ void checkRodTimer()
 		{
 			 
 			rodConnMsg = RESP_STX_ROD_CONN + STATE_CONNECTED;
+			if (AP_IS_TM == apType)
+			{
+				eNow.write(DF_Protocol_MainToRod_ApInfo, "0101");
+				if (dfMainAdcDiagnosticEnabled) eNow.write(DF_Protocol_MainToRod_ApInfo, "0201");
+			}
 
 		}
 		else	 

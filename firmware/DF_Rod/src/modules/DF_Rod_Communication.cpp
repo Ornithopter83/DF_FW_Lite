@@ -264,9 +264,14 @@ void nowRecvHandler()
 		{
 			case 1:	 
 				apType = val;
+				dfRodAdcDiagnosticEnabled = 0;
 				LogPrintln(" lg] APTYPE " + String(apType) + (apType? ",TM":",DF"));
 				break;
 			
+			case 2:
+				dfRodAdcDiagnosticEnabled = ((AP_IS_TM == apType) && (val == 1)) ? 1 : 0;
+				break;
+
 			default:
 				break;
 		}

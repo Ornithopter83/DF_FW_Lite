@@ -65,6 +65,8 @@ internal sealed class MainForm : Form
     private bool registrationWaiting;
     private string batteryPercent = "--";
     private string batteryState = "";
+    private RadioButton? adcDiagnosticOn;
+    private RadioButton? adcDiagnosticOff;
 
     public MainForm()
     {
@@ -78,7 +80,7 @@ internal sealed class MainForm : Form
         serial.BytesReceived += OnBytesReceived;
         pollTimer.Tick += (_, _) => { if (serial.IsOpen && !TrySend("$00%", false)) pollTimer.Stop(); };
         Shown += (_, _) => RefreshPorts();
-        FormClosing += (_, _) => { pollTimer.Stop(); if (serial.IsOpen) { TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); } serial.Dispose(); };
+        FormClosing += (_, _) => { pollTimer.Stop(); if (serial.IsOpen) { TrySend(DeviceProtocol.AdcDiagnostic(false), false); TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); } serial.Dispose(); };
     }
 
     private void BuildLayout()
@@ -253,6 +255,16 @@ internal sealed class MainForm : Form
         batteryRow.Controls.Add(gaugePanel);
         batteryRow.Controls.Add(batteryDiagnostic);
         content.Controls.Add(batteryRow);
+        FlowLayoutPanel adcRow = ToggleRow("배터리 ADC 상세 정보", DeviceProtocol.AdcDiagnostic, active => {
+            if (!active) {
+                batteryDiagnostic.Text = "(현재 ---- / 평균 ----)";
+                batteryDiagnostic.ForeColor = Color.DimGray;
+                batteryGauge.AverageAdc = -1;
+            }
+        });
+        adcDiagnosticOn = adcRow.Controls.OfType<RadioButton>().First();
+        adcDiagnosticOff = adcRow.Controls.OfType<RadioButton>().Last();
+        content.Controls.Add(adcRow);
         content.Controls.Add(FieldRow("릴 엔코더", statusLabels["릴 엔코더"]));
         content.Controls.Add(SectionTitle("릴 엔코더 보정"));
         FlowLayoutPanel encoderCalibrationRow = new() { Width = 1060, Height = 48, WrapContents = false };
@@ -718,7 +730,7 @@ internal sealed class MainForm : Form
     {
         message = message.Trim();
         if (!message.StartsWith('$') || !message.EndsWith('%') || message.Length > 120 || message.Any(c => c > 0x7f)) { MessageBox.Show("명령은 ASCII $로 시작하고 %로 끝나야 합니다 (120자 이하)."); return; }
-        string[] allowedPrefixes = { "$00", "$01", "$02", "$04", "$06", "$08", "$10", "$15", "$23", "$24", "$27", "$29", "$30", "$37" };
+        string[] allowedPrefixes = { "$00", "$01", "$02", "$04", "$06", "$08", "$10", "$15", "$23", "$24", "$27", "$29", "$30", "$31S", "$37" };
         if (!allowedPrefixes.Any(prefix => message.StartsWith(prefix, StringComparison.Ordinal))) { MessageBox.Show("Lite에서는 LM JIG, 게임, OTA, 전원 명령을 전송하지 않습니다."); return; }
         TrySend(message);
     }
@@ -742,6 +754,7 @@ internal sealed class MainForm : Form
     }
     private async Task<bool> InitializeConnectedMainAsync()
     {
+        if (adcDiagnosticOff != null) adcDiagnosticOff.Checked = true;
         rodConnected = false; imuConnected = false; registrationWaiting = false;
         encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
         rodRegisterButton.Text = "ROD 등록"; registrationState.Text = "등록 대기 안 함";
@@ -762,6 +775,7 @@ internal sealed class MainForm : Form
                 if (!serial.IsOpen) return false;
             }
         }
+        if (adcDiagnosticOn != null) adcDiagnosticOn.Checked = true;
         int connectionWait = 0;
         while (serial.IsOpen && connectionWait < 20 && (!rodConnected || !imuConnected)) {
             await Task.Delay(100);
@@ -784,7 +798,12 @@ internal sealed class MainForm : Form
     }
     private void DisconnectMain()
     {
-        if (serial.IsOpen) { TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); }
+        if (serial.IsOpen) {
+            TrySend(DeviceProtocol.AdcDiagnostic(false), false);
+            TrySend(DeviceProtocol.TorqueOff(), false);
+            TrySend(DeviceProtocol.BldcOff(), false);
+        }
+        if (adcDiagnosticOff != null && !adcDiagnosticOff.Checked) adcDiagnosticOff.Checked = true;
         pollTimer.Stop(); serial.Close(); connectButton.Text = "연결"; connectionState.Text = "연결 안 됨"; connectionState.ForeColor = Color.DimGray;
         rodConnected = false; imuConnected = false; imuDataEnabled = false; imuZeroButton.Enabled = false; imuOrientation.ClearZero(); registrationWaiting = false; rodRegisterButton.Text = "ROD 등록";
         encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
