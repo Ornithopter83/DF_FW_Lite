@@ -1,4 +1,4 @@
-// Rod communication implementation.
+ 
 #include "../DF_Rod_Internal.h"
 #include "DF_Rod_Communication.h"
 
@@ -108,16 +108,16 @@ void encoderCalibrationChangeCallback(String str) {
 	eNow.write(DF_Protocol_RodToMain_EncoderCalibration, str);
 }
 
-/*------------------------------------------------------------------------
-	Send IMU Data By eNOw ( SLAVE -> MAIN )
-------------------------------------------------------------------------*/
+ 
+
+
 void imuDataCallback(String pid, String str) {
   eNow.write(pid, str);
 }
 
-//
-//
-//
+ 
+ 
+ 
 
 
 int rodAliveRcv_LedBlinkFlag = 0;
@@ -127,11 +127,11 @@ int rodAliveRcv_LedBlinkFlag = 0;
 
 static unsigned int rodStatus = ROD_STS_UNKNOWN;
 
-//
-// ROD SET DATA :  CYCLWE TEST($F6)
-//
-//unsigned short exeFlag_RodImuOutCycle = 1;		// TEST FW
-unsigned short exeFlag_RodImuOutCycle = 0;		// REL
+ 
+ 
+ 
+ 
+unsigned short exeFlag_RodImuOutCycle = 0;		 
 
 void setData_RodCycleTest(String msg)
 {
@@ -141,8 +141,8 @@ void setData_RodCycleTest(String msg)
 	switch(kind)
 	{
 		case '0':
-			if(0 == act){	exeFlag_RodImuOutCycle = 0;	}	// $F600
-			else		{	exeFlag_RodImuOutCycle = 1; }	// $F601
+			if(0 == act){	exeFlag_RodImuOutCycle = 0;	}	 
+			else		{	exeFlag_RodImuOutCycle = 1; }	 
 			break;
 
 		default:
@@ -150,9 +150,9 @@ void setData_RodCycleTest(String msg)
 	}
 }
 
-//
-//
-//
+ 
+ 
+ 
 void sendInfo_boardType()
 {
 	String msg = "001";
@@ -161,21 +161,21 @@ void sendInfo_boardType()
 		LogPrintln(" LG] RodTyp " + String(rodBoardType) + "," + msg);
 }
 
-//
-//
-//
+ 
+ 
+ 
 void imuConnResp()
 {
 	String msg;
 
 	if(IMU_CONN == imuStatus)
 	{
-		//msg = RESP_STX_IMU_CONN_OK;
+		 
 		msg = "11";
 	}
 	else
 	{
-		//msg = RESP_STX_IMU_CONN_NG;
+		 
 		msg = "00";
 	}
 	eNow.write(DF_Protocol_RodToMain_ImuConnection, msg);
@@ -184,10 +184,10 @@ void imuConnResp()
 
 
 
-//====================================================
-//
-//	MAIN=>SLAVE recv Msg : (ESP Now) Recv Data Hanlder ,  
-//====================================================
+ 
+ 
+ 
+ 
 void nowRecvHandler()
 {
 	enum { DF_Rod_Communication_HandlerBufferSize = 128 };
@@ -222,28 +222,28 @@ void nowRecvHandler()
 
 
 
-//======================================
-  // (10) Slave Alive Check
-  if(0) { /* Dummy */ }
+ 
+   
+  if(0) {   }
 
-	//(30), OTHER_ROD_WRITE (BC ADDR : OTHER ROD -> ROD)
-  else if (DF_Protocol_Pid_RodToMain_RodAddress == now_rcv_id)			// OTHER ROD
+	 
+  else if (DF_Protocol_Pid_RodToMain_RodAddress == now_rcv_id)			 
   {
 		LogPrintln(" LG] rodRg rcv " + (now_msg_str) + "NOT_EXEC");
   }
-	//(31), MAIN_ADDR_WRITE, MAN=>ROD
-  else if (DF_Protocol_Pid_MainToRod_MainAddress == now_rcv_id)			// 타겟주소 저장
+	 
+  else if (DF_Protocol_Pid_MainToRod_MainAddress == now_rcv_id)			 
   {
-  	if(55 == rodRegistMode)	// RegiMode인 경우만
+  	if(55 == rodRegistMode)	 
   	{
-  		// T/O Stop
-  		rodRegistToStop();		// TO STOP
+  		 
+  		rodRegistToStop();		 
   		
-		//String msgAddr = cmd_str_data.substring(0,(0+17));
+		 
 		String msgAddr = cmd_str_data;
-  		//1.주소 저장
+  		 
   		int ret = targetAddrWrite(msgAddr);
-	  	if((1000 != ret) && (!isSetupMode) )	// < NG & NORMAL>  WRITE_OK = 1000, WRITE_FAIL = 1001, 그외는 LENGTH
+	  	if((1000 != ret) && (!isSetupMode) )	 
 	  	{
 			String logMsg = "";
 	  		if(1001 == ret)	logMsg = "Write Fail ";
@@ -251,33 +251,33 @@ void nowRecvHandler()
 			LogPrintln(" LG] Error_ TART ADDR " + logMsg + ",m:" + msgAddr + ",len:" + String(msgAddr.length()));
 	  	}
 		
-		//2-1. ADDR변경 STRING=>HEX for PEER
-		//2-2..Peer변경(TEST) -불필요.
+		 
+		 
 	
 		String wrtAddr = eNow.getTargetAddress();
 		LogPrintln(" LG] rodRg Addr:" + wrtAddr);
 
-		// 3. 대기 3초
-		rodRegi3secToStart();		// 3SEC후 Reset
+		 
+		rodRegi3secToStart();		 
 		
-		//4. Reset
-		//ESP.restart();
+		 
+		 
   	}
-	else	// NOT ROD REGIST
+	else	 
 	{
-	  	// NA
+	  	 
 			LogPrintln(" LG] rodRg rcv " + (now_msg_str) + "NOT_EXEC");
 	}
   }
 
-	// (33) AP/TM구분, xxYY
+	 
 	else if (DF_Protocol_Pid_MainToRod_ApInfo == now_rcv_id)
 	{
 		short kind = cmd_str_data.substring(0,2).toInt();
 		short val = cmd_str_data.substring(2,4).toInt();
 		switch(kind)
 		{
-			case 1:	// AP/TM구분
+			case 1:	 
 				apType = val;
 				LogPrintln(" lg] APTYPE " + String(apType) + (apType? ",TM":",DF"));
 				break;
@@ -287,7 +287,7 @@ void nowRecvHandler()
 		}
 	}
 
-	// (29) Reel Out All OFF
+	 
   else if (DF_Protocol_Pid_MainToRod_AllOutputsOff == now_rcv_id)
   {
 	int act = cmd_str_data.substring(0,(0+2)).toInt();
@@ -297,113 +297,113 @@ void nowRecvHandler()
 	}
 	else
 	{
-		// error
+		 
 	}
   }
 
   
-  // ( 5 ) PWRON_1ST CMD => ALIVE/IMU/BAT/TYPE Resp
-  else if (DF_Protocol_Pid_MainToRod_PowerOn == now_rcv_id)			// 1. SLAVE ALIVE REQ For Each 500ms
+   
+  else if (DF_Protocol_Pid_MainToRod_PowerOn == now_rcv_id)			 
   {
-	// OFF Measure IMU
-	imu.isMeasure = false;		// IMU DATA OFF
+	 
+	imu.isMeasure = false;		 
 	
-  	// 메인상태를 변경하여 이후 ALIVE수신시 - ALIVE송신/IMU/BAT/BdType를 100ms마다 송신함.
-  	mainStatus = MAIN_STS_PWRON;		// NEXT ALIVE 수신시 ROD INFo SEND
+  	 
+  	mainStatus = MAIN_STS_PWRON;		 
 		LogPrintln(" LG] MN_RCV MainPowerOn, PID = 5 ");
 
-	//rodStatus = ROD_STS_PWRON;
+	 
 
   }
 
-	// ( 6 ) AP START : Resp IMU/BAT/TYPE Send
-  else if (DF_Protocol_Pid_MainToRod_RodInfoRequest == now_rcv_id)			//
+	 
+  else if (DF_Protocol_Pid_MainToRod_RodInfoRequest == now_rcv_id)			 
   {
-	// OFF Measure IMU
- 	imu.isMeasure = false;		// IMU DATA OFF
+	 
+ 	imu.isMeasure = false;		 
 
- 	// IMU/BAT/BdType를 100ms마다 송신함.
-	recvInfoSeqStep = 1; 	// TBD, ROD_INFO_REQ & PID_ALIVE_CHK가 동시에 오는 경우는?
+ 	 
+	recvInfoSeqStep = 1; 	 
  		LogPrintln(" LG] RECV__ RODINFOREQ Ap Start, PID = 6 ");
 	
   }
 
-  // (10) ALIVE CHK
-  else if (DF_Protocol_Pid_MainToRod_Alive == now_rcv_id)			// 1. SLAVE ALIVE REQ For Each 1 SEC
+   
+  else if (DF_Protocol_Pid_MainToRod_Alive == now_rcv_id)			 
   {
 
-	// Alive Recived, Clear 1sec Counter
-	rod_Alive_recv_over_cnt = 0;			// OK = Clear OVER CNT at RECV ALIVE(MAIN ENB)
-	rodAliveRcv_LedBlinkFlag = 1;			// LED2 Display Check Flag
+	 
+	rod_Alive_recv_over_cnt = 0;			 
+	rodAliveRcv_LedBlinkFlag = 1;			 
 
 	
-	// 1) SEND ALIVE RESP
+	 
 	eNow.write(DF_Protocol_RodToMain_Alive, "");
 
-	// 2) 1st ALIVE RECV after MAIN PWR ON 1st CMD RECV
+	 
 	if(MAIN_STS_PWRON == mainStatus)
 	{
-		recvInfoSeqStep = 1; 		// IMU/BAT/TYPE 100ms SEND
+		recvInfoSeqStep = 1; 		 
 
-		// TBD, ROD_INFO_REQ & PID_ALIVE_CHK가 동시에 오는 경우는?
+		 
 	}
 	mainStatus = MAIN_STS_CONN;
 
   }
   
-  // (20) Version Read
+   
   else if (DF_Protocol_Pid_MainToRod_VersionRead == now_rcv_id)
   {
-	//eNow.write(STR_PID_SLAVE_VER_RESP_ROD, rodVer);		// Resp Ver_ROD(19)
+	 
 	String msg = rodVer;
   	if(IMU_CONN == imuStatus)
   	{
 		msg += ",";
 		msg += imu.getversion();
-		eNow.write(DF_Protocol_RodToMain_Version, msg);		// Resp Ver_IMU(20)
+		eNow.write(DF_Protocol_RodToMain_Version, msg);		 
 	}
 	else
 	{
 	  	msg += ",Vi99.99.99";
-		eNow.write(DF_Protocol_RodToMain_Version, msg);		// Resp Ver_IMU(20)
+		eNow.write(DF_Protocol_RodToMain_Version, msg);		 
 	}
 	LogPrintln( " lg] ver: " + msg);
   }
 
-  // (11) NOT_USE : ROD PASS ID
+   
 
-	// PID SEP => 11-BREAK, 12-IMU DATA
-  else if (DF_Protocol_Pid_MainToRod_Break == now_rcv_id)	// ( *** )  Control ID
+	 
+  else if (DF_Protocol_Pid_MainToRod_Break == now_rcv_id)	 
   {
-	// Current Rod board has no break motor.
+	 
   }
 
-	// (12) - IMU DATA / SET
-  else if (DF_Protocol_Pid_MainToRod_ImuDataControl == now_rcv_id)	// ( *** )  Control ID
+	 
+  else if (DF_Protocol_Pid_MainToRod_ImuDataControl == now_rcv_id)	 
   {
-	  // 3) IMU Setup($08)
-  	//else if (cmdStr.startsWith(STX_IMU_SETUP))  // 5. IMU
+	   
+  	 
   	{
   		int act = cmd_str_data.substring(0,1).toInt();
 		if( 0 == act || 1 == act)
 		{
-			imu.setConfig(cmd_str_data);		// From MAIN(From AP) // DATA ON(1)/OFF(0) Only
+			imu.setConfig(cmd_str_data);		 
 		}
 		else
 		{
 				LogPrintln( " lg] Error IMU CMD Error m:" + cmd_str_data);
-			// Error NA :: 2,3,4 수신 at NOW(RF, MAIN)
+			 
 		}
   	}
   }
 
-  // (19) VRT MOT CONT
-  //	19, A	-0,1
-  //	19, ACC	-2
-  //	19, AnnnFFF -3
-  //	19, ACCnnnFFF - 4
-  //	19, App		-5
-  else if (DF_Protocol_Pid_MainToRod_VerticalMotor == now_rcv_id)	// ( *** )  Control ID
+   
+   
+   
+   
+   
+   
+  else if (DF_Protocol_Pid_MainToRod_VerticalMotor == now_rcv_id)	 
   {
 		if(isRodNewBoard())
 		{
@@ -416,8 +416,8 @@ void nowRecvHandler()
 		}
   }
 
-  // (27) BTN LED CONT
-  else if (DF_Protocol_Pid_MainToRod_ButtonLed == now_rcv_id)	// ( *** )  Control ID
+   
+  else if (DF_Protocol_Pid_MainToRod_ButtonLed == now_rcv_id)	 
   {
  		if(isRodNewBoard())
 		{
@@ -430,7 +430,7 @@ void nowRecvHandler()
 		}
   } 
 
-	// (35) Encoder calibration requested by TestModule through Main.
+	 
 	else if (DF_Protocol_Pid_MainToRod_EncoderCalibration == now_rcv_id)
 	{
 		char action = cmd_str_data.length() ? cmd_str_data.charAt(0) : '\0';
@@ -449,47 +449,47 @@ void nowRecvHandler()
 		}
 	}
 
-  // ( ? ) NOT DEFINE PID
-  else					// ELSE : Error
+   
+  else					 
   {
-  		// Error
+  		 
   		LogPrintln(" LG] NowRcv Fail NotDef Pid:" + String(now_rcv_id) + ", msg:" + (now_msg_str));
   }
   
 }
 
-//
-//
-//
+ 
+ 
+ 
 void anaReelDeviceControl(int act, String msg)
 {
-	//
+	 
 
 	switch(act)
 	{
-		case 0:		// ALL OFF
-			//
-			imu.setConfig("0");		// IMU Data OUT OFF
-			//
+		case 0:		 
+			 
+			imu.setConfig("0");		 
+			 
 			rodVrtControl_Stop();
-			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		// VRT MOT OFF
-			//
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
+			 
 			rodBtnLedControl_Stop(0);
 			rodBtnLedControl_Stop(1);
-			digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF);	// BTN LED OFF
-			digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF);	// BTN LED OFF
+			digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF);	 
+			digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF);	 
 			break;
 
 		default:
-			// Error
+			 
 			break;
 	}
 }
 
-//---------------------------------------------
-//
-//	19, AccNNNFFF
-//---------------------------------------------
+ 
+ 
+ 
+ 
 
 void anaVrtMotMainCmd(String msg)
 {
@@ -497,22 +497,22 @@ void anaVrtMotMainCmd(String msg)
 	int cnt = 1;
 	int ontime = 100;
 	int offtime = 50;
-	//int time = cmd_str_data.substring(1,(1+4)).toInt();
+	 
 	switch(act)
 	{
 		case 0:
-			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		// VRT MOT OFF
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 			rodVrtControl_Stop();
 			break;
 	
 		case 1:
-			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		// VRT MOT ON
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		 
 			rodVrtControl_Stop();
-			// T/O Control TBD
+			 
 			break;
-		case 4: // c+ time // ID,ACCNNNFFF%
+		case 4:  
 
-			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		// VRT MOT OFF
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 			rodVrtControl_Stop();
 
 			cnt = msg.substring(1,(1+2)).toInt();
@@ -524,21 +524,21 @@ void anaVrtMotMainCmd(String msg)
 			offtime = msg.substring(6,(6+3)).toInt();
 			if(20 > offtime || 999 < offtime) { offtime = 50; }
 			vrt_ap_req_off_time = offtime;
-			//
-			rodVrtControl_Start(vrt_ap_req_cnt, vrt_ap_req_on_time, vrt_ap_req_off_time);	// AP REQ, 게임동작별 PreSET으로 다르게 설정
-			//
+			 
+			rodVrtControl_Start(vrt_ap_req_cnt, vrt_ap_req_on_time, vrt_ap_req_off_time);	 
+			 
 			break;
 			
-		case 5: // Pattern, TBD
-			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		// VRT MOT OFF
+		case 5:  
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 			rodVrtControl_Stop();
 
-		// TBC CONTROL
+		 
 		
 			break;
 	
 		default:
-			// Error NA :: 2,3,4 수신 at NOW(RF, MAIN)
+			 
 			break;
 	}
 
@@ -548,9 +548,9 @@ void anaVrtMotMainCmd(String msg)
 #define BTN_LED_ALL_POSI	0
 #define BTN_LED_LEFT_POSI	1
 #define BTN_LED_RIGHT_POSI	2
-#define BTN_LED_LAST_POSI	BTN_LED_RIGHT_POSI	// 주의, 마지막 POSI
+#define BTN_LED_LAST_POSI	BTN_LED_RIGHT_POSI	 
 
-// 27, xAccNNNFFF
+ 
 void anaBtnLedMainCmd(String msg)
 {
 	int idx;
@@ -559,33 +559,33 @@ void anaBtnLedMainCmd(String msg)
 	if(5 < act)
 	{
 		return;
-	}	// 처리 중지
+	}	 
 	
 	int posi = msg.substring(0,1).toInt();
-	// Position이 맞지 않으면 실행하지 않음
+	 
 	if( BTN_LED_ALL_POSI == posi && (0==act || 1==act) )
 	{
-		// ACTION
+		 
 	}
-	else if(BTN_LED_LAST_POSI < posi)	// MAX이상이면 처리안함.
+	else if(BTN_LED_LAST_POSI < posi)	 
 	{
 		return;
-	}	// 처리 중지
+	}	 
 
-	idx = (posi-1);		// idx : 0-Left, 1-Right
+	idx = (posi-1);		 
 
 	int pin;
 	int cnt;
 	unsigned int ontime;
 	unsigned int offtime;	
-	//int time = cmd_str_data.substring(1,(1+4)).toInt();
+	 
 	switch(act)
 	{
-		case 0:	//OFF
-			if(BTN_LED_ALL_POSI == posi)	// ALL
+		case 0:	 
+			if(BTN_LED_ALL_POSI == posi)	 
 			{
-				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF);		// BTN LED OFF
-				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF);		// BTN LED OFF
+				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF);		 
+				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF);		 
 				rodBtnLedControl_Stop(0);
 				rodBtnLedControl_Stop(1);
 			}
@@ -593,18 +593,18 @@ void anaBtnLedMainCmd(String msg)
 			{
 				if(idx) pin = BTN_LED_RT_BLUE_PIN;
 				else	pin = BTN_LED_LF_RED_PIN;
-				digitalWrite(pin, BTN_LED_OFF); 	// BTN LED OFF
+				digitalWrite(pin, BTN_LED_OFF); 	 
 				rodBtnLedControl_Stop(idx);
 			}
 			
 			
 			break;
 	
-		case 1:	// ON
-			if(BTN_LED_ALL_POSI == posi)	// ALL
+		case 1:	 
+			if(BTN_LED_ALL_POSI == posi)	 
 			{
-				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_ON);		// BTN LED ON
-				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_ON);		// BTN LED ON
+				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_ON);		 
+				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_ON);		 
 				rodBtnLedControl_Stop(0);
 				rodBtnLedControl_Stop(1);
 			}
@@ -612,22 +612,22 @@ void anaBtnLedMainCmd(String msg)
 			{
 				if(idx) pin = BTN_LED_RT_BLUE_PIN;
 				else	pin = BTN_LED_LF_RED_PIN;
-				digitalWrite(pin, BTN_LED_ON);		// BTN LED ON
+				digitalWrite(pin, BTN_LED_ON);		 
 				rodBtnLedControl_Stop(idx);
 			}
 			break;
 			
-		case 2:	//cnt
+		case 2:	 
 			break;
 			
-		case 3:	// time
+		case 3:	 
 			break;
 
-		case 4: // c+ time // ID,ACCNNNFFF%
+		case 4:  
 
 			if(idx) pin = BTN_LED_RT_BLUE_PIN;
 			else	pin = BTN_LED_LF_RED_PIN;
-			digitalWrite(pin, BTN_LED_OFF);		//  BTN LED OFF
+			digitalWrite(pin, BTN_LED_OFF);		 
 			rodBtnLedControl_Stop(idx);
 
 			cnt = msg.substring(2,(2+2)).toInt();
@@ -639,43 +639,43 @@ void anaBtnLedMainCmd(String msg)
 			offtime = msg.substring(7,(7+3)).toInt();
 			if(20 > offtime || 999 < offtime) { offtime = 50; }
 			btn_led_ap_req_off_time[idx] = offtime;
-			//
-			rodBtnLedControl_Start(idx, cnt, ontime, offtime);	// AP REQ, 게임동작별 PreSET으로 다르게 설정
-			//
+			 
+			rodBtnLedControl_Start(idx, cnt, ontime, offtime);	 
+			 
 			break;
 			
-		case 5: // Pattern, TBD
+		case 5:  
 			if(idx) pin = BTN_LED_RT_BLUE_PIN;
 			else	pin = BTN_LED_LF_RED_PIN;
-			digitalWrite(pin, BTN_LED_OFF);		// BTN LED OFF
+			digitalWrite(pin, BTN_LED_OFF);		 
 			rodBtnLedControl_Stop(idx);
 
-			// TBD Pattern Control
+			 
 			
 		default:
-			// Error NA :: 2,3,4 수신 at NOW(RF, MAIN)
+			 
 			break;
 	}
 	
-	//logMsg = "Posi/Act:" + cmd_str_data;
+	 
 
 }
 
 
-//-----------------------------------------
-//	VRT MOT Control
-// FW CONTROL VAR
-//-----------------------------------------
+ 
+ 
+ 
+ 
 static int vrt_cont_cnt = 0;
 static unsigned int vrt_cont_on_time = 100;
 static unsigned int vrt_cont_off_time = 50;
-//STEP
+ 
 static unsigned int vrt_cont_step = 0;
 
 #define VRT_MOT_CONT_START	10
 #define VRT_MOT_CONT_STOP	0
 
-// Control VAR & SAVE VAR분리
+ 
 
 void rodVrtControl_Start(int cnt, unsigned int ontime, unsigned int offtime)
 {
@@ -693,9 +693,9 @@ void rodVrtControl_Stop()
 	vrt_cont_flag = 0;
 }
 
-//
-//
-//	CALL 10ms
+ 
+ 
+ 
 void rodVrtControl()
 {
 	static unsigned int oldStep = 0;
@@ -707,36 +707,36 @@ void rodVrtControl()
 		case 0:
 			break;
 			
-		case VRT_MOT_CONT_START:	//Start
+		case VRT_MOT_CONT_START:	 
 			_cnt = 0;
 			vrt_cont_step = 20;
 			break;
 
-		case 20:		// REPWAT & ON
+		case 20:		 
 			_cnt++;
-			if(_cnt > vrt_cont_cnt)	// to END
+			if(_cnt > vrt_cont_cnt)	 
 			{
 				vrt_cont_step = 90;
 			}
 			else
 			{
-				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		// VRT MOT ON
+				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		 
 				setTO(_to);
 				vrt_cont_step = 21;
 				break;
 			}
-		case 21:		// OFF
+		case 21:		 
 			if(checkTO(_to, vrt_cont_on_time))
 			{
-				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		// VRT MOT OFF
+				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 				setTO(_to);
 				vrt_cont_step = 22;
 			}
 			break;
-		case 22:		// OFF Wait to REPEAT
+		case 22:		 
 			if(checkTO(_to, vrt_cont_off_time))
 			{
-				vrt_cont_step = 20;		// REPEAT
+				vrt_cont_step = 20;		 
 			}
 			break;
 
@@ -753,13 +753,13 @@ void rodVrtControl()
 }
 
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
+ 
+ 
+ 
 static unsigned int btn_led_cnt[BTN_LED_MAX_SIZE] = {0,0};
 static unsigned int btn_led_on_time[BTN_LED_MAX_SIZE] = {100,100};
 static unsigned int btn_led_off_time[BTN_LED_MAX_SIZE] = {50,50};
-// step
+ 
 static unsigned int btn_led_step[BTN_LED_MAX_SIZE] = {0,0};
 
 #define BTN_LED_CONT_START	10
@@ -775,23 +775,23 @@ void rodBtnLedControl_Start(int idx, unsigned int cnt, unsigned int ontime, unsi
 	
 	btn_led_flag[idx] = 1;
 
-	//LogPrintln(" lg] BtnLed START idx:" + String(idx));
+	 
 }
 
 void rodBtnLedControl_Stop(int idx)
 {
 	btn_led_step[idx] = BTN_LED_CONT_STOP;
 	btn_led_flag[idx] = 0;
-	//LogPrintln(" lg] BtnLed STOP idx:" + String(idx));
+	 
 }
 
 #define BTN_LED_LEFT_IDX	0
 #define BTN_LED_RIGHT_IDX	1
 
-//-------------------------------------------------
-//
-//	CALL 10ms
-//-------------------------------------------------
+ 
+ 
+ 
+ 
 void rodLfBtnLedControl()
 {
 	static unsigned int oldStep = 0;
@@ -799,46 +799,46 @@ void rodLfBtnLedControl()
 	static unsigned long _cnt = 0;
 	String sendMsg;
 
-	int idx = BTN_LED_LEFT_IDX;	// LEFT
+	int idx = BTN_LED_LEFT_IDX;	 
 	
-	// 0 - LEFT LED, 1- RIGHT LED
+	 
 	switch(btn_led_step[idx])
 	{
 		case 0:
 			break;
 			
-		case BTN_LED_CONT_START:	//Start
+		case BTN_LED_CONT_START:	 
 			_cnt = 0;
 			btn_led_step[idx] = 20;
 			break;
 
-		case 20:		// EPEAT & ON
+		case 20:		 
 			_cnt++;
-			if(_cnt > btn_led_cnt[idx])	// to END
+			if(_cnt > btn_led_cnt[idx])	 
 			{
 				btn_led_step[idx] = 90;
 			}
 			else
 			{
-				// ON
-				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_ON); 	// BTN LED OFF
+				 
+				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_ON); 	 
 				setTO(_to);
 				btn_led_step[idx] = 21;
 				break;
 			}
-		case 21:		// OFF
+		case 21:		 
 			if(checkTO(_to, btn_led_on_time[idx]))
 			{
-				// OFF
-				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF); 	// BTN LED OFF
+				 
+				digitalWrite(BTN_LED_LF_RED_PIN, BTN_LED_OFF); 	 
 				setTO(_to);
 				btn_led_step[idx] = 22;
 			}
 			break;
-		case 22:		// OFF Wait to REPEAT
+		case 22:		 
 			if(checkTO(_to, btn_led_off_time[idx]))
 			{
-				btn_led_step[idx] = 20;		// REPEAT
+				btn_led_step[idx] = 20;		 
 			}
 			break;
 
@@ -861,46 +861,46 @@ void rodRtBtnLedControl()
 	static unsigned long _cnt = 0;
 	String sendMsg;
 
-	int idx = BTN_LED_RIGHT_IDX;	// RIGHT
+	int idx = BTN_LED_RIGHT_IDX;	 
 	
-	// 0 - LEFT LED, 1- RIGHT LED
+	 
 	switch(btn_led_step[idx])
 	{
 		case 0:
 			break;
 			
-		case BTN_LED_CONT_START:	//Start
+		case BTN_LED_CONT_START:	 
 			_cnt = 0;
 			btn_led_step[idx] = 20;
 			break;
 
-		case 20:		// EPEAT & ON
+		case 20:		 
 			_cnt++;
-			if(_cnt > btn_led_cnt[idx])	// to END
+			if(_cnt > btn_led_cnt[idx])	 
 			{
 				btn_led_step[idx] = 90;
 			}
 			else
 			{
-				// ON
-				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_ON); 	// BTN LED ON
+				 
+				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_ON); 	 
 				setTO(_to);
 				btn_led_step[idx] = 21;
 				break;
 			}
-		case 21:		// OFF
+		case 21:		 
 			if(checkTO(_to, btn_led_on_time[idx]))
 			{
-				// OFF
-				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF); 	// BTN LED OFF
+				 
+				digitalWrite(BTN_LED_RT_BLUE_PIN, BTN_LED_OFF); 	 
 				setTO(_to);
 				btn_led_step[idx] = 22;
 			}
 			break;
-		case 22:		// OFF Wait to REPEAT
+		case 22:		 
 			if(checkTO(_to, btn_led_off_time[idx]))
 			{
-				btn_led_step[idx] = 20;		// REPEAT
+				btn_led_step[idx] = 20;		 
 			}
 			break;
 
@@ -918,8 +918,8 @@ void rodRtBtnLedControl()
 
 
 
-//=================================================================
-//		NORMAL Mode
-//	- DEBUG용 CMD입력
-//
-//=================================================================
+ 
+ 
+ 
+ 
+ 
