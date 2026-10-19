@@ -1,6 +1,6 @@
-//
-//
-//
+ 
+ 
+ 
 
 #include "Common.h"
 #include "Led.h"
@@ -16,14 +16,14 @@ Led::Led()
 void Led::init()
 {
 
-	// Cent LED R,G,B
-  	analogWrite(LED_CENT_R_PIN,LED_OFF_DUTY);			// 0% = LOW
-  	analogWrite(LED_CENT_G_PIN,LED_OFF_DUTY);			// 0% = LOW
-  	analogWrite(LED_CENT_B_PIN,LED_OFF_DUTY);			// 0% = LOW
-  	analogWrite(LED_BTM_PIN,LED_OFF_DUTY);			// 0% = LOW
+	 
+  	analogWrite(LED_CENT_R_PIN,LED_OFF_DUTY);			 
+  	analogWrite(LED_CENT_G_PIN,LED_OFF_DUTY);			 
+  	analogWrite(LED_CENT_B_PIN,LED_OFF_DUTY);			 
+  	analogWrite(LED_BTM_PIN,LED_OFF_DUTY);			 
 
-  		//analogWrite(LED_OPT_L_PIN,LED_OFF_DUTY);			// 0% = LOW
-  		//analogWrite(LED_OPT_R_PIN,LED_OFF_DUTY);			// 0% = LOW
+  		 
+  		 
 	
 
 	int ledoff = mapled(LED_OFF_DUTY);
@@ -33,18 +33,18 @@ void Led::init()
 }
 
 
-//callback Function Name : rotateChangeCallback
+ 
 void Led::LedCallback(void (*ledCallback)(String))
 {
   _ledCallback = ledCallback;
 }
 
 
-/*
-========Led ON,
-	Position : 
-	Duty : 0 ~ 255
-*/
+ 
+
+
+
+
 void Led::on(unsigned int ledPos, int _duty)
 {
 
@@ -76,18 +76,18 @@ void Led::on(unsigned int ledPos, int _duty)
 			
 			case LEDPOS_LEFT:
 
-					//ledOut(LED_OPT_L_PIN, _duty);
+					 
 
 			    break;
 			  
 			case LEDPOS_RIGHT:
 
-				  //ledOut(LED_OPT_R_PIN, _duty);
+				   
 
 			    break;
 			  
 			default:
-				//error
+				 
 				break;
 		}
 	}
@@ -119,7 +119,7 @@ void Led::RGBon(unsigned int ledPos, int rVal, int gVal, int bVal)
 				break;
 			
 			default:
-				// error
+				 
 				break;
 		}
 	}
@@ -151,18 +151,18 @@ void Led::off(unsigned int ledPos)
 			
 			case LEDPOS_LEFT:
 
-				  //ledOut(LED_OPT_L_PIN, LED_OFF_DUTY);
+				   
 			  
 				break;
 			  
 			case LEDPOS_RIGHT:
 				
-				  //ledOut(LED_OPT_R_PIN, LED_OFF_DUTY);
+				   
 
 				break;
 			  
 			default:
-				// error
+				 
 				break;
 		}
 	}
@@ -172,7 +172,7 @@ void Led::off(unsigned int ledPos)
 
 void Led::blink(unsigned int ledPos, int time, int bCnt)
 {
-	// TBD
+	 
 }
 
 

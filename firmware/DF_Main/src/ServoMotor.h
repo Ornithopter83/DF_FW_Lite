@@ -1,6 +1,6 @@
-//
-// ServoMotor.h
-//
+ 
+ 
+ 
 
 #pragma once
 
@@ -20,7 +20,7 @@ class ServoMotor
     int defaultAngle = 90;
 };
 
-// EXTERN VAR
-extern unsigned long curr_ms_tick;			// 1ms Curr tick
+ 
+extern unsigned long curr_ms_tick;			 
 extern String STX_SERVO_MOTOR;
 
