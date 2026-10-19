@@ -761,9 +761,19 @@ void anaApInfo(String msg)
 			eNow.write(DF_Protocol_MainToRod_ApInfo, send2rodMsg);
 
 			 
-			if(AP_IS_TM == apType)	 
+			if(AP_IS_TM == apType)
 			{
-				 
+				String statusMsg = RESP_STX_ROD_CONN;
+				statusMsg += (ROD_CONN == rod_conn_status) ? STATE_CONNECTED : STATE_DISCONN;
+				StsSendPrintln(statusMsg + "%");
+
+				statusMsg = RESP_STX_IMU_CONNECT;
+				statusMsg += (CONNECT == imu_conn_status) ? STATE_CONNECTED : STATE_DISCONN;
+				StsSendPrintln(statusMsg + "%");
+
+				statusMsg = STX_BAT_LVL;
+				statusMsg += (ROD_CONN == rod_conn_status) ? battLvlStr : String("-2");
+				StsSendPrintln(statusMsg + "%");
 			}
 			 
 			break;

@@ -44,8 +44,6 @@ internal sealed class MainForm : Form
     private readonly Label registrationState = ValueLabel("등록 대기 안 함");
     private readonly Label leftButtonState = Indicator("왼쪽");
     private readonly Label rightButtonState = Indicator("오른쪽");
-    private readonly Label setupButtonState = Indicator("설정");
-    private readonly Label bootButtonState = Indicator("부트");
     private readonly Label reelConnectionState = Indicator("릴 연결 대기");
     private readonly Label imuConnectionState = Indicator("IMU 연결 대기");
     private readonly ImuOrientationView imuOrientation = new() { Width = 300, Height = 150, Margin = new Padding(18, 0, 0, 0) };
@@ -256,14 +254,15 @@ internal sealed class MainForm : Form
         content.Controls.Add(batteryRow);
         content.Controls.Add(FieldRow("릴 엔코더", statusLabels["릴 엔코더"]));
         content.Controls.Add(SectionTitle("릴 엔코더 보정"));
-        FlowLayoutPanel encoderCalibrationRow = new() { Width = 760, Height = 48, WrapContents = false };
+        FlowLayoutPanel encoderCalibrationRow = new() { Width = 1060, Height = 48, WrapContents = false };
         encoderCalibrationRow.Controls.Add(encoderCalibrationStartButton);
         encoderCalibrationRow.Controls.Add(encoderCalibrationCompleteButton);
         encoderCalibrationRow.Controls.Add(encoderCalibrationCancelButton);
         encoderCalibrationRow.Controls.Add(new Label { Text = "회전 카운트", Width = 90, Height = 34, TextAlign = ContentAlignment.MiddleCenter });
         encoderCalibrationRow.Controls.Add(encoderCalibrationRawCount);
+        encoderCalibrationRow.Controls.Add(new Label { Text = "보정 상태", Width = 80, Height = 34, TextAlign = ContentAlignment.MiddleCenter, Margin = new Padding(12, 0, 3, 0) });
+        encoderCalibrationRow.Controls.Add(encoderCalibrationState);
         content.Controls.Add(encoderCalibrationRow);
-        content.Controls.Add(FieldRow("보정 상태", encoderCalibrationState));
         encoderCalibrationStartButton.Enabled = false;
         encoderCalibrationCompleteButton.Enabled = false;
         encoderCalibrationCancelButton.Enabled = false;
@@ -299,7 +298,7 @@ internal sealed class MainForm : Form
         };
         content.Controls.Add(SectionTitle("릴 버튼 상태"));
         FlowLayoutPanel indicators = new() { Width = 600, Height = 64 };
-        indicators.Controls.Add(leftButtonState); indicators.Controls.Add(rightButtonState); indicators.Controls.Add(setupButtonState); indicators.Controls.Add(bootButtonState);
+        indicators.Controls.Add(leftButtonState); indicators.Controls.Add(rightButtonState);
         content.Controls.Add(indicators);
         content.Controls.Add(SectionTitle("릴 출력"));
         content.Controls.Add(ToggleRow("진동 모터", DeviceProtocol.ReelVibration));
@@ -543,8 +542,6 @@ internal sealed class MainForm : Form
             string code = frame.Substring(3, 2);
             if (code == "10") SetButtonIndicator(leftButtonState, true, Color.Red); else if (code == "11") SetButtonIndicator(leftButtonState, false, Color.Gray);
             else if (code == "20") SetButtonIndicator(rightButtonState, true, Color.Blue); else if (code == "21") SetButtonIndicator(rightButtonState, false, Color.Gray);
-            else if (code == "80") SetButtonIndicator(setupButtonState, true, Color.Red); else if (code == "81") SetButtonIndicator(setupButtonState, false, Color.LightYellow);
-            else if (code == "90") SetButtonIndicator(bootButtonState, true, Color.Red); else if (code == "91") SetButtonIndicator(bootButtonState, false, Color.LightYellow);
         } else if (frame.StartsWith("$0608", StringComparison.Ordinal)) {
             SetStatus("Brightness", frame.Substring(5).TrimEnd('%'), null);
         } else if (frame.StartsWith("$27", StringComparison.Ordinal)) {
@@ -692,6 +689,7 @@ internal sealed class MainForm : Form
             currentAdc < 0 || currentAdc > 4095 || averageAdc < 0 || averageAdc > 4095 ||
             mappedPercent < -1000 || mappedPercent > 1000 || displayPercent < 0 || displayPercent > 99) return;
 
+        UpdateBatteryStatus(displayPercent.ToString(CultureInfo.InvariantCulture));
         batteryGauge.AverageAdc = averageAdc;
         batteryDiagnostic.Text = string.Format(CultureInfo.InvariantCulture,
             "(현재 {0:D4} / 평균 {1:D4})", currentAdc, averageAdc);
