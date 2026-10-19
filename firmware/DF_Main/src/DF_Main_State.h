@@ -1517,7 +1517,6 @@ extern unsigned short devCheckBldc24VFlag;
 
 extern unsigned short mainMotAutoSet_Flag;
 
-extern unsigned short wireAgingTest_Flag;
 
 extern unsigned short devBbnAllChkStep;
 
@@ -1532,7 +1531,6 @@ extern unsigned short devBldc24VChkStep;
 
 extern unsigned short mainMotAutoSet_Step;
 
-extern unsigned short wireAgingTest_Step;
 
 extern unsigned short devChkErrOccure;
 

@@ -1581,7 +1581,6 @@ unsigned short devCheckBldc24VFlag = 0;
 
 unsigned short mainMotAutoSet_Flag = 0;
 
-unsigned short wireAgingTest_Flag = 0;
 
 	 
 unsigned short devBbnAllChkStep = 0;					 
@@ -1596,7 +1595,6 @@ unsigned short devBldc24VChkStep = 0;
 
 unsigned short mainMotAutoSet_Step = 0;	 
 
-unsigned short wireAgingTest_Step = 0;	 
 
 
 	 
@@ -1966,8 +1964,6 @@ void ana_SetDataSave(String msg);
 String anaBtnLedCmd(String msg);
 String anaDevSetReq(String msg);
 String anaDevSet_MainMotor_AutoSet(String msg);
-String anaDevFunctionReq(String msg);
-String anaDevFunc_wireAging(String msg);
 void mainMot_MinOut_AutoSet_Start(String msg);
 void mainMot_MinOut_AutoSet_Stop(String msg);
 void torqMotor_DefaultOut();
@@ -1978,10 +1974,6 @@ void stbyTorqOffControl_Start();
 void stbyTorqOffControl_Stop(int flag);
 void stbyTorqOff_ReqCheck();
 void stbyTorqOff_Control();
-void wireAging_Test_Start(String msg);
-unsigned short splitTextToStrings(String msg, String *s);
-void wireAging_Test_Stop(String msg);
-void wireAging_Test_Control();
 void boardLed_Control();
 void read_input_1ms();
 void read_input_10ms();
