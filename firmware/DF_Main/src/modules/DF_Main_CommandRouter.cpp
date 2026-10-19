@@ -764,11 +764,11 @@ void anaApInfo(String msg)
 			if(AP_IS_TM == apType)
 			{
 				String statusMsg = RESP_STX_ROD_CONN;
-				statusMsg += (ROD_CONN == rod_conn_status) ? STATE_CONNECTED : STATE_DISCONN;
+				statusMsg += ((ROD_CONN == rod_conn_status) ? "01" : "00");
 				StsSendPrintln(statusMsg + "%");
 
 				statusMsg = RESP_STX_IMU_CONNECT;
-				statusMsg += (CONNECT == imu_conn_status) ? STATE_CONNECTED : STATE_DISCONN;
+				statusMsg += ((CONNECT == imu_conn_status) ? "01" : "00");
 				StsSendPrintln(statusMsg + "%");
 
 				statusMsg = STX_BAT_LVL;
