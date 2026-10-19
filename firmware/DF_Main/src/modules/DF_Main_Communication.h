@@ -12,17 +12,15 @@ void battLevelSet( String msg);
 void setRod_Connected();
 void uartRecvHandlerImp();
 bool isParaCheckOk(int idx, int val);
-void waveType_TorqSet();
-int HitType_TorqSet(int _fishKind);
-int isExecBldc();
+
+
 void torqMot_OffControlStart(unsigned int onTime);
 void torqMot_OffControlStop();
 void torqMotor_OffTime_Control();
 void bbnMotor_OffTime_Start(unsigned int time);
 void bbnMotor_OffTime_Control();
-void clear_ExecFlag();
-void execGameOver();
-void setVal_Hit_MainPwr(String msg);
+
+
 void SetIMU_Measure_Out_OnOff(unsigned int _setClr);
 void sendSleepEnable(int Mode, int Time, int Id);
 void sendCurrentStatus();

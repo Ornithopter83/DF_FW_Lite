@@ -133,22 +133,7 @@ static unsigned int rodStatus = ROD_STS_UNKNOWN;
  
 unsigned short exeFlag_RodImuOutCycle = 0;		 
 
-void setData_RodCycleTest(String msg)
-{
-	char kind = msg.charAt(0);
-	int act = msg.charAt(1);
-	
-	switch(kind)
-	{
-		case '0':
-			if(0 == act){	exeFlag_RodImuOutCycle = 0;	}	 
-			else		{	exeFlag_RodImuOutCycle = 1; }	 
-			break;
 
-		default:
-			break;
-	}
-}
 
  
  

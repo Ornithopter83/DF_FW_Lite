@@ -68,9 +68,6 @@ void devchk_OkEnd()
 	 
 	send2resp_FwSelfControlCmd(STX_TORQUE_MOTOR, outTorq);
 
-		 
-		stbyTorqOff_ReqCheck();
-
 }
 
  
@@ -378,10 +375,6 @@ void devchk_bbnAll_Control()
 			msg = STX_DEV_CONT_REQ + msgErr + "%";
 			Resp2ApPrintln(msg);
 
-
-				 
-				stbyTorqOff_ReqCheck();
-			
 			break;
 			
 		 

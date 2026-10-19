@@ -33,16 +33,8 @@ void findDiagCode(String msg, stDiagCode code);
 int controlDiagInput(String msg);
 int controlDiagOutput(String msg);
 void diagOutAllOff();
-void Set_WaveData( String msg);
-void Set_BiteData( String msg);
-void Set_HitData(String msg);
-void Set_BreakData( String msg);
-void Set_ExtledData(String msg);
-void Set_BbnTokTokData( String msg);
-void Set_TorqAdjValData( String msg);
-void Set_LedValue( String msg);
-void Set_TorqHitHoldOn( String msg);
-void Set_EnbData( String msg);
+
+
 void subAcOff_WithOtherOff();
 int CheckAppCmd();
 int CheckPowerSwitch();

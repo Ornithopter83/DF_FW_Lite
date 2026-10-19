@@ -163,12 +163,7 @@ String L_BTN_DN = "$0600000010%";
 String R_BTN_UP = "$0600000100%";		 
 String R_BTN_DN = "$0600001000%";		 
 
-String ROD_ENC_CNT = "$0700000+";
-
-#define TESTROD_START_STEP	9  
-unsigned short iocStep = TESTROD_START_STEP;			 
-unsigned long rod_ImuCycleCnt = 0;	 
-
+String ROD_ENC_CNT = "$0700000+";
  
 unsigned short recvInfoSeqStep = 0;	 
 
@@ -210,12 +205,10 @@ extern uint8_t broad_cast_addr[];
  
  
  
-void execRod_ImuOutCycle();
 String zeroFill4Char(unsigned int _val);
 void btnChangeCallback(String str);
 void rotateChangeCallback(String str);
 void imuDataCallback(String pid, String str);
-void setData_RodCycleTest(String msg);
 void sendInfo_boardType();
 void imuConnResp();
 void nowRecvHandler();
@@ -267,163 +260,7 @@ void ioPinSetting();
 void checkFileSystem();
 void DF_Rod_Application_Setup();
 void DF_Rod_Application_Loop();
-void execRod_ImuOutCycle()
-{
 
-	static unsigned short oldiocStep = 0;
-	static unsigned long _to;
-	static unsigned int _rptCnt=0;
-	static unsigned int _imuCnt=0;
-	static unsigned int _encCnt=0;
-	String sndStr;
-	
-	
-	switch(iocStep)
-	{
-		case 0:		 
-			break;
-			
-		case TESTROD_START_STEP:	 
-			led2Red_OutSts = HIGH;
-			digitalWrite(LED2_RED_PIN, led2Red_OutSts);
-			rod_ImuCycleCnt++;
-			if(1) { LogPrintln(" LG] RODCYC, " + String(rod_ImuCycleCnt) + " cnt"); }
-			_rptCnt = 0;
-			_imuCnt = 0;
-			iocStep = 10;
-			break;
-			
-		 
-		case 10:	 
-			_rptCnt++;
-			if((3000/500) < _rptCnt)
-			 
-			{
-				led2Red_OutSts = LOW;
-				digitalWrite(LED2_RED_PIN, led2Red_OutSts);
-				_rptCnt = 0;
-				iocStep = 20;	 
-			}
-			else
-			{
-				if(_rptCnt % 2) btnChangeCallback(R_BTN_UP);		 
-				else			btnChangeCallback(R_BTN_DN);		 
-				setTO(_to);
-				iocStep = 11;	
-			}
-			break;
-		case 11:
-			if(checkTO(_to, 500))
-			 
-			{
-				iocStep = 10;					
-			}
-			break;
-
-		case 20:			 
-			 
-			imu.isMeasure =  true;		 
-			setTO(_to);			
-			iocStep = 21;					
-			break;
-		case 21:
-			if(checkTO(_to, 67*100))	 
-			 
-			{
-				imu.isMeasure =  false;		 
-				setTO(_to); 		
-				iocStep = 22;					
-			}
-			break;
-		case 22:
-			if(checkTO(_to, 33*100))	 
-			 
-			{
-				imu.isMeasure = false;
-				_rptCnt = 0;
-				_imuCnt++;
-				iocStep = 30;	 
-				if(0) {}
-				else if(1 == _imuCnt) { iocStep = 30; }	 
-				else if(2 == _imuCnt) { iocStep = 40; } 	 
-				else if(3 == _imuCnt) { iocStep = 40; } 	 
-				else if(4 == _imuCnt) { iocStep = 40; } 	 
-				else if(5 == _imuCnt) { iocStep = 40; } 	 
-				else if(6 == _imuCnt) { iocStep = 40; }		 
-				else if(7 == _imuCnt) { iocStep = 10; }	 
-				else if(7 < _imuCnt) { iocStep = 50; }	 
-				 
-			}
-			break;
-
-		case 30:	 
-			_rptCnt++;
-			if((3000/500) < _rptCnt)
-			 
-			{
-				_rptCnt = 0;
-				iocStep = 20;	 
-			}
-			else
-			{
-				if(_rptCnt % 2) btnChangeCallback(L_BTN_UP);		 
-				else			btnChangeCallback(L_BTN_DN);		 
-				setTO(_to);
-				iocStep = 31;	
-			}
-			break;
-		case 31:
-			if(checkTO(_to, 500))
-			{
-				iocStep = 30;					
-			}
-			break;
-
-		case 40:	 
-			_rptCnt++;
-			if((3000/500) < _rptCnt)		 
-			 
-			{
-				_rptCnt = 0;
-				iocStep = 20;	 
-			}
-			else
-			{ 
-				_encCnt = encoder.count;
-				_encCnt++;
-				if(20 < _encCnt) { _encCnt = 0; }
-				encoder.count = _encCnt;
-				sndStr = ROD_ENC_CNT + encoder.fillZero2char(_encCnt) + "%";
-				rotateChangeCallback(sndStr);		 
-				setTO(_to);
-				iocStep = 41;	
-			}
-			break;
-		case 41:
-			if(checkTO(_to, 500))
-			{
-				iocStep = 40;					
-			}
-			break;
-
-			
-		case 50:
-			 
-			_imuCnt = 0;
-			_rptCnt = 0;
-			iocStep = 9;	 
-			break;
-			
-		case 60:
-			break;
-
-		case 90:
-			break;
-			
-		default:
-			break;
-	}
-}
 
 
 

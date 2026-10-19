@@ -170,7 +170,7 @@ internal sealed class MainForm : Form
     private async Task InitializeMainAsync()
     {
         string[][] groups = {
-            new[] { "$00%", "$290101%", "$1101%" },
+            new[] { "$00%", "$290101%" },
             new[] { "$00%", "$080%" },
             new[] { "$00%", "$0112%", "$0110%", "$0115%", "$0117%", "$1501%" }
         };

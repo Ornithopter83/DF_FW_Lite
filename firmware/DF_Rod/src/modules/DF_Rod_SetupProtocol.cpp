@@ -78,20 +78,13 @@ void uartPcHandler_NormalMode()
 	}
 
 	 
-  	else if (msg.startsWith(STX_SET_FILE))
-	{
-		 
-		eNow.fsFormat();
-  	}
+  	
+
 	
 
 	 
-  	else if (msg.startsWith(STX_SET_DATA))
-	{
-	  msg = msg.substring(3, msg.length());
-	  setData_RodCycleTest(msg);
-	   
-    }
+  	
+
 	
 	 
 	else

@@ -33,21 +33,8 @@ void anaDeviceContReq(String msg)
 
 					 
 						 
-					if(stbyTorqOffControl_Flag) 	 
-					{
-						stbyTorqOffControl_Req_Flag = 1;	 
-						stbyTorqOffControl_Stop(0);	 
-					}
-						 
-					else if( GMWAT_STBY == gmWatStatus)
-					{
-						stbyTorqOffControl_Req_Flag = 1;	 
-					}
-
-				 
-			
-				 
-				devReadyCheck();
+					
+devReadyCheck();
 				 
 			}
 
@@ -127,7 +114,7 @@ void ana_MainMotControl( String msg )
 
 	 
 		  	 
-			if(exeBite || devReadychkFlag || holdOnPtnAll_Flag || stbyTorqOffControl_Flag)
+			if(devReadychkFlag)
 			{
 				 
 			}
@@ -160,7 +147,7 @@ void ana_BobbinControl_Check(String msg)
 	reqBobbinMsg = msg;
 	 
 	
-		if(exeBite || devReadychkFlag )
+		if(devReadychkFlag)
 		{
 			 
 		}
@@ -471,197 +458,6 @@ void set_rod_conn_status(unsigned int sts)
 	rod_conn_status = (sts);
 }
 
- 
- 
-
-
-
-void condition_fw_check_10ms()
-{
-
-	 
-	 
-	if( 1 == cntRightButtonOn && 0 == cntRightButtonOff)
-	{
-		rightBtnOnCount++;
-	}
-	else if (0 == cntRightButtonOn && 1 == cntRightButtonOff )
-	{
-		if(40 < rightBtnOnCount)   
-		{
-			exeWave = 1;
-			gameStatus = GAME_WAVE;
-			waveType_TorqSet();
-			
-			LogPrintln(" AP] ExCst Wave TgTorq: " + String(stWaveTorqVal.tgTorq));	   
-		}
-		rightBtnOnCount = 0;
-	}
-	else
-	{
-		rightBtnOnCount = 0;
-	}
-	
-	 
-	if( reqBreakMotor != oldBreakMotor )
-	{
-		 
-		if( 0 == oldBreakMotor )		 
-		{
-			 
-		  if( GAME_BITE == gameStatus)			 
-		  {
-			exeHit = 1;
-			gameStatus = GAME_HIT;
-		
- 
-
-
-
-
-
-			 
-			if( fishTypeFixENB)		 
-			{
-				if (!torqResistFix)		 
-				{
-					stHitTorqVal.targetTorq = HitType_TorqSet(fishTypeFix);
-					if ( LEVEL_NORMAL == gameLevel)		 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		 
-					}
-					else if ( LEVEL_HARD == gameLevel)	 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		 
-					}
-					else						 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		 
-					}
-					stHitTorqVal.midTorq = (stHitTorqVal.holdonTorq + stHitTorqVal.lowTorq)/2; 
-				}
-			}
-			else						 
-			{
-				 
-				if (!torqResistFix)		 
-				{
-					 
-					fishTypeAuto = fishKind_autoFromBreak(reqBreakMotor);		 
-					stHitTorqVal.targetTorq = HitType_TorqSet(fishTypeAuto); 
-					if ( LEVEL_NORMAL == gameLevel)		 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		 
-					}
-					else if ( LEVEL_HARD == gameLevel)	 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		 
-					}
-					else						 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		 
-					}
-					stHitTorqVal.midTorq = (stHitTorqVal.holdonTorq + stHitTorqVal.lowTorq)/2; 
-				}
-			}
-			execHit_ResistRandomStart();						 
-
-			 
-			execHit_SetBreakOnceStart();
-			
-			
-			LogPrintln(" AP] Exe_Hiting, FishKind = " + String(fishTypeAuto));    
-			
-			LogPrintln(" AP] Exe_Hiting, Torq_FIX: " + String(torqResistFix) + ", Torq Resist: " + String(stHitTorqVal.holdonTorq) + ", low: " + String(stHitTorqVal.lowTorq) + ", Mid: " + String(stHitTorqVal.midTorq) );
-		  }
-		}
-
-		 
-		else if ( 0 == reqBreakMotor )
-		{
-			exeSuccessFail = 1;
-			gameStatus = GAME_SUCCESS;
-			
-			LogPrintln(" AP] Exe_Success_or_Fail");    
-		}
-		oldBreakMotor = reqBreakMotor;
-	}
-	
-	 
-	if( reqServoMotor != oldServoMotor)
-	{
-		if(2 == oldServoMotor || 0 == oldServoMotor)		 
-		{
-			exeBite = 1;
-			gameStatus = GAME_BITE;
-			biteType_TorqSet(fishTypeFix);
-			
-			LogPrintln(" AP] Exe_Biting, Fish Kind: " + String(fishTypeFix));
-			
-			LogPrintln(" AP] Exe_Biting, DeepTorq: " + String(stBiteTorqVal.deepTorq) + " sh_Torq: " + String(stBiteTorqVal.shallowTorq));    
-		}
-	
-		 
-		else if ( 2 == reqServoMotor )	 
-		{
-			exeGameOver = 1;  
-			gameStatus = GAME_WAIT;
-			 
-			exeWave = 0;
-			exeBite = 0;
-			exeHit = 0;
-			exeResist = 0;
-			exeHoldon = 0;
-			exeRanding = 0;
-			exeSuccessFail = 0;
-			LogPrintln(" AP] Exe_Ending");    
-			
-		}
-	
-		oldServoMotor = reqServoMotor;
-	}
-
-	 
-	if( reqImuMeasFlag != oldImuMeasFlag)
-	{
-		if(exeHit)			 
-		{
-			if(0 == oldImuMeasFlag)		 
-			{
-				exeHoldon = 1;		 
-				gameStatus = GAME_HOLDON;
-				if (!torqResistFix)		 
-				{
-					stHitTorqVal.targetTorq = HitType_TorqSet(fishTypeAuto); 
-					if ( LEVEL_NORMAL == gameLevel)		 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 12 / 10) + 28 );		 
-					}
-					else if ( LEVEL_HARD == gameLevel)	 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq * 14 / 10) + 21 );		 
-					}
-					else						 
-					{
-						stHitTorqVal.holdonTorq = ((stHitTorqVal.targetTorq *  9 / 10) + 41 );		 
-					}
-					stHitTorqVal.midTorq = (stHitTorqVal.holdonTorq + stHitTorqVal.lowTorq)/2; 
-				}
-				
-				LogPrintln(" AP] Exe_Hoding ON, Fish Kind: " + String(fishTypeFix));    
-				
-				LogPrintln(" AP] Exe_Hoding ON, Torq_FIX: " + String(torqResistFix) + ", Torq Resist: " + String(stHitTorqVal.holdonTorq) + ", low: " + String(stHitTorqVal.lowTorq) + ", Mid: " + String(stHitTorqVal.midTorq) );
-			}
-			else if(0 == reqImuMeasFlag)	 
-			{
-				exeHoldOff = 1;		 
-				
-				LogPrintln(" AP] Exe_Hoding OFF");	  
-			}
-		}
-		oldImuMeasFlag = reqImuMeasFlag;
-	}
-}
 
  
  
