@@ -1,6 +1,6 @@
  
 #include "../DF_Main_Internal.h"
-#include "DF_Main_LmWireControl.h"
+#include "DF_Main_BasicControl.h"
 void anaDeviceContReq(String msg)
 {
 	unsigned int iKind = msg.substring(3).toInt();

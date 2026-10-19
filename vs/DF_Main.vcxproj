@@ -37,7 +37,7 @@
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_LedControl.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_CommandRouter.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_DeviceCheck.cpp" />
-    <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_LmWireControl.cpp" />
+    <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_BasicControl.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_GameControl.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_Diagnostics.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\modules\DF_Main_Scheduler.cpp" />
@@ -50,7 +50,6 @@
     <ClCompile Include="..\firmware\DF_Main\src\Encoder.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\FileSys.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\Led.cpp" />
-    <ClCompile Include="..\firmware\DF_Main\src\LmMotor.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\Potentiometer.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\ServoMotor.cpp" />
     <ClCompile Include="..\firmware\DF_Main\src\Version.cpp" />
@@ -67,7 +66,7 @@
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_LedControl.h" />
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_CommandRouter.h" />
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_DeviceCheck.h" />
-    <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_LmWireControl.h" />
+    <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_BasicControl.h" />
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_GameControl.h" />
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_Diagnostics.h" />
     <ClInclude Include="..\firmware\DF_Main\src\modules\DF_Main_Scheduler.h" />
@@ -78,7 +77,6 @@
     <ClInclude Include="..\firmware\DF_Main\src\Encoder.h" />
     <ClInclude Include="..\firmware\DF_Main\src\FileSys.h" />
     <ClInclude Include="..\firmware\DF_Main\src\Led.h" />
-    <ClInclude Include="..\firmware\DF_Main\src\LmMotor.h" />
     <ClInclude Include="..\firmware\DF_Main\src\Potentiometer.h" />
     <ClInclude Include="..\firmware\DF_Main\src\ServoMotor.h" />
     <ClInclude Include="..\firmware\DF_Main\src\Version.h" />

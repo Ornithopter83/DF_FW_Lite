@@ -55,8 +55,6 @@ extern volatile int reelAlloffStep;
 
 #include "Diag.h"
 
-#include "LmMotor.h"
-
 #include "Version.h"
 
 #include <Update.h>
@@ -120,7 +118,6 @@ extern BobbinMotor bbnMotor;
 
 extern Encoder mainEnc;
 
-extern LmMotor lmMotor;
 
 extern Led extLed;
 
@@ -252,7 +249,6 @@ extern String STX_BREAK_MOTOR;
 
 extern String STX_LED_CONT;
 
-extern String STX_RESERVE07;
 
 extern String STX_IMU_SET;
 
@@ -1218,21 +1214,16 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define SNS_bbnEncB		BIT_7
 
-#define SNS_LM_HOME		BIT_8
 
-#define SNS_LM_LEFT		BIT_9
 
-#define SNS_LM_RIGHT	BIT_10
 
 #define SNS_RSV11		BIT_11
 
 #define SNS_RSV12		BIT_12
 
-#define SNS_LMMOT_FG	BIT_13
 
 #define SNS_RSV14		BIT_14
 
-#define SNS_LM_ENC		BIT_15
 
 #define BIT_SNS_BOOT	0x0001
 
@@ -1256,15 +1247,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define BIT_SNS_ENCAB	(BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)
 
-#define BIT_SNS_LMHOME_BIT8		0x0100
 
-#define BIT_SNS_LMLEFT_BIT9		0x0200
 
-#define BIT_SNS_LMRIGHT_BIT10	0x0400
 
-#define BIT_SNS_LMMOTFG			0x2000
 
-#define BIT_SNS_LMENC			0x8000
 
 #define SNS_ON		1
 
@@ -1278,15 +1264,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define LVL01_BBNENCB	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
 
-#define LVL01_LMMOTFG	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
 
-#define LVL01_LMENC		(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMENC))
 
-#define LVL01_LMHOME	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMHOME_BIT8))
 
-#define LVL01_LMLEFT	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMLEFT_BIT9))
 
-#define LVL01_LMRIGHT	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMRIGHT_BIT10))
 
 #define LE01_BBNFG		(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNFG))
 
@@ -1294,15 +1275,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define LE01_BBNENCB	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCB))
 
-#define LE01_LMMOTFG	(sensor1ms[SENSOR_1].le & (BIT_SNS_LMMOTFG))
 
-#define LE01_LMENC		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMENC))
 
-#define LE01_LMHOME		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMHOME_BIT8))
 
-#define LE01_LMLEFT		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMLEFT_BIT9))
 
-#define LE01_LMRIGHT	(sensor1ms[SENSOR_1].le & (BIT_SNS_LMRIGHT_BIT10))
 
 #define TE01_BBNFG		(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 
@@ -1310,15 +1286,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define TE01_BBNENCB	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCB))
 
-#define TE01_LMMOTFG	(sensor1ms[SENSOR_1].te & (BIT_SNS_LMMOTFG))
 
-#define TE01_LMENC		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMENC))
 
-#define TE01_LMHOME		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMHOME_BIT8))
 
-#define TE01_LMLEFT		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMLEFT_BIT9))
 
-#define TE01_LMRIGHT	(sensor1ms[SENSOR_1].te & (BIT_SNS_LMRIGHT_BIT10))
 
 #define LVL10_BOOT		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BOOT))
 
@@ -1338,11 +1309,8 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define	LVL10_ENCAB		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_ENCAB))
 
-#define lev10_lmHome	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMHOME_BIT8))? 1:0)
 
-#define lev10_lmLeft	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMLEFT_BIT9))? 1:0)
 
-#define lev10_lmRight	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMRIGHT_BIT10))? 1:0)
 
 #define LVL10_LMMOTFG	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
 
@@ -1354,15 +1322,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define LE10_PWROFF_SWC	(sensor10ms[SENSOR_1].le & (BIT_SNS_PWRSWC))
 
-#define LE10_LMHOME		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMHOME_BIT8))
 
-#define LE10_LMLEFT		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMLEFT_BIT9))
 
-#define LE10_LMRIGHT	(sensor10ms[SENSOR_1].le & (BIT_SNS_LMRIGHT_BIT10))
 
-#define LE10_LMMOTFG	(sensor10ms[SENSOR_1].le & (BIT_SNS_LMMOTFG))
 
-#define LE10_LMENC		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMENC))
 
 #define TE10_BBNFG		(sensor10ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 
@@ -1370,15 +1333,10 @@ extern sensor sensor10ms[SENSOR_MAX];
 
 #define TE10_PWROFF_SWC	(sensor10ms[SENSOR_1].te & (BIT_SNS_PWRSWC))
 
-#define TE10_LMHOME		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMHOME_BIT8))
 
-#define TE10_LMLEFT		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMLEFT_BIT9))
 
-#define TE10_LMRIGHT	(sensor10ms[SENSOR_1].te & (BIT_SNS_LMRIGHT_BIT10))
 
-#define TE10_LMMOTFG	(sensor10ms[SENSOR_1].te & (BIT_SNS_LMMOTFG))
 
-#define TE10_LMENC		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMENC))
 
 extern int recvPwrOffExec_Resp;
 
@@ -1396,55 +1354,30 @@ extern uint8_t broad_cast_addr[];
 
 extern volatile int rodRegistMode;
 
-#define LM_POSI_UNKNOWN		0
 
-#define LM_POSI_HOME		1
 
-#define LM_POSI_HOMEMOVE	2
 
-#define LM_POSI_LEFT		10
 
-#define LM_POSI_LEFTEND		11
 
-#define LM_POSI_LEFTMOVE	12
 
-#define LM_POSI_RIGHT		20
 
-#define LM_POSI_RIGHTEND	21
 
-#define LM_POSI_RIGHTMOVE	22
 
-#define LM_POSI_MAX		30
 
-extern int lmPosi;
 
-extern int oldlmPosi;
 
-#define LM_HOME_SEN_ON		HIGH
 
-#define LM_HOME_SEN_OFF		LOW
 
-#define LM_LEFT_SEN_ON		LOW
 
-#define LM_LEFT_SEN_OFF		HIGH
 
-#define LM_RIGHT_SEN_ON		LOW
 
-#define LM_RIGHT_SEN_OFF	HIGH
 
-extern short lmHomeNG_Flag;
 
-extern short lmLeftNG_Flag;
 
-extern short lmRightNG_Flag;
 
-extern short lmFishLevel;
 
-extern short lmLeftDuty;
 
-extern short lmRightDuty;
 
-extern short lmReturnDuty;
 
 extern short endTmReqDuty;
 
@@ -1452,27 +1385,16 @@ extern short leftEndTmReqDuty;
 
 extern short rightEndTmReqDuty;
 
-extern short lmHome_Init;
 
-extern short lmHome_Flag;
 
-extern short lmLeft_Flag;
 
-extern short lmRight_Flag;
 
-extern short lmReturn_Flag;
 
-extern short lmHold_Stop_Flag;
 
-extern short lmHomeRptCnt;
 
-extern short lmHomeStep;
 
-extern short lmLeftStep;
 
-extern short lmRightStep;
 
-extern short lmReturnStep;
 
 typedef struct _motdutyTbl
 {
@@ -1514,17 +1436,12 @@ extern STLMOTDUTYTBL stLmReturnTbl;
 
 extern volatile int nvm01_home_stopWait_time;
 
-#define LM_HOME_RETRY_CNT	3
 
-#define LM_HOME_STOP_WAIT_TIME	0
 
-#define LM_HOME_MOVE_DUTY	40
 
-#define LM_HOME_DIR_CHANGE_TIME		100
 
 #define LM_START_WAIT_TIME 10
 
-#define LM_HOME_TO_TIME			3000
 
 #define LM_MOVE_ERR_TO_TIME		3000
 
@@ -1534,17 +1451,11 @@ extern short fishLevel;
 
 extern short rcvlmPwr;
 
-extern short lmLeftStartReq;
 
-extern short lmRightStartReq;
 
-#define LM_PRIORITY_NO		0
 
-#define LM_PRIORITY_LEFT	1
 
-#define LM_PRIORITY_RIGHT	2
 
-extern short lmPriority;
 
 extern short fishPwr;
 
@@ -1584,7 +1495,6 @@ extern volatile unsigned int oldcurrWirePulse;
 
 #define DF_CONFIG_STAND_ALONE	1
 
-#define DF_CONFIG_LMJIG			99
 
 extern short dfConfig;
 
@@ -1602,7 +1512,6 @@ extern unsigned short devCheckBbnEncFlag;
 
 extern unsigned short devCheckTorqFlag;
 
-extern unsigned short devCheckLmMotFlag;
 
 extern unsigned short devCheckBldc24VFlag;
 
@@ -1618,7 +1527,6 @@ extern unsigned short devBbnEncChkStep;
 
 extern unsigned short devTorqChkStep;
 
-extern unsigned short devLmMotChkStep;
 
 extern unsigned short devBldc24VChkStep;
 
@@ -1768,7 +1676,6 @@ void servoDefault();
 
 void bbnBldcOff();
 
-void lmMotOff();
 
 void breakMotorOff();
 

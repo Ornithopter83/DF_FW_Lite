@@ -16,7 +16,6 @@
 #include "Encoder.h"
 #include "Led.h"
 #include "Diag.h"
-#include "LmMotor.h"
 #include "Version.h"
 #include <Update.h>
 #include <FreeRTOSConfig.h>
@@ -114,7 +113,6 @@ BobbinMotor bbnMotor;
 Encoder mainEnc;				 
  
 
-LmMotor lmMotor;		 
  
 
 Led extLed;		 
@@ -231,7 +229,6 @@ String STX_BBN_MOTOR     = "$04";
 String STX_BREAK_MOTOR    = "$05";
 String STX_LED_CONT			= "$06";
 
-String STX_RESERVE07		= "$07";	 
 String STX_IMU_SET			= "$08";
 
 String STX_IMU_DATA_STS		= "$09";
@@ -1296,14 +1293,9 @@ sensor sensor10ms[SENSOR_MAX] =
 #define SNS_bbnEncA		BIT_6  
 #define SNS_bbnEncB		BIT_7  
 
-#define SNS_LM_HOME		BIT_8
-#define SNS_LM_LEFT		BIT_9
-#define SNS_LM_RIGHT	BIT_10
 #define SNS_RSV11		BIT_11	 
 #define SNS_RSV12		BIT_12	 
-#define SNS_LMMOT_FG	BIT_13
 #define SNS_RSV14		BIT_14	 
-#define SNS_LM_ENC		BIT_15
 
 
 
@@ -1322,12 +1314,7 @@ sensor sensor10ms[SENSOR_MAX] =
 #define BIT_SNS_BBNALL	(BIT_SNS_BBNFG|BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)		 
 #define BIT_SNS_ENCAB	(BIT_SNS_BBNENCA|BIT_SNS_BBNENCB)					 
  
-#define BIT_SNS_LMHOME_BIT8		0x0100
-#define BIT_SNS_LMLEFT_BIT9		0x0200
-#define BIT_SNS_LMRIGHT_BIT10	0x0400
 
-#define BIT_SNS_LMMOTFG			0x2000
-#define BIT_SNS_LMENC			0x8000
 
 #define SNS_ON		1
 #define SNS_OFF		0
@@ -1337,32 +1324,17 @@ sensor sensor10ms[SENSOR_MAX] =
 #define LVL01_BBNFG		(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNFG))
 #define LVL01_BBNENCA	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCA))
 #define LVL01_BBNENCB	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
-#define LVL01_LMMOTFG	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
-#define LVL01_LMENC		(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMENC))
 
-#define LVL01_LMHOME	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMHOME_BIT8))
-#define LVL01_LMLEFT	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMLEFT_BIT9))
-#define LVL01_LMRIGHT	(sensor1ms[SENSOR_1].lvl & (BIT_SNS_LMRIGHT_BIT10))
 
 #define LE01_BBNFG		(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNFG))
 #define LE01_BBNENCA	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCA))
 #define LE01_BBNENCB	(sensor1ms[SENSOR_1].le & (BIT_SNS_BBNENCB))
-#define LE01_LMMOTFG	(sensor1ms[SENSOR_1].le & (BIT_SNS_LMMOTFG))
-#define LE01_LMENC		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMENC))
 
-#define LE01_LMHOME		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMHOME_BIT8))
-#define LE01_LMLEFT		(sensor1ms[SENSOR_1].le & (BIT_SNS_LMLEFT_BIT9))
-#define LE01_LMRIGHT	(sensor1ms[SENSOR_1].le & (BIT_SNS_LMRIGHT_BIT10))
 
 #define TE01_BBNFG		(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNFG))
 #define TE01_BBNENCA	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCA))
 #define TE01_BBNENCB	(sensor1ms[SENSOR_1].te & (BIT_SNS_BBNENCB))
-#define TE01_LMMOTFG	(sensor1ms[SENSOR_1].te & (BIT_SNS_LMMOTFG))
-#define TE01_LMENC		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMENC))
 
-#define TE01_LMHOME		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMHOME_BIT8))
-#define TE01_LMLEFT		(sensor1ms[SENSOR_1].te & (BIT_SNS_LMLEFT_BIT9))
-#define TE01_LMRIGHT	(sensor1ms[SENSOR_1].te & (BIT_SNS_LMRIGHT_BIT10))
 
 
  
@@ -1377,9 +1349,6 @@ sensor sensor10ms[SENSOR_MAX] =
 #define LVL10_BBNENCB	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_BBNENCB))
 #define	LVL10_ENCAB		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_ENCAB))		 
 
-#define lev10_lmHome	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMHOME_BIT8))? 1:0)
-#define lev10_lmLeft	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMLEFT_BIT9))? 1:0)
-#define lev10_lmRight	((sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMRIGHT_BIT10))? 1:0)
 
 #define LVL10_LMMOTFG	(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMMOTFG))
 #define LVL10_LMENC		(sensor10ms[SENSOR_1].lvl & (BIT_SNS_LMENC))
@@ -1390,12 +1359,7 @@ sensor sensor10ms[SENSOR_MAX] =
 #define LE10_USB5V		(sensor10ms[SENSOR_1].le & (BIT_SNS_USB5V))
 #define LE10_PWROFF_SWC	(sensor10ms[SENSOR_1].le & (BIT_SNS_PWRSWC))
 
-#define LE10_LMHOME		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMHOME_BIT8))
-#define LE10_LMLEFT		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMLEFT_BIT9))
-#define LE10_LMRIGHT	(sensor10ms[SENSOR_1].le & (BIT_SNS_LMRIGHT_BIT10))
 
-#define LE10_LMMOTFG	(sensor10ms[SENSOR_1].le & (BIT_SNS_LMMOTFG))
-#define LE10_LMENC		(sensor10ms[SENSOR_1].le & (BIT_SNS_LMENC))
 
  
 #define TE10_BBNFG		(sensor10ms[SENSOR_1].te & (BIT_SNS_BBNFG))
@@ -1403,12 +1367,7 @@ sensor sensor10ms[SENSOR_MAX] =
 #define TE10_USB5V		(sensor10ms[SENSOR_1].te & (BIT_SNS_USB5V))
 #define TE10_PWROFF_SWC	(sensor10ms[SENSOR_1].te & (BIT_SNS_PWRSWC))
 
-#define TE10_LMHOME		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMHOME_BIT8))
-#define TE10_LMLEFT		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMLEFT_BIT9))
-#define TE10_LMRIGHT	(sensor10ms[SENSOR_1].te & (BIT_SNS_LMRIGHT_BIT10))
 
-#define TE10_LMMOTFG	(sensor10ms[SENSOR_1].te & (BIT_SNS_LMMOTFG))
-#define TE10_LMENC		(sensor10ms[SENSOR_1].te & (BIT_SNS_LMENC))
 
  
 int recvPwrOffExec_Resp = 0;
@@ -1434,60 +1393,24 @@ volatile int rodRegistMode = 0;
 
 
  
-#define LM_POSI_UNKNOWN		0
-#define LM_POSI_HOME		1		 
-#define LM_POSI_HOMEMOVE	2		 
 
-#define LM_POSI_LEFT		10		 
-#define LM_POSI_LEFTEND		11
-#define LM_POSI_LEFTMOVE	12
 
-#define LM_POSI_RIGHT		20		 
-#define LM_POSI_RIGHTEND	21		 
-#define LM_POSI_RIGHTMOVE	22		 
 
-#define LM_POSI_MAX		30		 
 
-int lmPosi = LM_POSI_UNKNOWN;
-int oldlmPosi = LM_POSI_UNKNOWN;
 
  
-#define LM_HOME_SEN_ON		HIGH  
-#define LM_HOME_SEN_OFF		LOW  
-#define LM_LEFT_SEN_ON		LOW
-#define LM_LEFT_SEN_OFF		HIGH
-#define LM_RIGHT_SEN_ON		LOW
-#define LM_RIGHT_SEN_OFF	HIGH
 
  
-short lmHomeNG_Flag = 0;		 
-short lmLeftNG_Flag = 0;
-short lmRightNG_Flag = 0;		 
 
-short lmFishLevel = 0;
-short lmLeftDuty;
-short lmRightDuty;
-short lmReturnDuty;
 
 short endTmReqDuty = DEFAULT_TORQ;	 
 short leftEndTmReqDuty = DEFAULT_TORQ;	 
 short rightEndTmReqDuty = DEFAULT_TORQ;	 
 
-short lmHome_Init = 0;
-short lmHome_Flag = 0;
-short lmLeft_Flag = 0;		 
-short lmRight_Flag = 0;
-short lmReturn_Flag = 0;
 
-short lmHold_Stop_Flag = 0;		 
 
  
-short lmHomeRptCnt = 0;
 
-short lmHomeStep = 0;
-short lmLeftStep = 0;
-short lmRightStep = 0;
-short lmReturnStep = 0;
 
  
  
@@ -1587,16 +1510,11 @@ volatile int nvm01_home_stopWait_time = 1;
  
  
  
-#define LM_HOME_RETRY_CNT	3	 
 
-#define LM_HOME_STOP_WAIT_TIME	0	 
 
-#define LM_HOME_MOVE_DUTY	40
-#define LM_HOME_DIR_CHANGE_TIME		100	 
 
 #define LM_START_WAIT_TIME 10  
 
-#define LM_HOME_TO_TIME			3000	 
 #define LM_MOVE_ERR_TO_TIME		3000	 
 #define LM_MOVE_TO_TIME	3000
 
@@ -1605,13 +1523,7 @@ short fishLevel = FISH_LVL_1;
 short rcvlmPwr = MOT_PWR_LVL_b;
 
  
-short lmLeftStartReq = 0;
-short lmRightStartReq = 0;
 
-#define LM_PRIORITY_NO		0
-#define LM_PRIORITY_LEFT	1
-#define LM_PRIORITY_RIGHT	2
-short lmPriority = LM_PRIORITY_NO;
 
  
  
@@ -1644,7 +1556,6 @@ volatile unsigned int oldcurrWirePulse = 0;
  
 #define DF_CONFIG_UNKNOWN		0
 #define DF_CONFIG_STAND_ALONE	1
-#define DF_CONFIG_LMJIG			99
 
 short dfConfig = DF_CONFIG_UNKNOWN;
 
@@ -1664,7 +1575,6 @@ unsigned short devCheckBbnMotFlag = 0;
 unsigned short devCheckBbnEncFlag = 0;
  
 unsigned short devCheckTorqFlag = 0;
-unsigned short devCheckLmMotFlag = 0;
 
 unsigned short devCheckBldc24VFlag = 0;
  
@@ -1679,7 +1589,6 @@ unsigned short devBbnMotChkStep = 0;
 unsigned short devBbnEncChkStep = 0;
  
 unsigned short devTorqChkStep = 0;
-unsigned short devLmMotChkStep = 0;
 
 unsigned short devBldc24VChkStep = 0;	 
  
@@ -1809,7 +1718,6 @@ void torqDefault();
 int GetDefValue4torqMotor();
 void servoDefault();
 void bbnBldcOff();
-void lmMotOff();
 void breakMotorOff();
 void motor_AllOff();
 void motor_AllDefault();
@@ -1837,8 +1745,6 @@ void torqMot_OffControlStop();
 void torqMotor_OffTime_Control();
 void bbnMotor_OffTime_Start(unsigned int time);
 void bbnMotor_OffTime_Control();
-void lmMotor_OffTime_Start(unsigned int time);
-void lmMotor_OffTime_Control();
 void clear_ExecFlag();
 void execGameOver();
 void setVal_Hit_MainPwr(String msg);
@@ -1863,8 +1769,6 @@ void anaFastHold(String msg);
 void anaFastComboBtn(String msg);
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
-short lmFish_3Level_Set(short pwr);
-void lmReturnOrHome_Start();
 void wireHomeControl_Start();
 void wireHomeControl_Stop();
 void wireHome_Control();
@@ -1896,11 +1800,8 @@ void send2resp_FwSelfControlCmd(String Cmd, int torq);
 String stringTo3char(int val);
 void devChkMsgSend(String msg);
 void devchk_bbnAllStart();
-void devchk_lmMotStart();
 void devCheckFlagStep_AllClear();
 void devchk_bbnAll_Control();
-void devchk_lmMot_Control();
-void devchk_lmEnc_Control();
 void devReadyCheck();
 void send_Error_Clr();
 void anaDeviceContReq(String msg);
@@ -1908,29 +1809,7 @@ void anaRestDistance(String msg);
 void ana_AngleControl( String msg );
 void ana_MainMotControl( String msg );
 void ana_BobbinControl_Check(String msg);
-void ana_LineMotControl_Check(String msg);
 void ana_BobbinControl(String msg);
-void ana_LmMotControl(String msg);
-void lmHome_Control_Start(int _init, int tmReqDuty);
-void lmHome_Control_Stop();
-void lmLeft_Control_Start(int fish, int pwr, int ReqTm);
-void lmLeft_Control_Return();
-void lmLeft_Control_Stop();
-void lmRight_Control_Start(int fish, int pwr, int ReqTm);
-void lmRight_Control_Return();
-void lmRight_Control_Stop();
-void lmCenter_Control_Start(int fish, int pwr);
-void lmCenter_Control_Stop();
-void lmReturn_Control_Start(int pwr);
-void lmReturn_Control_Stop();
-void lmHoldOn_Stop();
-void lmHome_Control_2();
-void lmHome_Control();
-void lmPosition_Set(int posi);
-void lmLeft_Control();
-void lmRight_Control();
-void lmReturn_Control();
-void anaMotOutRateSet(String msg);
 void checkRodTimer();
 void set_rod_conn_status(unsigned int sts);
 void condition_fw_check_10ms();
@@ -2029,9 +1908,6 @@ void diagOutput_AllOff();
 void diagOutput_BoardOutAllOff();
 void setRGBcolor(int pos, int Color);
 void setOutRGBcolor(int pos, int Color);
-void diagLmMotor_TimeoutStart(unsigned int _time);
-void diagLmMotor_TimeOutStop();
-void diagLmMotor_TimeoutControl();
 void diagBbnMotor_TimeoutStart(unsigned int _time);
 void diagBbnMotor_TimeoutControl();
 void daigBbnMotor_TokTokEnd();
@@ -2260,11 +2136,10 @@ void DC24V_B_off()
 void ledoff_BoardLedAllOff()
 {
 	digitalWrite(BD_LED2_PIN, LOW);
-	if(DF_CONFIG_LMJIG != dfConfig)
-	{
+
 		digitalWrite(BD_LED3_PIN, LOW);
 		digitalWrite(BD_LED4_PIN, LOW);
-	}
+	
 }
 
  
@@ -2342,10 +2217,7 @@ void bbnBldcOff()
 }
 
  
-void lmMotOff()
-{
-	lmMotor.offBldc();
-}
+
 
 #define ROD_BREAK_OFF_STR_DATA	"000"
 void breakMotorOff()
@@ -2363,7 +2235,6 @@ void motor_AllOff()
   	torqOff();
   	servoDefault();
   	bbnBldcOff();
-	lmMotOff();
 	 
 }
 
@@ -2372,7 +2243,6 @@ void motor_AllDefault()
 	torqDefault();
 	servoDefault();
 	bbnBldcOff();
-	lmMotOff();
 	 
 }
 
@@ -2390,7 +2260,6 @@ void output_AllOff()
   torqOff();
   servoDefault();
   bbnBldcOff();
-  lmMotOff();
 
 	 
   extLed_AllOff();
