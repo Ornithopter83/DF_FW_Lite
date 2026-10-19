@@ -1,6 +1,6 @@
 #pragma once
 
-// Cross-module compatibility constants retained during the first conversion.
+ 
 #define PWR_ON 1
 #define PWR_OFF 0
 #define SEND_NOW_STEP_TIME 10
@@ -27,7 +27,7 @@ extern volatile int reelAlloffStep;
 
 
 
-// Shared low-level state and compatibility API. Feature-owned declarations live in module headers.
+ 
 
 
 
@@ -350,8 +350,6 @@ extern String STX_DIAG_FUNC;
 extern String STX_DIAG_SET;
 
 extern String STX_DIAG_EXIT;
-
-extern String STX_DNLD_EXEC;
 
 extern String STX_WAVE_SET;
 
@@ -1713,39 +1711,8 @@ extern int g_ProcPtr;
 
 extern unsigned char g_readBuf[MAX_SAVE_LEN];
 
-#define	DN_MAX_BUF	2
 
-#define	DN_MAX_LEN	0x8000
 
-#define	DN_RCV_PTR	0x1000
-
-extern int g_DnExecFlag;
-
-extern int g_DnExecStep;
-
-extern int g_DnRecvNxt;
-
-extern int g_DnRecvSeq;
-
-extern unsigned short g_DnDataSum;
-
-extern unsigned short g_DnCalcSum;
-
-extern int g_DnRecvLen;
-
-extern int g_DnRecvIdx;
-
-extern int g_DnExecIdx;
-
-extern int g_DnSaveIdx;
-
-extern int g_DnSaveLen[DN_MAX_BUF];
-
-extern unsigned char g_DnExecBuf[DN_MAX_LEN];
-
-extern unsigned char g_DnSaveBuf[DN_MAX_BUF][DN_MAX_LEN];
-
-extern unsigned char* g_DnRecvBuf;
 
 extern volatile unsigned int g_idleCountCore0;
 

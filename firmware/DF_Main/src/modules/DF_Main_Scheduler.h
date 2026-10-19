@@ -4,8 +4,6 @@
 
 void imuDataOutCmdSend(int onOff);
 void usb5vChange_Check();
-int DecodeLZ(unsigned char* src, unsigned char* dst, int opt);
-void Exec_Download(String msg);
 void Log_Control_Step();
 void reelAllOff_SendControl();
 void lmLongWireCheck_Start();
