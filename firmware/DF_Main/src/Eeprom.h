@@ -1,8 +1,8 @@
-//
-// EEPROM.H
-// I2C
-//	kps
-//
+ 
+ 
+ 
+ 
+ 
 
 #pragma once
 
@@ -10,8 +10,8 @@
 #include "Wire.h"
 
 
-#define EEP_TOT_SIZE 32*1024	// 32K byte
-#define EEP_PAGE_SIZE 1024	// 32K byte
+#define EEP_TOT_SIZE 32*1024	 
+#define EEP_PAGE_SIZE 1024	 
 
 
 #define EEP_PAGE1	0
@@ -40,7 +40,7 @@ class Eeprom
 	
     void checksum();
 	
-    //void setReadCallback(void (*rotateCallback)(int _dir, int _cnt));
+     
     
     int page = 0;
 	int addr = 0;
@@ -54,7 +54,7 @@ class Eeprom
 	String nib2char(byte _nib);
 };
 
-// Extern VAR
+ 
 extern unsigned long curr_ms_tick;
 
 

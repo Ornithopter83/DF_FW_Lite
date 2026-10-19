@@ -1,16 +1,16 @@
-//
-//
-//
+ 
+ 
+ 
 
 #include "Common.h"
 #include "Eeprom.h"
 
 
-//-- Define ContByte
+ 
 #define CONTWRITE 0xA0
 #define CONTREAD  0xA1
 
-//---
+ 
 #define I2C_SLAVE_ADDR	0x50
 
 
@@ -23,9 +23,9 @@ void Eeprom::init()
 {
 	bool rts;
 
-	rts = Wire.begin();		// Master
+	rts = Wire.begin();		 
 
-	//
+	 
 
 }
 
@@ -33,11 +33,11 @@ void Eeprom::init()
 int Eeprom::cReadSend(unsigned int len)
 {
 	return (int)Wire.requestFrom(I2C_SLAVE_ADDR, len);
-	// Read For Loop
+	 
 }
 
 
-//int Eeprom::read(unsigned int reqOffset, unsigned int reqLen, unsigned short* bufPtr)
+ 
 
 int Eeprom::readSend(unsigned int reqOffset, unsigned int reqLen)
 {
@@ -45,20 +45,20 @@ int Eeprom::readSend(unsigned int reqOffset, unsigned int reqLen)
 	unsigned int max = (reqOffset + reqLen);
 	if( !reqLen || (0x8000 < reqLen) || (0x7FFF < reqOffset))
 	{
-		return (-1);	// NG
+		return (-1);	 
 	}
 
 	else
 	{
 		Wire.beginTransmission(I2C_SLAVE_ADDR);
-		Wire.write( (byte)(reqOffset & 0x7F00 >> 8) );	// MSB
-		Wire.write( (byte)(reqOffset & 0x00FF) ); // LSB
-		//int rts = Wire.endTransmission();
-		int rts = Wire.endTransmission(false);				// Do not release the bus after transmission
+		Wire.write( (byte)(reqOffset & 0x7F00 >> 8) );	 
+		Wire.write( (byte)(reqOffset & 0x00FF) );  
+		 
+		int rts = Wire.endTransmission(false);				 
 
 		Wire.requestFrom(I2C_SLAVE_ADDR, reqLen);
 		
-		return (rts);	//OK
+		return (rts);	 
 	}
 
 }
@@ -74,18 +74,18 @@ int Eeprom::read(byte* buffPtr, unsigned int reqOffset, unsigned int reqLen)
 			buffPtr[i]= Wire.read();
 		}
 	}
-	// TBD (rdlen <==> reqLen)
+	 
 	return rdLen;
 }
 
-// TBD
+ 
 int Eeprom::buffSave(unsigned int reqOffset, unsigned int reqLen)
 {
 	
 	unsigned int max = (reqOffset+reqLen);
 	if( !reqLen || (0x8000 < reqLen) || (0x7FFF < reqOffset))
 	{
-		return (-1);	// NG
+		return (-1);	 
 	}
 
 	else
@@ -114,14 +114,14 @@ int Eeprom::buffSave(unsigned int reqOffset, unsigned int reqLen)
 			i=(i-reqOffset+1);
 		}
 
-		return (i);	//OK
+		return (i);	 
 	}
 
 }
 
-//----------------------------------------
-//	eeprom Data Display (LOG OUT)
-//----------------------------------------
+ 
+ 
+ 
 void Eeprom::grazingGeddong(byte* buffPtr, unsigned int reqAddr, unsigned int reqLen)
 {
 
@@ -129,7 +129,7 @@ void Eeprom::grazingGeddong(byte* buffPtr, unsigned int reqAddr, unsigned int re
 	String buffStr="";
 	int i = 0;
 
-	//ubyte* bufPtr = buffPtr;
+	 
 	for(i=reqAddr; i<max; i++)
 	{
 		buffStr += nib2char(buffPtr[i]);
@@ -157,7 +157,7 @@ String Eeprom::nib2char(byte _nib)
 
 	return str;	
 }
-//callback Function Name : rotateChangeCallback
+ 
 
 
 int Eeprom::writeSend(unsigned int reqOffset, unsigned int reqLen)
@@ -172,7 +172,7 @@ int Eeprom::write(byte *buffPtr, unsigned int reqOffset, unsigned int reqLen)
 	max = (reqOffset + reqLen);
 	if( !reqLen || (0x7FFF < reqOffset) || (0x8000 < max) )
 	{
-		return (-1);	// NG
+		return (-1);	 
 	}
 	else
 	{
@@ -189,19 +189,19 @@ int Eeprom::write(byte *buffPtr, unsigned int reqOffset, unsigned int reqLen)
 }
 
 
-/*
+ 
 
-void Eeprom::setReadCallback(void (*rotateCallback)(int _dir, int _cnt))
-{
-  _rotateCallback = rotateCallback;
-}
 
-*/
 
-/*
-//
-//
-*/
+
+
+
+
+
+ 
+
+
+
 void Eeprom::checksum()
 {
 
@@ -209,30 +209,30 @@ void Eeprom::checksum()
  
 }
 
-/*
-String Encoder::fillZero(int _count)
-{
-  String str;
-  if (_count < 10)
-  {
-    str = "0000" + String(_count);
-  }
-  else if (_count < 100)
-  {
-    str = "000" + String(_count);
-  }
-  else if (_count < 1000)
-  {
-    str = "00" + String(_count);
-  }
-  else if (_count < 10000)
-  {
-    str = "0" + String(_count);
-  }  else
-  {
-    str = String(_count);
-  }
-  return str;
-}
-*/
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
