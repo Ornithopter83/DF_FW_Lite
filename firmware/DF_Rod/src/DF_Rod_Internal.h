@@ -8,4 +8,3 @@
 #include "modules/DF_Rod_PowerAndImu.h"
 #include "modules/DF_Rod_Registration.h"
 #include "modules/DF_Rod_SchedulerAndInput.h"
-#include "modules/DF_Rod_Ota.h"

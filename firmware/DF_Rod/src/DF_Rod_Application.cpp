@@ -147,8 +147,6 @@ void DF_Rod_Application_Loop()
 
 	//==== System Run Timer & Counter
 	run_timer();			// Freerun Timer & System Counter() 1ms, 10ms, 100ms, 1 sec)
-	DF_Rod_Ota_Process();
-
 	//===== MODE SELECTION
 
 	//-- SETUP

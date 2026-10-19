@@ -1062,10 +1062,7 @@ void nowRecvHandler()
 	{
 		return;
 	}
-	if (DF_Main_RodOtaRelay_HandleRodFrame((const unsigned char *)receiveBuffer, receiveLength, sourceAddress))
-	{
-		return;
-	}
+
 	String now_msg_str(receiveBuffer);
 	now_rcv_id = now_msg_str.substring(0, 2).toInt();
 	if (0 == now_rcv_id)
@@ -1435,8 +1432,6 @@ void uartRecvParsing()
 /*  =====================================
        From PC, (Uart) Recv Data Hanlder From PC
   ===================================== */
-#include "DF_Main_BoardWifi.h"
-
 void uartRecvHandler()
 {
 /*
@@ -1457,8 +1452,6 @@ void uartRecvHandler()
 	rcved_flag = 0; // MSG ANA FINISH
 
 	msg.trim();				// Delete Space in String
-	if (DF_Main_BoardWifi_HandlePairCommand(msg)) return;
-
 	// msg있을때만 처리    
     if (msg == "")			// Return, if not Recv
     {
@@ -1485,10 +1478,7 @@ void uartRecvHandler()
 	// ANA AP CMD & EXEC
 	// Recv STX String Switch
 	if(0) { /* Dummy */ }
-	else if (DF_Main_RodOtaRelay_HandlePcCommand(msg))
-	{
-		return;
-	}
+
 	else if (msg.startsWith(STX_ENCODER_CALIBRATION))
 	{
 		String payload = msg.substring(3);

@@ -1,8 +1,6 @@
 #include "DF_Main_Application.h"
 #include "DF_Main_Internal.h"
 #include "modules/DF_Main_Scheduler.h"
-#include "modules/DF_Main_BoardWifi.h"
-
 void DF_Main_Application_Setup()
 {
 	curr_ms_tick = millis();
@@ -103,10 +101,7 @@ void DF_Main_Application_Setup()
 	delay(50);
 
 
-	if (Update.hasError()) {			// (V1081)
-		Update.end(false);  // 시스템 OTA 세션 정리
-		LogPrintln(" lg] System: Previous OTA error cleared");
-	}
+
 
 //-------------------------------------------------------------------------------
 	// == 메인모터 MainMot Default VAL읽기, FILE없으면 FILE쓰기(70)
@@ -160,7 +155,6 @@ void DF_Main_Application_Setup()
 	curr_ms_tick = millis();
 	LogPrintln(" LG] PWRON enow INIT");
 	eNow.init(recv_cb_esp_now_msg);  // esp_now
-	DF_Main_BoardWifi_Begin();
 	//--- now Callback Func ( Recv from Slave Message ),  ESP-NOW 데이터 수신시 콜백 함수를 등록.
 	if(ESP_OK != esp_now_register_send_cb(sent_cb_esp_now_sts))		// Data송신완료 콜백함수
 	{
@@ -356,8 +350,6 @@ void DF_Main_Application_Loop()
 	//=== 2) RECV CMD from AP, ROD, ExtUART, LOG
 	uartRecvParsing();	// NOT DELAY(BREAK) Pasing
 	uartRecvHandler();	// PC(APP) - Main UART
-	DF_Main_BoardWifi_Poll();
-
 	nowRecvHandler();		// MAIN <-> ROD NOW(wifi RF 2.4G)
 
 

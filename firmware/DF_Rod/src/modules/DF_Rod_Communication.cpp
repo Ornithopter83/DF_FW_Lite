@@ -97,17 +97,14 @@ int DF_Rod_Communication_TakeReceived(char *data, unsigned int capacity, unsigne
 }
 
 void btnChangeCallback(String str) {
-	if (DF_Rod_Ota_IsActive()) return;
   eNow.write(DF_Protocol_RodToMain_Button, str);
 }
 
 void rotateChangeCallback(String str) {
-	if (DF_Rod_Ota_IsActive()) return;
   eNow.write(DF_Protocol_RodToMain_Encoder, str);
 }
 
 void encoderCalibrationChangeCallback(String str) {
-	if (DF_Rod_Ota_IsActive()) return;
 	eNow.write(DF_Protocol_RodToMain_EncoderCalibration, str);
 }
 
@@ -115,7 +112,6 @@ void encoderCalibrationChangeCallback(String str) {
 	Send IMU Data By eNOw ( SLAVE -> MAIN )
 ------------------------------------------------------------------------*/
 void imuDataCallback(String pid, String str) {
-	if (DF_Rod_Ota_IsActive()) return;
   eNow.write(pid, str);
 }
 
@@ -207,14 +203,8 @@ void nowRecvHandler()
 	{
 		return;
 	}
-	if (DF_Rod_Ota_HandleFrame((const unsigned char *)receiveBuffer, receiveLength, sourceAddress))
-	{
-		return;
-	}
-	if (DF_Rod_Ota_IsActive())
-	{
-		return;
-	}
+
+
 	String now_msg_str(receiveBuffer);
 	now_rcv_id = now_msg_str.substring(0, 2).toInt();
 	if (0 == now_rcv_id)
