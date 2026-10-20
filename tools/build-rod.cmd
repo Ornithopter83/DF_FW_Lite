@@ -9,7 +9,7 @@ if errorlevel 1 exit /b %errorlevel%
 set "DF_SKETCH=%DF_REPO_ROOT%\firmware\DF_Rod"
 set "DF_BUILD_PATH=%DF_REPO_ROOT%\artifacts\build\DF_Rod"
 set "DF_OUTPUT_PATH=%DF_REPO_ROOT%\artifacts\firmware\DF_Rod"
-set "DF_RELEASE_PATH=%DF_REPO_ROOT%\bin\%DF_BUILD_CONFIGURATION%\%DF_BUILD_PLATFORM%\%DF_ROD_VERSION%"
+set "DF_RELEASE_PATH=%DF_REPO_ROOT%\bin\Rod\%DF_ROD_VERSION%"
 if not exist "%DF_BUILD_PATH%" mkdir "%DF_BUILD_PATH%"
 if errorlevel 1 exit /b %errorlevel%
 if not exist "%DF_OUTPUT_PATH%" mkdir "%DF_OUTPUT_PATH%"

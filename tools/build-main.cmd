@@ -9,7 +9,7 @@ if errorlevel 1 exit /b %errorlevel%
 set "DF_SKETCH=%DF_REPO_ROOT%\firmware\DF_Main"
 set "DF_BUILD_PATH=%DF_REPO_ROOT%\artifacts\build\DF_Main"
 set "DF_OUTPUT_PATH=%DF_REPO_ROOT%\artifacts\firmware\DF_Main"
-set "DF_RELEASE_PATH=%DF_REPO_ROOT%\bin\%DF_BUILD_CONFIGURATION%\%DF_BUILD_PLATFORM%\%DF_MAIN_VERSION%"
+set "DF_RELEASE_PATH=%DF_REPO_ROOT%\bin\Main\%DF_MAIN_VERSION%"
 
 if not exist "%DF_SKETCH%\DF_Main.ino" (
     echo [ERROR] Main sketch not found: "%DF_SKETCH%\DF_Main.ino"

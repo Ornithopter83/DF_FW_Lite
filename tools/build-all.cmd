@@ -22,8 +22,8 @@ if errorlevel 1 exit /b %errorlevel%
 call "%~dp0build-output-env.cmd" "%~1" "%~2"
 if errorlevel 1 exit /b %errorlevel%
 
-set "DF_MAIN_OUTPUT=%DF_REPO_ROOT%\bin\%DF_BUILD_CONFIGURATION%\%DF_BUILD_PLATFORM%\%DF_MAIN_VERSION%"
-set "DF_ROD_OUTPUT=%DF_REPO_ROOT%\bin\%DF_BUILD_CONFIGURATION%\%DF_BUILD_PLATFORM%\%DF_ROD_VERSION%"
+set "DF_MAIN_OUTPUT=%DF_REPO_ROOT%\bin\Main\%DF_MAIN_VERSION%"
+set "DF_ROD_OUTPUT=%DF_REPO_ROOT%\bin\Rod\%DF_ROD_VERSION%"
 set "DF_MAIN_BIN=%DF_MAIN_OUTPUT%\DF_Main.ino.bin"
 set "DF_ROD_BIN=%DF_ROD_OUTPUT%\DF_Rod.ino.bin"
 

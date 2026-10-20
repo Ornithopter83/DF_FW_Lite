@@ -9,7 +9,7 @@ powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0re
 if errorlevel 1 exit /b %errorlevel%
 powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0remove-output-directory.ps1" -Target "%DF_REPO_ROOT%\artifacts\firmware\DF_Main"
 if errorlevel 1 exit /b %errorlevel%
-powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0remove-output-directory.ps1" -Target "%DF_REPO_ROOT%\bin\%DF_BUILD_CONFIGURATION%\%DF_BUILD_PLATFORM%\%DF_MAIN_VERSION%"
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0remove-output-directory.ps1" -Target "%DF_REPO_ROOT%\bin\Main\%DF_MAIN_VERSION%"
 if errorlevel 1 exit /b %errorlevel%
 
 echo [DF Main] Intermediate and published artifacts cleaned.

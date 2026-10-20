@@ -9,7 +9,7 @@ try {
         throw "Output path is outside the repository: $dfPath"
     }
     $dfRelative = $dfPath.Substring($dfPrefix.Length)
-    $dfAllowed = '^(artifacts\\(build|firmware)\\DF_(Main|Rod)|artifacts\\publish\\TestModule|bin\\(debug|release)\\x64\\V[mr]\d+\.\d+\.\d+\.\d+|bin\\testmodule\\(Debug|Release)(\\win-x64)?)$'
+    $dfAllowed = '^(artifacts\\(build|firmware)\\DF_(Main|Rod)|artifacts\\publish\\TestModule|bin\\(debug|release)\\x64\\V[mr]\d+\.\d+\.\d+\.\d+|bin\\testmodule\\(Debug|Release)(\\win-x64)?|bin\\Main\\Vm\d+\.\d+\.\d+\.\d+|bin\\Rod\\Vr\d+\.\d+\.\d+\.\d+|bin\\TM)$'
     if ($dfRelative -notmatch $dfAllowed) { throw "Refusing to remove an unexpected output path: $dfPath" }
     $dfCursor = $dfRoot
     foreach ($dfSegment in $dfRelative.Split('\')) {

@@ -17,6 +17,12 @@ artifacts/
 **/build/
 vs/x64/
 toolchain/
+# Keep repository launch scripts in bin; generated output subdirectories stay ignored.
+!/bin/
+/bin/*
+!/bin/Lite_Main.cmd
+!/bin/Lite_Rod.cmd
+!/bin/Lite_TestModule.cmd
 *.exe
 *.bin
 *.elf
