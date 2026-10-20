@@ -211,12 +211,12 @@
 #define send2extPrintf	Serial2.printf		 
 #define send2extPrintln	Serial2.println
 
-#define DAIG_OFF	0
-#define DAIG_ON		1
+#define DIAG_OFF	0
+#define DIAG_ON		1
 
-#define DAIG_MOT_OFF 0
-#define DAIG_MOT_CW  1
-#define DAIG_MOT_CCW 2
+#define DIAG_MOT_OFF 0
+#define DIAG_MOT_CW  1
+#define DIAG_MOT_CCW 2
 
 #define ON	HIGH
 #define OFF	LOW

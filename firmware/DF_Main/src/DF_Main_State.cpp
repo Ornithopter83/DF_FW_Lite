@@ -76,14 +76,7 @@ unsigned int ledColorOrder[LED_IDX_MAX][COLOR_ORDER] =
 	{0,1,2,3,4,5,6,7,8,9},		 
 };
 
-typedef struct _diagCode
-{
-	int catNo;			 
-	int itemNo;			 
-	int act;			 
-	int para;			 
-}stDiagCode;
-typedef stDiagCode *ptrDiagCode;
+
 
 ENow eNow;
 Potentiometer torqMotor;		 
@@ -321,18 +314,18 @@ String STATE_WAITING   = "00000000";
 String STATE_ENABLE    = "11111111";		 
 String STATE_READY     = "22222222";		 
 
-#define STATE_CONN_UNKNOWN     "-1";		 
+#define STATE_CONN_UNKNOWN     "-1"		 
 
-#define STATE_DISCONN          "00";
-#define STATE_CONNECTED        "01";
-#define STATE_DISCONN_NOTINIT  "11";
-#define STATE_DISCONN_NOTPEER  "12";
-#define STATE_DISCONN_SLEEP    "88";
-#define STATE_DISCONN_MAC      "99";
+#define STATE_DISCONN          "00"
+#define STATE_CONNECTED        "01"
+#define STATE_DISCONN_NOTINIT  "11"
+#define STATE_DISCONN_NOTPEER  "12"
+#define STATE_DISCONN_SLEEP    "88"
+#define STATE_DISCONN_MAC      "99"
 
 #define IMU_CONN_2CHAR_INT 11
 
-bool isGameEnable = false;				 
+
 
 #define STR_BOOTINFO_DEFAULT	"06028"	 
 #define	DEF_PWRON_DELAY_TIME	60
@@ -1435,12 +1428,12 @@ void diagInput_BoardInAllOff();
 void diagInput_BoardInAllOn();
 void DiagInput_MotInAllOff();
 void DiagInput_MotInAllOn();
-void DiagInput_MainEcoderInAllOn();
+void DiagInput_MainEncoderInAllOn();
 void DiagInput_MechaInAllOff();
 void DiagInput_ElecInAllOff();
 void DiagInput_ElecInAllOn();
 void diagInput_Cat0(String _msg);
-void diagIput_Cat1(String _msg);
+void diagInput_Cat1(String _msg);
 void diagInput_Cat3(String _msg);
 void diagInput_Cat5(String _msg);
 void diagInputTest(String _msg);
@@ -1450,15 +1443,13 @@ void setRGBcolor(int pos, int Color);
 void setOutRGBcolor(int pos, int Color);
 void diagBbnMotor_TimeoutStart(unsigned int _time);
 void diagBbnMotor_TimeoutControl();
-void daigBbnMotor_TokTokEnd();
+void diagBbnMotor_TokTokEnd();
 void diagBbnMotor_TokTokStart(unsigned int _ackKind, unsigned int _cnt);
 void diagBbnMotor_TokTokControl(unsigned _opKind);
 void diagOut_Cat1(String _msg);
 void diagOut_Cat3(String _msg);
 void diagOutputTest(String _msg);
-void findDiagCode(String msg, stDiagCode code);
-int controlDiagInput(String msg);
-int controlDiagOutput(String msg);
+
 void diagOutAllOff();
 
 void subAcOff_WithOtherOff();
@@ -1813,9 +1804,7 @@ String stringSign6Char(long _int)
 String fillZero2String3Char(unsigned int uint)
 {
   String str;
-  if(0)	{ }
-
-  else if (10 > uint)	 
+  if (10 > uint)	 
   {
     str = "00" + String(uint);
   }
@@ -1872,8 +1861,7 @@ String fillZero4Char(unsigned int _val)
 
  	if(9999 < _val) { _val = 9999; }
 
-  if(0) {}	 
-  else if (  10 > _val) { return "000" + String(_val); }
+  if (  10 > _val) { return "000" + String(_val); }
   else if ( 100 > _val) { return "00" + String(_val); }
   else if (1000 > _val) { return "0" + String(_val); }
   else 					{ return String(_val); }

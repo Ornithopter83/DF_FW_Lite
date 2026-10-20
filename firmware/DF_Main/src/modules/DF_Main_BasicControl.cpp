@@ -57,11 +57,6 @@ void anaRestDistance(String msg)
 
 }
 
-void ana_AngleControl( String msg )
-{
-
-}
-
 void ana_MainMotControl( String msg )
 {
 	int recvTorq;
@@ -70,12 +65,6 @@ void ana_MainMotControl( String msg )
 	  	recvTorq = msg.substring(3,(3+3)).toInt();		 
 
 		onTime = (unsigned int)msg.substring(6).toInt();
-	  	if(0 != onTime)	 
-	  	{
-	  	}
-		else
-		{
-		}
 
 	int torq = recvTorq;		 
 
@@ -87,18 +76,14 @@ void ana_MainMotControl( String msg )
 
 	if(defaultTorqueMotor > reqTorqueMotor) 	{ reqTorqueMotor = defaultTorqueMotor; }
 
-			if(devReadychkFlag)
-			{
-
-			}
-			else	 
-			{
-				torqMotor.setValue(torq);
-				if(onTime && (AP_IS_TM == apType))
-				{
-					torqMot_OffControlStart(onTime);
-				}
-			}
+			if (!devReadychkFlag)
+	{
+		torqMotor.setValue(torq);
+		if (onTime && (AP_IS_TM == apType))
+		{
+			torqMot_OffControlStart(onTime);
+		}
+	}
 
 		  Resp2ApPrintln(msg+"%");
 
@@ -115,14 +100,10 @@ void ana_BobbinControl_Check(String msg)
 {
 	reqBobbinMsg = msg;
 
-		if(devReadychkFlag)
-		{
-
-		}
-		else	 
-		{
-			ana_BobbinControl(msg);
-		}
+		if (!devReadychkFlag)
+	{
+		ana_BobbinControl(msg);
+	}
 
 }
 
@@ -140,17 +121,11 @@ void ana_BobbinControl(String msg)
 	if(0 > duty) { duty = 0; }
 	if(255 < duty) { duty = 255; }
 	int onTime = msg.substring(7,(7+4)).toInt();
-	if(0 > onTime ) { onTime = 0; }		 
+	if(0 > onTime ) { onTime = 0; }
 
-	{
+	LogPrintln(" AP] BLDCo  + msg);
 
-	}
-
-	LogPrintln(" AP] BLDCo " + msg);
-
-	if(0) { }	 
-
-	else if(AP_BBN_CMD_OFF == act)
+	if(AP_BBN_CMD_OFF == act)
 	{
 		bbnMotor.offBldc();
 	}
@@ -164,11 +139,6 @@ void ana_BobbinControl(String msg)
 		bbnMotor.onBldc(BBN_MOT_CCW, duty);
 		if(onTime) { bbnMotor_OffTime_Start(onTime); }
 	}
-	else
-	{
-
-	}
-
 	if(AP_BBN_CMD_MAX > act)
 	{
 		respMsg = msg.substring(0,(0+4)) + fillZero2String3Char(bbnMotor.sbbnOut) + msg.substring(7) + "%";
@@ -197,12 +167,7 @@ void checkRodTimer()
 	String imuConnMsg = "-1";
 	String batMsg = "-1";
 
- 	if (isGameEnable)		   
-	{
-	}
-	else
-	{
-	}
+ 	
 
 	if (old_rod_conn_status != rod_conn_status)
 	{

@@ -12,12 +12,12 @@ void diagInput_BoardInAllOff();
 void diagInput_BoardInAllOn();
 void DiagInput_MotInAllOff();
 void DiagInput_MotInAllOn();
-void DiagInput_MainEcoderInAllOn();
+void DiagInput_MainEncoderInAllOn();
 void DiagInput_MechaInAllOff();
 void DiagInput_ElecInAllOff();
 void DiagInput_ElecInAllOn();
 void diagInput_Cat0(String _msg);
-void diagIput_Cat1(String _msg);
+void diagInput_Cat1(String _msg);
 void diagInput_Cat3(String _msg);
 void diagInput_Cat5(String _msg);
 void diagInputTest(String _msg);
@@ -27,15 +27,13 @@ void setRGBcolor(int pos, int Color);
 void setOutRGBcolor(int pos, int Color);
 void diagBbnMotor_TimeoutStart(unsigned int _time);
 void diagBbnMotor_TimeoutControl();
-void daigBbnMotor_TokTokEnd();
+void diagBbnMotor_TokTokEnd();
 void diagBbnMotor_TokTokStart(unsigned int _ackKind, unsigned int _cnt);
 void diagBbnMotor_TokTokControl(unsigned _opKind);
 void diagOut_Cat1(String _msg);
 void diagOut_Cat3(String _msg);
 void diagOutputTest(String _msg);
-void findDiagCode(String msg, stDiagCode code);
-int controlDiagInput(String msg);
-int controlDiagOutput(String msg);
+
 void diagOutAllOff();
 
 

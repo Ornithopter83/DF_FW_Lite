@@ -4,7 +4,6 @@
 
 void anaDeviceContReq(String msg);
 void anaRestDistance(String msg);
-void ana_AngleControl( String msg );
 void ana_MainMotControl( String msg );
 void ana_BobbinControl_Check(String msg);
 void ana_BobbinControl(String msg);

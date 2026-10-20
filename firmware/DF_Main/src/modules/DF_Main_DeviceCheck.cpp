@@ -3,8 +3,7 @@
 #include "DF_Main_DeviceCheck.h"
 void devChkReady_Control()
 {
-	if(0)	{}	 
-	else if(devCheckAllFlag)		{ devchk_bbnAll_Control(); }
+	if(devCheckAllFlag)		{ devchk_bbnAll_Control(); }
 
 	 
 	else
@@ -83,9 +82,8 @@ String stringTo3char(int val)
 	if(  0 > val)	val = 0;
 	if(999 < val)	val = 999;
 
-	if(0)				{}  
-	else if(100 < val)	{strRts = String(val); }		 
-	else if( 10 < val)	{strRts = "0" + String(val); }	 
+	if(100 <= val)	{strRts = String(val); }		 
+	else if( 10 <= val)	{strRts = "0" + String(val); }	 
 	else				{strRts = "00" + String(val); }	 
 
 	return strRts;

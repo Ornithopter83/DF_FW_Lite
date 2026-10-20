@@ -192,8 +192,7 @@ void logUartRecvParsing()
 		for(int i=0; i<msglength; i++)
 		{
 			char recvCh = LogSerial.read();
-			if(0) { }
-			else if( 0x24 == recvCh)		 
+			if( 0x24 == recvCh)		 
 			{
 				logRcved_Seq = 50;	 
 				logRcvApMsg = "$";
@@ -251,9 +250,7 @@ void logRecvHandler()
 		return;
 	}
 
-		if (0) { }	 
-
-		else if (msg.startsWith(STX_ROD_REGIST))	 
+		if (msg.startsWith(STX_ROD_REGIST))	 
 		{
 			anaRodRegist(msg);
 		}
@@ -350,8 +347,7 @@ void imuInterval_Measure()
   	if(imuIntervalCheckCnt)
   	{
   		imuIntervalCheckCnt++;
-		if(0) {}
-  		else if(2 == imuIntervalCheckCnt) { measureCnt = curr_ms_tick;	} 
+		if(2 == imuIntervalCheckCnt) { measureCnt = curr_ms_tick;	} 
   		else if(3 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
   		else if(4 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
   		else if(5 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
@@ -420,9 +416,7 @@ void nowRecvHandler()
 		}
 	}
 
-	if(0) { }	 
-
-	else if (DF_Protocol_Pid_RodToMain_RodAddress == now_rcv_id)	 
+	if (DF_Protocol_Pid_RodToMain_RodAddress == now_rcv_id)	 
 	{
 		memcpy(rcv_src_addr_back, sourceAddress, 6);
 
@@ -688,9 +682,7 @@ void uartRecvHandler()
 	setTO(g_LastCmdTick);						 
 	g_RecvCmdCount++;							 
 
-	if(0) {   }
-
-	else if (msg == "$31S0" || msg == "$31S1")
+	if (msg == "$31S0" || msg == "$31S1")
 	{
 		if (AP_IS_TM != apType) return;
 		dfMainAdcDiagnosticEnabled = (msg == "$31S1") ? 1 : 0;
@@ -787,12 +779,7 @@ void uartRecvHandler()
  		ana_MainMotControl(msg);
 	}
 
-    else if (msg.startsWith(STX_SERVO_MOTOR))
-    {
-		ana_AngleControl(msg);
-    }
-
-    else if (msg.startsWith(STX_BBN_MOTOR))
+else if (msg.startsWith(STX_BBN_MOTOR))
     {
 
 		ana_BobbinControl_Check(msg);
@@ -1327,11 +1314,6 @@ void system_counter()
 		curr_ms_tick = lSys1MsTime;	    
 	portEXIT_CRITICAL(&mux);    
 
-	if(0)
-	{
-	}
-
-	else
 	{
 
 		if(curr_ms_tick != old_ms_tick)

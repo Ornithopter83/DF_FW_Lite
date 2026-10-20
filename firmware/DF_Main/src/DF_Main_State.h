@@ -89,15 +89,7 @@ extern unsigned int ledDimmHoldTime[LED_IDX_MAX];
 
 extern unsigned int ledColorOrder[LED_IDX_MAX][COLOR_ORDER];
 
-typedef struct _diagCode
-{
-	int catNo;			      
-	int itemNo;			       
-	int act;			         
-	int para;			             
-}stDiagCode;
 
-typedef stDiagCode *ptrDiagCode;
 
 extern ENow eNow;
 
@@ -449,23 +441,23 @@ extern String STATE_ENABLE;
 
 extern String STATE_READY;
 
-#define STATE_CONN_UNKNOWN     "-1";
+#define STATE_CONN_UNKNOWN     "-1"
 
-#define STATE_DISCONN          "00";
+#define STATE_DISCONN          "00"
 
-#define STATE_CONNECTED        "01";
+#define STATE_CONNECTED        "01"
 
-#define STATE_DISCONN_NOTINIT  "11";
+#define STATE_DISCONN_NOTINIT  "11"
 
-#define STATE_DISCONN_NOTPEER  "12";
+#define STATE_DISCONN_NOTPEER  "12"
 
-#define STATE_DISCONN_SLEEP    "88";
+#define STATE_DISCONN_SLEEP    "88"
 
-#define STATE_DISCONN_MAC      "99";
+#define STATE_DISCONN_MAC      "99"
 
 #define IMU_CONN_2CHAR_INT 11
 
-extern bool isGameEnable;
+
 
 #define STR_BOOTINFO_DEFAULT	"06028"
 
