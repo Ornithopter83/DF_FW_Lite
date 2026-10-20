@@ -587,11 +587,6 @@ short EB_IMU::saveInterval(int intval)
 	return saveInterval(intvalStr);
 }
 
-short EB_IMU::saveInterval(String intvalStr)		 
-{
-	return saveInterval(intvalStr);
-}
-
  
 short EB_IMU::saveInterval(String intvalStr)		 
 {
