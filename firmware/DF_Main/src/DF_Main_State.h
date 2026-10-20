@@ -36,7 +36,6 @@ extern volatile int reelAlloffStep;
 
 #include "ENow.h"
 
-#include "ServoMotor.h"
 
 #include "Potentiometer.h"
 
@@ -46,7 +45,6 @@ extern volatile int reelAlloffStep;
 
 #include "Led.h"
 
-#include "Diag.h"
 
 #include "Version.h"
 
@@ -105,7 +103,6 @@ extern ENow eNow;
 
 extern Potentiometer torqMotor;
 
-extern ServoMotor sMotor;
 
 extern BobbinMotor bbnMotor;
 
@@ -562,13 +559,9 @@ extern unsigned int sys_count_5sec;
 
 #define checkLmEnc(var,TO) (TO < (mainEnc.lmCnt - var))
 
-extern int reqServoMotor;
 
-extern int oldServoMotor;
 
-extern int absReqServoMotor;
 
-extern int oldAbsServoMotor;
 
 extern short recv_TorqMotor_Flag;
 

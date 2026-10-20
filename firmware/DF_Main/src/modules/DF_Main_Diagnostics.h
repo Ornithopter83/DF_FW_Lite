@@ -1,7 +1,11 @@
 #pragma once
 
 #include <Arduino.h>
-#include "../Diag.h"
+
+void mDiag_entry();
+void mDiag_exit();
+void diagInputMonitor();
+void diagInputMotorSensorAllOff();
 
 void diagInput_AllOff();
 void diagInput_BoardInAllOff();

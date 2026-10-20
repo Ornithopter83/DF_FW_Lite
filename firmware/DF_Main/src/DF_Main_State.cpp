@@ -6,12 +6,10 @@
 #include "FileSys.h"
 #include "Eeprom.h"
 #include "ENow.h"
-#include "ServoMotor.h"
 #include "Potentiometer.h"
 #include "BobbinMotor.h"
 #include "Encoder.h"
 #include "Led.h"
-#include "Diag.h"
 #include "Version.h"
 #include <Update.h>
 #include <FreeRTOSConfig.h>
@@ -90,7 +88,6 @@ typedef stDiagCode *ptrDiagCode;
 ENow eNow;
 Potentiometer torqMotor;		 
 
-ServoMotor sMotor;				 
 
 BobbinMotor bbnMotor;					 
 Encoder mainEnc;				 
@@ -399,10 +396,6 @@ unsigned int sys_count_5sec = 0;
 #define setLmEnc(var) (var = mainEnc.lmCnt)
 #define checkLmEnc(var,TO) (TO < (mainEnc.lmCnt - var))
 
-int reqServoMotor = 2;
-int oldServoMotor = -1;
-int absReqServoMotor = 2;
-int oldAbsServoMotor = -1;
 
 short recv_TorqMotor_Flag = 0;	 
 int reqTorqueMotor = DEFAULT_TORQ;  

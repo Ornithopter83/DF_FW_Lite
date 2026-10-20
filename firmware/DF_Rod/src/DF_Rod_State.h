@@ -11,7 +11,6 @@
 
 #include "ENow.h"
 
-#include "Potentiometer.h"
 
 #include "EB_IMU.h"
 
@@ -25,7 +24,6 @@ extern Encoder encoder;
 
 extern SwitchButton sBtn;
 
-extern Potentiometer brkMotor;
 
 extern EB_IMU imu;
 

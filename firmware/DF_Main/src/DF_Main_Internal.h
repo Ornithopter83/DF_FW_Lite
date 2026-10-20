@@ -7,6 +7,5 @@
 #include "modules/DF_Main_CommandRouter.h"
 #include "modules/DF_Main_DeviceCheck.h"
 #include "modules/DF_Main_BasicControl.h"
-#include "modules/DF_Main_GameControl.h"
 #include "modules/DF_Main_Diagnostics.h"
 #include "modules/DF_Main_Scheduler.h"

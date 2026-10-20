@@ -4,7 +4,6 @@
 #include "SwitchButton.h"
 #include "Encoder.h"
 #include "ENow.h"
-#include "Potentiometer.h"
 #include "EB_IMU.h"
 #include "Battery.h"
 #include "Version.h"
@@ -12,7 +11,6 @@
 ENow eNow;
 Encoder encoder;
 SwitchButton sBtn;
-Potentiometer brkMotor;
 EB_IMU imu;
 Battery battery;
 

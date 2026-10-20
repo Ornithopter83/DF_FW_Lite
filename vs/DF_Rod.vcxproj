@@ -44,7 +44,6 @@
     <ClCompile Include="..\firmware\DF_Rod\src\EB_IMU.cpp" />
     <ClCompile Include="..\firmware\DF_Rod\src\ENow.cpp" />
     <ClCompile Include="..\firmware\DF_Rod\src\Encoder.cpp" />
-    <ClCompile Include="..\firmware\DF_Rod\src\Potentiometer.cpp" />
     <ClCompile Include="..\firmware\DF_Rod\src\SwitchButton.cpp" />
     <ClCompile Include="..\firmware\DF_Rod\src\Version.cpp" />
   </ItemGroup>
@@ -63,7 +62,6 @@
     <ClInclude Include="..\firmware\DF_Rod\src\EB_IMU.h" />
     <ClInclude Include="..\firmware\DF_Rod\src\ENow.h" />
     <ClInclude Include="..\firmware\DF_Rod\src\Encoder.h" />
-    <ClInclude Include="..\firmware\DF_Rod\src\Potentiometer.h" />
     <ClInclude Include="..\firmware\DF_Rod\src\SwitchButton.h" />
     <ClInclude Include="..\firmware\DF_Rod\src\Version.h" />
     <ClInclude Include="..\libraries\DFProtocol\src\DFProtocol.h" />
