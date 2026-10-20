@@ -41,7 +41,8 @@ internal sealed class ImuOrientationView : Control
     public ImuOrientationView()
     {
         BuildReelModel(out model, out faces, out handleModel, out handleFaces);
-        reelTopImage = LoadEmbeddedImage("DFTestModule.Assets.reel-top-v2.png");
+        using (Image? topSource = LoadEmbeddedImage("DFTestModule.Assets.reel-top-v2.png"))
+            reelTopImage = topSource == null ? null : ExtractGoldPanel(topSource);
         reelBottomImage = LoadEmbeddedImage("DFTestModule.Assets.reel-bottom.png");
         reelTopTexture = reelTopImage == null ? null : new ReelSceneTexture(reelTopImage);
         reelBottomTexture = reelBottomImage == null ? null : new ReelSceneTexture(reelBottomImage);
@@ -199,6 +200,149 @@ internal sealed class ImuOrientationView : Control
         return image;
     }
 
+    // Isolate the dominant metallic-gold region of the source photo once at startup.
+    // The fill between its left/right silhouette keeps the white buttons and L/R labels.
+    private static Bitmap? ExtractGoldPanel(Image image)
+    {
+        using Bitmap source = new(image.Width, image.Height, PixelFormat.Format32bppArgb);
+        using (Graphics canvas = Graphics.FromImage(source))
+            canvas.DrawImageUnscaled(image, 0, 0);
+
+        int width = source.Width, height = source.Height;
+        int[] pixels = new int[width * height];
+        BitmapData inputData = source.LockBits(new Rectangle(0, 0, width, height),
+            ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        try
+        {
+            for (int y = 0; y < height; y++)
+                System.Runtime.InteropServices.Marshal.Copy(
+                    IntPtr.Add(inputData.Scan0, y * inputData.Stride),
+                    pixels, y * width, width);
+        }
+        finally { source.UnlockBits(inputData); }
+
+        const int step = 4;
+        int columns = (width + step - 1) / step;
+        int rows = (height + step - 1) / step;
+        int[] regions = new int[columns * rows];
+        for (int row = 0; row < rows; row++)
+        for (int col = 0; col < columns; col++)
+        {
+            int color = pixels[Math.Min(row * step + step / 2, height - 1) * width +
+                Math.Min(col * step + step / 2, width - 1)];
+            int alpha = (int)((uint)color >> 24);
+            int red = (color >> 16) & 255, green = (color >> 8) & 255, blue = color & 255;
+            if (alpha >= 160 && red >= 100 && green >= 60 &&
+                red * 10 >= green * 11 && green * 10 >= blue * 11 && red - blue >= 45)
+                regions[row * columns + col] = -1;
+        }
+
+        // Find the largest connected gold area, ignoring isolated brass reflections.
+        int[] queue = new int[regions.Length];
+        int regionId = 0, largestId = 0, largestSize = 0;
+        for (int i = 0; i < regions.Length; i++)
+        {
+            if (regions[i] != -1) continue;
+            int head = 0, tail = 0;
+            regions[i] = ++regionId;
+            queue[tail++] = i;
+            while (head < tail)
+            {
+                int cell = queue[head++];
+                int x = cell % columns, y = cell / columns;
+                if (x > 0 && regions[cell - 1] == -1)
+                {
+                    regions[cell - 1] = regionId;
+                    queue[tail++] = cell - 1;
+                }
+                if (x + 1 < columns && regions[cell + 1] == -1)
+                {
+                    regions[cell + 1] = regionId;
+                    queue[tail++] = cell + 1;
+                }
+                if (y > 0 && regions[cell - columns] == -1)
+                {
+                    regions[cell - columns] = regionId;
+                    queue[tail++] = cell - columns;
+                }
+                if (y + 1 < rows && regions[cell + columns] == -1)
+                {
+                    regions[cell + columns] = regionId;
+                    queue[tail++] = cell + columns;
+                }
+            }
+            if (tail > largestSize) { largestSize = tail; largestId = regionId; }
+        }
+        if (largestSize < Math.Max(25, regions.Length / 250)) return null;
+
+        int[] left = new int[rows], right = new int[rows];
+        Array.Fill(left, columns);
+        Array.Fill(right, -1);
+        int top = rows, bottom = -1, minColumn = columns, maxColumn = -1;
+        for (int row = 0; row < rows; row++)
+        for (int col = 0; col < columns; col++)
+        {
+            if (regions[row * columns + col] != largestId) continue;
+            left[row] = Math.Min(left[row], col);
+            right[row] = Math.Max(right[row], col);
+            top = Math.Min(top, row);
+            bottom = Math.Max(bottom, row);
+            minColumn = Math.Min(minColumn, col);
+            maxColumn = Math.Max(maxColumn, col);
+        }
+
+        int paddingX = Math.Max(2, width / 250);
+        int paddingY = Math.Max(2, height / 250);
+        int cropLeft = Math.Max(0, minColumn * step - paddingX);
+        int cropTop = Math.Max(0, top * step - paddingY);
+        int cropRight = Math.Min(width, (maxColumn + 1) * step + paddingX);
+        int cropBottom = Math.Min(height, (bottom + 1) * step + paddingY);
+        int croppedWidth = cropRight - cropLeft, croppedHeight = cropBottom - cropTop;
+        Bitmap result = new(croppedWidth, croppedHeight, PixelFormat.Format32bppArgb);
+        int[] resultPixels = new int[croppedWidth * croppedHeight];
+        int feather = Math.Max(2, width / 500);
+        for (int y = cropTop; y < cropBottom; y++)
+        {
+            int row = Math.Clamp(y / step, top, bottom);
+            // Bridge short gaps caused by highlights and the white button surfaces.
+            if (right[row] < 0)
+            {
+                int near = row;
+                while (near > top && right[near] < 0) near--;
+                if (right[near] < 0)
+                {
+                    near = row;
+                    while (near < bottom && right[near] < 0) near++;
+                }
+                if (right[near] < 0) continue;
+                row = near;
+            }
+            int edgeLeft = Math.Max(cropLeft, left[row] * step - paddingX);
+            int edgeRight = Math.Min(cropRight - 1, (right[row] + 1) * step + paddingX);
+            for (int x = edgeLeft; x <= edgeRight; x++)
+            {
+                int pixel = pixels[y * width + x];
+                int alpha = (int)((uint)pixel >> 24);
+                int edge = Math.Min(x - edgeLeft, edgeRight - x);
+                alpha = (int)(alpha * Math.Clamp(edge / (float)feather, 0f, 1f));
+                resultPixels[(y - cropTop) * croppedWidth + x - cropLeft] =
+                    (alpha << 24) | (pixel & 0x00FFFFFF);
+            }
+        }
+
+        BitmapData outputData = result.LockBits(new Rectangle(0, 0, croppedWidth, croppedHeight),
+            ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        try
+        {
+            for (int y = 0; y < croppedHeight; y++)
+                System.Runtime.InteropServices.Marshal.Copy(
+                    resultPixels, y * croppedWidth,
+                    IntPtr.Add(outputData.Scan0, y * outputData.Stride), croppedWidth);
+        }
+        finally { result.UnlockBits(outputData); }
+        return result;
+    }
+
     private void DrawPhotoSurface(ReelSceneRenderer renderer, Matrix3 orientation)
     {
         Point3 topNormal = orientation.Transform(new Point3(0, 1, 0));
@@ -212,23 +356,17 @@ internal sealed class ImuOrientationView : Control
         const float maxX = 1.94f * RightScale;
         const float minZ = -0.82f * FrontScale;
         const float maxZ = 0.82f * FrontScale;
-        float surfaceY = (facing >= 0 ? 0.69f : -0.69f) * TopScale;
+        float surfaceY = (facing >= 0 ? 0.53f : -0.69f) * TopScale;
         Point3[] corners;
         RectangleF sourceRectangle;
         if (facing >= 0)
         {
-            // Crop the original top photo to the center gold control panel.
-            // The reel casing and right crank are already part of the 3D model.
-            const float sourceMinXRatio = 0.18f;
-            const float sourceMaxXRatio = 0.47f;
-            const float sourceMinYRatio = 0.04f;
-            const float sourceMaxYRatio = 0.96f;
-
-            // Project only onto the top panel, not onto the modeled crank.
-            float panelMinX = -0.06f * RightScale;
-            float panelMaxX = 0.44f * RightScale;
-            float panelMinZ = -0.72f * FrontScale;
-            float panelMaxZ = 0.72f * FrontScale;
+            // The texture now contains only the alpha-masked gold control cover.
+            // Match its size to the panel rather than the crank assembly.
+            const float panelMinX = -0.52f * RightScale;
+            const float panelMaxX = 0.48f * RightScale;
+            const float panelMinZ = -0.60f * FrontScale;
+            const float panelMaxZ = 0.60f * FrontScale;
             corners = new[]
             {
                 new Point3(panelMinX, surfaceY, panelMinZ),
@@ -236,11 +374,7 @@ internal sealed class ImuOrientationView : Control
                 new Point3(panelMaxX, surfaceY, panelMaxZ),
                 new Point3(panelMinX, surfaceY, panelMaxZ)
             };
-            sourceRectangle = new RectangleF(
-                image.Width * sourceMinXRatio,
-                image.Height * sourceMinYRatio,
-                image.Width * (sourceMaxXRatio - sourceMinXRatio),
-                image.Height * (sourceMaxYRatio - sourceMinYRatio));
+            sourceRectangle = new RectangleF(0, 0, image.Width, image.Height);
         }
         else
         {
@@ -267,7 +401,7 @@ internal sealed class ImuOrientationView : Control
         List<Point3> handleVertices = new();
         List<Face> handleSurfaces = new();
 
-        Color bodyFront = Color.FromArgb(223, 191, 125); // Pale gold reel top when no photo is available.
+        Color bodyFront = Color.FromArgb(48, 52, 61);
         Color bodyBack = Color.FromArgb(38, 42, 49);
         Color bodySide = Color.FromArgb(61, 66, 76);
         Color black = Color.FromArgb(30, 33, 39);
@@ -281,6 +415,16 @@ internal sealed class ImuOrientationView : Control
             new(0.54f, 0.66f), new(-0.55f, 0.66f), new(-0.78f, 0.43f), new(-0.80f, -0.48f)
         };
         AddExtrusion(vertices, surfaces, bodyProfile, -0.49f, 0.49f, bodyFront, bodyBack, bodySide);
+
+        // A thin, rounded gold control cover remains visible if the source photo is missing.
+        Color gold = Color.FromArgb(205, 162, 79);
+        PointF[] goldCover =
+        {
+            new(-0.45f, -0.60f), new(0.41f, -0.60f), new(0.48f, -0.52f),
+            new(0.48f, 0.52f), new(0.41f, 0.60f), new(-0.45f, 0.60f),
+            new(-0.52f, 0.52f), new(-0.52f, -0.52f)
+        };
+        AddExtrusion(vertices, surfaces, goldCover, -0.51f, -0.50f, gold, gold, gold);
 
         // RIGHT 방향으로 놓인 스풀, 회전축과 핸들
         AddCylinderX(vertices, surfaces, 0.48f, 1.18f, 0.03f, 0.02f, 0.47f, 14, blackHighlight, black);
