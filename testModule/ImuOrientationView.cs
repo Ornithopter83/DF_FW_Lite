@@ -181,7 +181,22 @@ internal sealed class ImuOrientationView : Control
         using Image source = Image.FromStream(stream);
         // 배경 격자가 이미지에 굳어 들어간 자산은 표시하지 않고 3D 모델로 대체한다.
         if (!Image.IsAlphaPixelFormat(source.PixelFormat)) return null;
-        return new Bitmap(source);
+        Bitmap image = new(source);
+        // A PNG may have an alpha channel but still contain an opaque background.
+        // Reject it instead of drawing a rectangular photo behind the reel.
+        bool hasTransparentEdge = false;
+        for (int x = 0; x < image.Width && !hasTransparentEdge; x++)
+            hasTransparentEdge = image.GetPixel(x, 0).A < 250 ||
+                image.GetPixel(x, image.Height - 1).A < 250;
+        for (int y = 0; y < image.Height && !hasTransparentEdge; y++)
+            hasTransparentEdge = image.GetPixel(0, y).A < 250 ||
+                image.GetPixel(image.Width - 1, y).A < 250;
+        if (!hasTransparentEdge)
+        {
+            image.Dispose();
+            return null;
+        }
+        return image;
     }
 
     private void DrawPhotoSurface(ReelSceneRenderer renderer, Matrix3 orientation)
@@ -236,7 +251,7 @@ internal sealed class ImuOrientationView : Control
         List<Point3> handleVertices = new();
         List<Face> handleSurfaces = new();
 
-        Color bodyFront = Color.FromArgb(48, 52, 61);
+        Color bodyFront = Color.FromArgb(223, 191, 125); // Pale gold reel top when no photo is available.
         Color bodyBack = Color.FromArgb(38, 42, 49);
         Color bodySide = Color.FromArgb(61, 66, 76);
         Color black = Color.FromArgb(30, 33, 39);

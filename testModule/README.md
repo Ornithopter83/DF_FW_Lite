@@ -26,12 +26,12 @@ ROD 무선 업데이트 버튼은 사용할 수 없습니다. MAIN/ROD USB 업�
 
 ## 원본 릴 사진 텍스처 복원
 
-`ImuOrientationView`와 3D 메시 렌더링 소스는 복원했습니다. 원본 이미지 두 개를 사용할 경우 다음 경로에 복사하면 빌드 시 자동 포함됩니다.
+`ImuOrientationView`와 3D 메시 렌더링 소스는 복원했습니다. TM 빌드 시 `tools/restore-tm-assets.ps1`이 원본 이미지 두 개를 자동으로 복사 또는 다운로드하여 내장합니다. 이미지가 이미 있으면 그대로 사용합니다.
 
 - `testModule/Assets/reel-top-v2.png`
 - `testModule/Assets/reel-bottom.png`
 
-원본 저장소의 두 파일을 쉽게 복사하려면 `powershell -ExecutionPolicy Bypass -File .\tools\restore-tm-assets.ps1`을 실행하십시오. 원본을 로컬에서 찾을 수 없다면 해당 스크립트가 GitHub 공개 원본 경로에서 내려받습니다. 이미지가 없어도 3D 형상 렌더링은 작동하도록 설계돼 있으나 원본 사진 텍스처는 표시되지 않습니다.
+원본 파일을 바로 복사하려면 `powershell -ExecutionPolicy Bypass -File .\tools\restore-tm-assets.ps1`을 별도로 실행할 수도 있습니다. 빌드 중 원본을 로컬에서 찾지 못하면 GitHub 공개 원본 경로에서 내려받으며, 복원에 실패해도 빌드는 계속됩니다. 이미지가 없는 경우 3D 형상의 상단은 연한 금색으로 표시됩니다. 불투명한 사진 배경을 가진 자산은 렌더링하지 않아 격자나 배경 사각형이 표시되지 않도록 합니다.
 
 ## 실행
 

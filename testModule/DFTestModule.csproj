@@ -15,10 +15,22 @@
   <ItemGroup>
     <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     <EmbeddedResource Include="esptool_V4.5.1.exe" LogicalName="DFTestModule.esptool_V4.5.1.exe" />
-    <EmbeddedResource Include="Assets\reel-top-v2.png" Condition="Exists('Assets\reel-top-v2.png')" LogicalName="DFTestModule.Assets.reel-top-v2.png" />
-    <EmbeddedResource Include="Assets\reel-bottom.png" Condition="Exists('Assets\reel-bottom.png')" LogicalName="DFTestModule.Assets.reel-bottom.png" />
   </ItemGroup>
   <Target Name="RestoreEmbeddedEsptool" BeforeTargets="AssignTargetPaths" Condition="'$(DesignTimeBuild)' != 'true'">
     <Exec Command="powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\tools\restore-tm-updater.ps1&quot;" />
+  </Target>
+  <!-- Recover the original transparent reel photographs before the embedded-resource list is finalized. -->
+  <Target Name="RestoreReelPhotoAssets" BeforeTargets="AssignTargetPaths"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\tools\restore-tm-assets.ps1&quot;"
+          ContinueOnError="WarnAndContinue" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(MSBuildProjectDirectory)\Assets\reel-top-v2.png"
+                        Condition="Exists('$(MSBuildProjectDirectory)\Assets\reel-top-v2.png')"
+                        LogicalName="DFTestModule.Assets.reel-top-v2.png" />
+      <EmbeddedResource Include="$(MSBuildProjectDirectory)\Assets\reel-bottom.png"
+                        Condition="Exists('$(MSBuildProjectDirectory)\Assets\reel-bottom.png')"
+                        LogicalName="DFTestModule.Assets.reel-bottom.png" />
+    </ItemGroup>
   </Target>
 </Project>
