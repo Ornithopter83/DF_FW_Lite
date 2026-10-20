@@ -92,6 +92,7 @@ void DF_Rod_Application_Setup()
 		encoder.setCalibrationCallback(encoderCalibrationChangeCallback);
 		sBtn.setSwitchCallback(btnChangeCallback);
 		imu.setStateCallback(imuDataCallback);
+        imu.setCalibrationCallback(imuCalibrationChangeCallback);
 
 		imu.setStartStop(IMU_CONF_START);			 
 
@@ -152,7 +153,8 @@ void DF_Rod_Application_Loop()
 
 			uartPcHandler_NormalMode();
 
-			resp_imu = imu.uartRecv_Normal();			 
+			resp_imu = imu.uartRecv_Normal();
+            imu.pollGyroCalibration();			 
 
 			encoder.rotate();		 
 

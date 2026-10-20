@@ -111,6 +111,10 @@ void imuDataCallback(String pid, String str) {
   eNow.write(pid, str);
 }
 
+void imuCalibrationChangeCallback(String status) {
+  eNow.write(DF_Protocol_RodToMain_ImuCalibration, status);
+}
+
 int rodAliveRcv_LedBlinkFlag = 0;
 
 #define ROD_STS_UNKNOWN	0
@@ -323,6 +327,14 @@ void nowRecvHandler()
 
 		}
   	}
+  }
+
+  else if (DF_Protocol_Pid_MainToRod_ImuCalibration == now_rcv_id)
+  {
+    if (cmd_str_data == "C" && IMU_CONN == imuStatus)
+        imu.requestGyroCalibration();
+    else
+        imuCalibrationChangeCallback("U");
   }
 
   else if (DF_Protocol_Pid_MainToRod_VerticalMotor == now_rcv_id)	 

@@ -15,6 +15,7 @@ const char DF_Protocol_MainToRod_MainAddress[]      = "31";
 const char DF_Protocol_MainToRod_ApInfo[]           = "33";
 const char DF_Protocol_MainToRod_Sleep[]            = "34";
 const char DF_Protocol_MainToRod_EncoderCalibration[] = "35";
+const char DF_Protocol_MainToRod_ImuCalibration[] = "37";
 
 const char DF_Protocol_RodToMain_BoardType[]        = "02";
 const char DF_Protocol_RodToMain_Alive[]            = "10";
@@ -28,6 +29,7 @@ const char DF_Protocol_RodToMain_BatteryDiagnostic[]= "28";
 const char DF_Protocol_RodToMain_RodAddress[]       = "32";
 const char DF_Protocol_RodToMain_Sleep[]            = "34";
 const char DF_Protocol_RodToMain_EncoderCalibration[] = "36";
+const char DF_Protocol_RodToMain_ImuCalibration[] = "38";
 
 int DF_Protocol_Encode(char* output, size_t outputCapacity, const char* pidText, const char* payload, size_t payloadLength)
 {

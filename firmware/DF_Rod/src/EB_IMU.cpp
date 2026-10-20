@@ -4,6 +4,8 @@
 
 #include "Common.h"
 #include "EB_IMU.h"
+#include <math.h>
+#include <stdio.h>
  
 
 extern String rodVer;
@@ -34,9 +36,11 @@ static const char *IMU_FILE = "/imu.txt";
  
 void (*_imuCallback)(String, String);
 
-EB_IMU::EB_IMU()
+EB_IMU::EB_IMU() :
+    calibrationState(0), calibrationSamples(0), calibrationRequestedAt(0),
+    calibrationLastMovingAt(0), calibrationLastSampleAt(0),
+    calibrationMoved(false), calibrationCallback(NULL)
 {
-
 }
 
  
@@ -144,6 +148,8 @@ void EB_IMU::init()
 	 
 	isMeasure = false;
 	imuDataStr = "";
+    calibrationState = 0;
+    calibrationSamples = 0;
 
   	 
   	 
@@ -326,6 +332,108 @@ void EB_IMU::setConfigString(String msg)
 
 
 
+// State 1 waits for naturally occurring stillness; state 2 waits asynchronously
+// for the EBIMU <ok> reply. Never block Rod's 1 ms communication loop.
+void EB_IMU::setCalibrationCallback(void (*callback)(String))
+{
+    calibrationCallback = callback;
+}
+
+void EB_IMU::finishGyroCalibration(const char *result)
+{
+    calibrationState = 0;
+    if (calibrationCallback != NULL) calibrationCallback(String(result));
+}
+
+void EB_IMU::requestGyroCalibration()
+{
+    if (calibrationState != 0)
+    {
+        if (calibrationCallback != NULL) calibrationCallback("B");
+        return;
+    }
+    calibrationState = 1;
+    calibrationSamples = 0;
+    calibrationMoved = false;
+    calibrationRequestedAt = millis();
+    calibrationLastMovingAt = calibrationRequestedAt;
+    calibrationLastSampleAt = 0;
+    if (calibrationCallback != NULL) calibrationCallback("W");
+}
+
+void EB_IMU::observeGyroMotion(const String &line)
+{
+    if (calibrationState == 0) return;
+    const char *value = line.c_str();
+    while (*value == ',' || *value == ' ') value++;
+    float roll, pitch, yaw, gx, gy, gz;
+    if (sscanf(value, "%f,%f,%f,%f,%f,%f",
+        &roll, &pitch, &yaw, &gx, &gy, &gz) != 6 ||
+        !isfinite(gx) || !isfinite(gy) || !isfinite(gz))
+    {
+        return; // Invalid or incomplete frames never count as stationary.
+    }
+    unsigned long now = millis();
+    calibrationLastSampleAt = now;
+    // Values are gyro rates in degrees/second in the configured sog1 output.
+    if (fabs(gx) > 1.5f || fabs(gy) > 1.5f || fabs(gz) > 1.5f)
+    {
+        calibrationLastMovingAt = now;
+        calibrationSamples = 0;
+        if (calibrationState == 2) calibrationMoved = true;
+    }
+    else if (calibrationState == 1 && calibrationSamples < 1000)
+    {
+        calibrationSamples++;
+    }
+}
+
+bool EB_IMU::handleCalibrationReply(const String &line)
+{
+    if (calibrationState != 2 || line.indexOf('<') < 0) return false;
+    if (line.indexOf("<ok>") >= 0)
+    {
+        finishGyroCalibration(calibrationMoved ? "M" : "S");
+        return true;
+    }
+    if (line.indexOf("<ng>") >= 0 || line.indexOf("<err>") >= 0 ||
+        line.indexOf("<error>") >= 0)
+    {
+        finishGyroCalibration("E");
+        return true;
+    }
+    // Ignore other command responses while expecting the gyro result.
+    return line.startsWith("<");
+}
+
+void EB_IMU::pollGyroCalibration()
+{
+    if (calibrationState == 0) return;
+    unsigned long now = millis();
+    if (calibrationState == 1)
+    {
+        if (now - calibrationRequestedAt >= 12000UL)
+        {
+            finishGyroCalibration("M");
+        }
+        else if (calibrationSamples >= 10 &&
+            now - calibrationLastMovingAt >= 2200UL &&
+            calibrationLastSampleAt != 0 &&
+            now - calibrationLastSampleAt <= 500UL)
+        {
+            calibrationState = 2;
+            calibrationMoved = false;
+            calibrationRequestedAt = now;
+            send2Imuln("<cg>");
+            if (calibrationCallback != NULL) calibrationCallback("R");
+        }
+    }
+    else if (calibrationState == 2 && now - calibrationRequestedAt >= 5000UL)
+    {
+        finishGyroCalibration("T");
+    }
+}
+
 int EB_IMU::ebimu_parser(float *item, int number_of_item)
 {
   int n, i;
@@ -348,12 +456,19 @@ if(rbytes)
 	 
     if (mBuf[mBuf_cnt] == 0x0A)			 
     {
-    	result = IMU_PARSER_OK;
-		
-		 
-    	memcpy(&str[0], &mBuf[0], (mBuf_cnt));		 
-		str[mBuf_cnt] = NULL;
-		imuDataStr = String(str);
+        memcpy(&str[0], &mBuf[0], mBuf_cnt);
+        str[mBuf_cnt] = '\0';
+        String frame(str);
+        frame.trim();
+        if (!handleCalibrationReply(frame))
+        {
+            if (!frame.startsWith("<"))
+            {
+                imuDataStr = frame;
+                observeGyroMotion(frame);
+                result = IMU_PARSER_OK;
+            }
+        }
 
 	  
 	  mBuf_cnt = -1;
@@ -494,6 +609,8 @@ void EB_IMU::setInterval(int ms)
 
 String EB_IMU::getversion()
 {
+  // Do not consume the calibration acknowledgement with the blocking reply() path.
+  if (calibrationState != 0) return "<busy>";
   String str;
 	
    

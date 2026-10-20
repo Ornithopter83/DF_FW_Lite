@@ -24,7 +24,8 @@ typedef enum
     DF_Protocol_Pid_MainToRod_MainAddress = 31,
     DF_Protocol_Pid_MainToRod_ApInfo = 33,
     DF_Protocol_Pid_MainToRod_Sleep = 34,
-    DF_Protocol_Pid_MainToRod_EncoderCalibration = 35
+    DF_Protocol_Pid_MainToRod_EncoderCalibration = 35,
+    DF_Protocol_Pid_MainToRod_ImuCalibration = 37
 } DF_Protocol_MainToRodPid;
 
 typedef enum
@@ -40,7 +41,8 @@ typedef enum
     DF_Protocol_Pid_RodToMain_BatteryDiagnostic = 28,
     DF_Protocol_Pid_RodToMain_RodAddress = 32,
     DF_Protocol_Pid_RodToMain_Sleep = 34,
-    DF_Protocol_Pid_RodToMain_EncoderCalibration = 36
+    DF_Protocol_Pid_RodToMain_EncoderCalibration = 36,
+    DF_Protocol_Pid_RodToMain_ImuCalibration = 38
 } DF_Protocol_RodToMainPid;
 
 typedef enum
@@ -77,6 +79,7 @@ extern const char DF_Protocol_MainToRod_MainAddress[];
 extern const char DF_Protocol_MainToRod_ApInfo[];
 extern const char DF_Protocol_MainToRod_Sleep[];
 extern const char DF_Protocol_MainToRod_EncoderCalibration[];
+extern const char DF_Protocol_MainToRod_ImuCalibration[];
 
 extern const char DF_Protocol_RodToMain_BoardType[];
 extern const char DF_Protocol_RodToMain_Alive[];
@@ -90,6 +93,7 @@ extern const char DF_Protocol_RodToMain_BatteryDiagnostic[];
 extern const char DF_Protocol_RodToMain_RodAddress[];
 extern const char DF_Protocol_RodToMain_Sleep[];
 extern const char DF_Protocol_RodToMain_EncoderCalibration[];
+extern const char DF_Protocol_RodToMain_ImuCalibration[];
 
 typedef struct
 {

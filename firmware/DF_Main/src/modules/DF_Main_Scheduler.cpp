@@ -449,6 +449,12 @@ void nowRecvHandler()
 		}
 	}
 
+  else if (DF_Protocol_Pid_RodToMain_ImuCalibration == now_rcv_id && (!rodRegistrationMode))
+  {
+    // Shared response contract for TM and the regular MAIN user application.
+    Resp2ApPrintln(String("$38") + now_cmd_data + "%");
+  }
+
   else if (now_rcv_id == DF_Protocol_Pid_RodToMain_ImuData && (!rodRegistrationMode))
   {
 
@@ -692,6 +698,24 @@ void uartRecvHandler()
 		}
 		return;
 	}
+
+    else if (msg.startsWith("$38"))
+    {
+        // $38C% requests an in-place stationary gyro calibration; no guided rotation.
+        if (msg != "$38C")
+        {
+            Resp2ApPrintln("$38E%");
+            return;
+        }
+        if ((ROD_CONN != rod_conn_status) || rodRegistrationMode || (0 != gRodSleepStat) ||
+            (CONNECT != imu_conn_status))
+        {
+            Resp2ApPrintln("$38U%");
+            return;
+        }
+        eNow.write(DF_Protocol_MainToRod_ImuCalibration, "C");
+        return;
+    }
 
 	else if (msg.startsWith(STX_ENCODER_CALIBRATION))
 	{

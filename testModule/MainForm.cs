@@ -49,6 +49,12 @@ internal sealed class MainForm : Form
     private readonly Label imuConnectionState = Indicator("IMU 연결 대기");
     private readonly ImuOrientationView imuOrientation = new() { Width = 300, Height = 150, Margin = new Padding(18, 0, 0, 0) };
     private readonly Button imuZeroButton = SmallButton("0점 보정", 100);
+    private readonly Button imuCalibrationButton = SmallButton("캘리브레이션", 125);
+    private readonly Label imuCalibrationState = new()
+    {
+        AutoSize = true, ForeColor = Color.DimGray,
+        Text = "IMU 캘리브레이션 대기", Margin = new Padding(7, 0, 0, 8)
+    };
     private readonly Label encoderCalibrationState = ValueLabel("릴 연결 대기");
     private readonly Label encoderCalibrationRawCount = ValueLabel("00");
     private readonly Button encoderCalibrationStartButton = SmallButton("엔코더 보정", 120);
@@ -61,6 +67,8 @@ internal sealed class MainForm : Form
     private bool rodConnected;
     private bool imuConnected;
     private bool imuDataEnabled;
+    private bool imuCalibrationActive;
+    private DateTime imuCalibrationRequestedAt;
     private bool encoderMonitorEnabled;
     private bool registrationWaiting;
     private string batteryPercent = "--";
@@ -78,7 +86,11 @@ internal sealed class MainForm : Form
         Font = new Font("맑은 고딕", 9F);
         BuildLayout();
         serial.BytesReceived += OnBytesReceived;
-        pollTimer.Tick += (_, _) => { if (serial.IsOpen && !TrySend("$00%", false)) pollTimer.Stop(); };
+        pollTimer.Tick += (_, _) => {
+            if (imuCalibrationActive && DateTime.UtcNow - imuCalibrationRequestedAt > TimeSpan.FromSeconds(22))
+                FinishImuCalibration("IMU 보정 응답 시간 초과", false);
+            if (serial.IsOpen && !TrySend("$00%", false)) pollTimer.Stop();
+        };
         Shown += (_, _) => RefreshPorts();
         FormClosing += (_, _) => { pollTimer.Stop(); if (serial.IsOpen) { TrySend(DeviceProtocol.AdcDiagnostic(false), false); TrySend(DeviceProtocol.TorqueOff(), false); TrySend(DeviceProtocol.BldcOff(), false); } serial.Dispose(); };
     }
@@ -329,9 +341,13 @@ internal sealed class MainForm : Form
             imuDataEnabled = enabled;
             imuZeroButton.Enabled = enabled;
         });
+        imuCalibrationButton.Click += (_, _) => StartImuCalibration();
         imuToggle.Width = 665;
         imuToggle.Controls.Add(imuZeroButton);
+        imuToggle.Controls.Add(imuCalibrationButton);
         content.Controls.Add(imuToggle);
+        content.Controls.Add(imuCalibrationState);
+        UpdateImuCalibrationButton();
         FlowLayoutPanel imuArea = new() { Width = 665, Height = 155, WrapContents = false };
         TableLayoutPanel imu = new() { Width = 315, Height = 110, ColumnCount = 4, RowCount = 3 };
         string[] keys = { "Roll", "Pitch", "Yaw", "GX", "GY", "GZ" };
@@ -344,6 +360,76 @@ internal sealed class MainForm : Form
         imuArea.Controls.Add(imuOrientation);
         content.Controls.Add(imuArea);
         page.Controls.Add(content); return page;
+    }
+
+    private void UpdateImuCalibrationButton()
+    {
+        imuCalibrationButton.Enabled = serial.IsOpen && rodConnected &&
+            imuConnected && !imuCalibrationActive;
+    }
+
+    private void StartImuCalibration()
+    {
+        if (imuCalibrationActive || !serial.IsOpen || !rodConnected || !imuConnected) return;
+        if (!TrySend(DeviceProtocol.ImuCalibration())) return;
+        imuCalibrationActive = true;
+        imuCalibrationRequestedAt = DateTime.UtcNow;
+        imuCalibrationState.Text = "정지 상태 확인 중 (자세는 수평일 필요 없음)";
+        imuCalibrationState.ForeColor = Color.DarkOrange;
+        UpdateImuCalibrationButton();
+    }
+
+    private void FinishImuCalibration(string message, bool success)
+    {
+        imuCalibrationActive = false;
+        imuCalibrationState.Text = message;
+        imuCalibrationState.ForeColor = success ? Color.DarkGreen : Color.Firebrick;
+        AppendLog(success ? "SYSTEM" : "WARNING", message);
+        UpdateImuCalibrationButton();
+    }
+
+    private void ProcessImuCalibrationFrame(string frame)
+    {
+        if (frame.Length < 5) return;
+        char status = frame[3];
+        switch (status)
+        {
+            case 'W':
+                imuCalibrationActive = true;
+                imuCalibrationRequestedAt = DateTime.UtcNow;
+                imuCalibrationState.Text = "릴이 정지할 때까지 자동 대기 중";
+                imuCalibrationState.ForeColor = Color.DarkOrange;
+                break;
+            case 'R':
+                imuCalibrationActive = true;
+                imuCalibrationRequestedAt = DateTime.UtcNow;
+                imuCalibrationState.Text = "자이로 보정 중 (약 2초간 정지 유지)";
+                imuCalibrationState.ForeColor = Color.DarkOrange;
+                break;
+            case 'S':
+                FinishImuCalibration("자이로 캘리브레이션 완료", true);
+                return;
+            case 'M':
+                FinishImuCalibration("안정적인 정지 상태가 아니어서 보정을 완료하지 못했습니다", false);
+                return;
+            case 'T':
+                FinishImuCalibration("IMU 보정 완료 응답 없음", false);
+                return;
+            case 'E':
+                FinishImuCalibration("IMU가 보정 명령을 처리하지 못했습니다", false);
+                return;
+            case 'B':
+                // A previous request may still be running in the Rod.
+                FinishImuCalibration("IMU 캘리브레이션 진행 중", false);
+                return;
+            case 'U':
+                FinishImuCalibration("ROD 또는 IMU 연결 상태를 확인하세요", false);
+                return;
+            default:
+                FinishImuCalibration("알 수 없는 캘리브레이션 상태: " + status, false);
+                return;
+        }
+        UpdateImuCalibrationButton();
     }
 
     private Panel BuildInputPage()
@@ -563,6 +649,9 @@ internal sealed class MainForm : Form
             bool wasRodConnected = rodConnected;
             rodConnected = frame.Substring(3, 2) == "01";
             SetConnectionIndicator(reelConnectionState, rodConnected, "릴");
+            if (!rodConnected && imuCalibrationActive)
+                FinishImuCalibration("ROD 연결 해제로 캘리브레이션 상태를 확인할 수 없습니다", false);
+            UpdateImuCalibrationButton();
             if (!rodConnected) {
                 batteryDiagnostic.Text = "(현재 ---- / 평균 ----)";
                 batteryDiagnostic.ForeColor = Color.DimGray;
@@ -595,6 +684,9 @@ internal sealed class MainForm : Form
             bool wasImuConnected = imuConnected;
             imuConnected = frame.Substring(3, 2) == "01";
             SetConnectionIndicator(imuConnectionState, imuConnected, "IMU");
+            if (!imuConnected && imuCalibrationActive)
+                FinishImuCalibration("IMU 연결 해제로 캘리브레이션 상태를 확인할 수 없습니다", false);
+            UpdateImuCalibrationButton();
             if (!imuConnected && wasImuConnected) {
                 imuVersion.Text = "IMU 미연결";
             } else if (imuConnected && !wasImuConnected && serial.IsOpen && !initializingMainConnection) {
@@ -613,6 +705,8 @@ internal sealed class MainForm : Form
         } else if (frame.StartsWith("$14", StringComparison.Ordinal)) {
             SetStatus("릴 엔코더", frame.Substring(3).TrimEnd('%'), Color.LightGreen);
             imuOrientation.AdvanceHandleCounterClockwise();
+        } else if (frame.StartsWith("$38", StringComparison.Ordinal)) {
+            ProcessImuCalibrationFrame(frame);
         } else if (frame.StartsWith("$37", StringComparison.Ordinal)) {
             UpdateEncoderCalibration(frame.Substring(3).TrimEnd('%'));
         } else if (frame.StartsWith("$30", StringComparison.Ordinal) && frame.Length >= 5) {
@@ -730,7 +824,7 @@ internal sealed class MainForm : Form
     {
         message = message.Trim();
         if (!message.StartsWith('$') || !message.EndsWith('%') || message.Length > 120 || message.Any(c => c > 0x7f)) { MessageBox.Show("명령은 ASCII $로 시작하고 %로 끝나야 합니다 (120자 이하)."); return; }
-        string[] allowedPrefixes = { "$00", "$01", "$02", "$04", "$06", "$08", "$10", "$15", "$23", "$24", "$27", "$29", "$30", "$31S", "$37" };
+        string[] allowedPrefixes = { "$00", "$01", "$02", "$04", "$06", "$08", "$10", "$15", "$23", "$24", "$27", "$29", "$30", "$31S", "$37", "$38" };
         if (!allowedPrefixes.Any(prefix => message.StartsWith(prefix, StringComparison.Ordinal))) { MessageBox.Show("Lite에서는 LM JIG, 게임, OTA, 전원 명령을 전송하지 않습니다."); return; }
         TrySend(message);
     }
@@ -756,6 +850,10 @@ internal sealed class MainForm : Form
     {
         if (adcDiagnosticOff != null) adcDiagnosticOff.Checked = true;
         rodConnected = false; imuConnected = false; registrationWaiting = false;
+        imuCalibrationActive = false;
+        imuCalibrationState.Text = "IMU 캘리브레이션 대기";
+        imuCalibrationState.ForeColor = Color.DimGray;
+        UpdateImuCalibrationButton();
         encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
         rodRegisterButton.Text = "ROD 등록"; registrationState.Text = "등록 대기 안 함";
         registrationState.BackColor = Color.FromArgb(239, 241, 244);
@@ -806,6 +904,10 @@ internal sealed class MainForm : Form
         if (adcDiagnosticOff != null && !adcDiagnosticOff.Checked) adcDiagnosticOff.Checked = true;
         pollTimer.Stop(); serial.Close(); connectButton.Text = "연결"; connectionState.Text = "연결 안 됨"; connectionState.ForeColor = Color.DimGray;
         rodConnected = false; imuConnected = false; imuDataEnabled = false; imuZeroButton.Enabled = false; imuOrientation.ClearZero(); registrationWaiting = false; rodRegisterButton.Text = "ROD 등록";
+        imuCalibrationActive = false;
+        imuCalibrationState.Text = "IMU 캘리브레이션 대기";
+        imuCalibrationState.ForeColor = Color.DimGray;
+        UpdateImuCalibrationButton();
         encoderCalibrationActive = false; encoderCalibrationAwaitingApply = false; encoderCalibrationState.Text = "릴 연결 대기"; encoderCalibrationRawCount.Text = "00"; UpdateEncoderCalibrationButtons();
         mainVersion.Text = "Vm -"; rodVersion.Text = "Vr -"; imuVersion.Text = "IMU -";
         SetConnectionIndicator(reelConnectionState, false, "릴"); SetConnectionIndicator(imuConnectionState, false, "IMU");

@@ -26,6 +26,8 @@ internal static class DeviceProtocol
     public static string ReelLeftLed(bool on) { return on ? "$2411%" : "$2410%"; }
     public static string ReelRightLed(bool on) { return on ? "$2421%" : "$2420%"; }
     public static string Imu(bool on) { return on ? "$081%" : "$080%"; }
+    // Shared MAIN command: available to TM and other connected user applications.
+    public static string ImuCalibration() { return "$38C%"; }
     public static string AdcDiagnostic(bool on) { return on ? "$31S1%" : "$31S0%"; }
     public static string EncoderCalibrationStart() { return "$37S%"; }
     public static string EncoderCalibrationComplete() { return "$37C%"; }

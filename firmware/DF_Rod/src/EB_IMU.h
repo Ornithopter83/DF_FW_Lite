@@ -53,6 +53,9 @@ class EB_IMU
 
     void disable();
     void jyro_calibration();
+    void setCalibrationCallback(void (*callback)(String));
+    void requestGyroCalibration();
+    void pollGyroCalibration();
     void setInterval(int ms);
 	void setStartStop(int set);
      
@@ -73,6 +76,16 @@ class EB_IMU
 	String imuVer = "";
 
   private:
+    unsigned char calibrationState;
+    unsigned short calibrationSamples;
+    unsigned long calibrationRequestedAt;
+    unsigned long calibrationLastMovingAt;
+    unsigned long calibrationLastSampleAt;
+    bool calibrationMoved;
+    void (*calibrationCallback)(String);
+    void finishGyroCalibration(const char *result);
+    bool handleCalibrationReply(const String &line);
+    void observeGyroMotion(const String &line);
     int ebimu_parser(float *item, int number_of_item);
     String reply();
 	int respCheck();

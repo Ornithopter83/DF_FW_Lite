@@ -15,6 +15,7 @@ void btnChangeCallback(String str);
 void rotateChangeCallback(String str);
 void encoderCalibrationChangeCallback(String str);
 void imuDataCallback(String pid, String str);
+void imuCalibrationChangeCallback(String status);
 void setData_RodCycleTest(String msg);
 void sendInfo_boardType();
 void imuConnResp();
