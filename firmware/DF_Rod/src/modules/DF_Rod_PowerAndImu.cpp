@@ -10,6 +10,11 @@ void rodAliveRecvTOCheck()
 	{
 		 
 		rodAliveRcv_LedBlinkFlag = 0;		 
+		if (MAIN_STS_DISCONN != mainStatus)
+		{
+			rodVrtControl_Stop();
+			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);
+		}
 		mainStatus = MAIN_STS_DISCONN;
     }
 	else

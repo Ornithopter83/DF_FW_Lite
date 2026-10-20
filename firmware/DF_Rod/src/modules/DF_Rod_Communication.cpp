@@ -469,11 +469,11 @@ void anaBtnLedMainCmd(String msg)
 
 	int posi = msg.substring(0,1).toInt();
 
-	if( BTN_LED_ALL_POSI == posi && (0==act || 1==act) )
+	if (BTN_LED_ALL_POSI == posi && (0 == act || 1 == act))
 	{
 
 	}
-	else if(BTN_LED_LAST_POSI < posi)	 
+	else if (posi < BTN_LED_LEFT_POSI || BTN_LED_LAST_POSI < posi)	 
 	{
 		return;
 	}	 
@@ -608,6 +608,7 @@ void rodVrtControl()
 			if(_cnt > vrt_cont_cnt)	 
 			{
 				vrt_cont_step = 90;
+				break;
 			}
 			else
 			{
@@ -697,6 +698,7 @@ void rodLfBtnLedControl()
 			if(_cnt > btn_led_cnt[idx])	 
 			{
 				btn_led_step[idx] = 90;
+				break;
 			}
 			else
 			{
@@ -758,6 +760,7 @@ void rodRtBtnLedControl()
 			if(_cnt > btn_led_cnt[idx])	 
 			{
 				btn_led_step[idx] = 90;
+				break;
 			}
 			else
 			{

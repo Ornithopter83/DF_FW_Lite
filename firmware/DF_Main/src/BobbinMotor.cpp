@@ -82,20 +82,17 @@ void BobbinMotor::onBldc(int _dir, int _duty255)
 {
 	int	inDuty = _duty255;
 
+	if (_duty255 <= 0 || bldcLimitVal <= 0)
+	{
+		offBldc();
+		return;
+	}
+
 	String logMsg;
 
 	 
 	 
-	if(0 == _duty255)	 
-  	{
-		digitalWrite(BBN_MOT_ON_PIN, BBN_MOT_OFF);		 
-			digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VOFF); 	   
-		
-  	}
-  	else  
-  	{
-		digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VON);		 
-  	}
+	digitalWrite(BBN_BLDC_24VON_PIN, BBN_BLDC_24VON);
 
 	 
 	digitalWrite(BBN_MOT_DIR_PIN, _dir);			 

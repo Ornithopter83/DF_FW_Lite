@@ -301,11 +301,11 @@ void Encoder::rotate()
 	unsigned int pulsesPerRevolution;
 	unsigned long previousCorrectedStepCount;
 	unsigned long currentCorrectedStepCount;
-	bool multiplyCorrection;
+	bool applyCorrection;
 
 	currentCLK = digitalRead(ENC_HALL_SEN_PIN);
-	multiplyCorrection = calibrationValid && (calibratedPulsesPerRevolution < DF_Rod_Encoder_CalibrationTargetStepCount);
-	pulsesPerRevolution = multiplyCorrection ? calibratedPulsesPerRevolution : MAX_COUNT_VX;
+	applyCorrection = calibrationValid && (calibratedPulsesPerRevolution > 0);
+	pulsesPerRevolution = applyCorrection ? calibratedPulsesPerRevolution : MAX_COUNT_VX;
 
 	 
 	if (lastCLK != currentCLK)
@@ -328,23 +328,20 @@ void Encoder::rotate()
 		{
 			previousCount = (unsigned int)count;
 			count++;
-			if (count > (int)pulsesPerRevolution)
+			if (applyCorrection)
+			{
+				previousCorrectedStepCount = ((unsigned long)previousCount * DF_Rod_Encoder_CalibrationTargetStepCount) / pulsesPerRevolution;
+				currentCorrectedStepCount = ((unsigned long)count * DF_Rod_Encoder_CalibrationTargetStepCount) / pulsesPerRevolution;
+				if (currentCorrectedStepCount > previousCorrectedStepCount)
+				{
+					pendingCorrectedOutputCount += currentCorrectedStepCount - previousCorrectedStepCount;
+				}
+			}
+			if (count >= (int)pulsesPerRevolution)
 			{
 				count = 0;
 			}
-			if (multiplyCorrection)
-			{
-				if ((unsigned int)count > previousCount)
-				{
-					previousCorrectedStepCount = ((unsigned long)previousCount * DF_Rod_Encoder_CalibrationTargetStepCount) / calibratedPulsesPerRevolution;
-					currentCorrectedStepCount = ((unsigned long)count * DF_Rod_Encoder_CalibrationTargetStepCount) / calibratedPulsesPerRevolution;
-					if (currentCorrectedStepCount > previousCorrectedStepCount)
-					{
-						pendingCorrectedOutputCount += currentCorrectedStepCount - previousCorrectedStepCount;
-					}
-				}
-			}
-			else
+			if (!applyCorrection)
 			{
 				sendCount();
 			}
@@ -352,7 +349,7 @@ void Encoder::rotate()
 	}
 	lastCLK = currentCLK;
 
-	if (!calibrationActive && multiplyCorrection)
+	if (!calibrationActive && applyCorrection)
 	{
 		sendPendingCorrectedStep();
 	}
@@ -400,7 +397,7 @@ String Encoder::sendCount()
 	long correctedStepCount;
 	unsigned int pulsesPerRevolution;
 
-	pulsesPerRevolution = (calibrationValid && (calibratedPulsesPerRevolution < DF_Rod_Encoder_CalibrationTargetStepCount))
+	pulsesPerRevolution = (calibrationValid && calibratedPulsesPerRevolution > 0)
 		? calibratedPulsesPerRevolution : MAX_COUNT_VX;
 	if (0 == pulsesPerRevolution) pulsesPerRevolution = MAX_COUNT_VX;
 	correctedStepCount = ((long)count * DF_Rod_Encoder_CalibrationTargetStepCount) / (long)pulsesPerRevolution;

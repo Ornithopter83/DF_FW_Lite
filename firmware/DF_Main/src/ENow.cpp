@@ -167,7 +167,12 @@ void ENow::write(String pid, String str)
 {
 	char msg[128];
 	String cmd = pid + str;			 
-	strcpy(msg, cmd.c_str());
+	if (static_cast<unsigned int>(cmd.length()) >= sizeof(msg))
+	{
+		LogPrintln(" LG] ESP-NOW payload too long");
+		return;
+	}
+	cmd.toCharArray(msg, sizeof(msg));
 	int len = cmd.length();
 
 	 
@@ -200,7 +205,12 @@ void ENow::writeBC(String pid, String str)
 
   char msg[128];
   str = pid + str;			   
-  strcpy(msg, str.c_str());
+  if (static_cast<unsigned int>(str.length()) >= sizeof(msg))
+  {
+  	LogPrintln(" LG] ESP-NOW payload too long");
+  	return;
+  }
+  str.toCharArray(msg, sizeof(msg));
   int len = str.length();
 
 	esp_err_t errRet = esp_now_send(broad_cast_addr, (uint8_t *) &msg[0], len);
