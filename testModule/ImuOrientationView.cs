@@ -217,14 +217,30 @@ internal sealed class ImuOrientationView : Control
         RectangleF sourceRectangle;
         if (facing >= 0)
         {
-            const float bodyFraction = 0.62f;
-            float photoMaxX = minX + (maxX - minX) * bodyFraction;
+            // Crop the original top photo to the center gold control panel.
+            // The reel casing and right crank are already part of the 3D model.
+            const float sourceMinXRatio = 0.18f;
+            const float sourceMaxXRatio = 0.47f;
+            const float sourceMinYRatio = 0.04f;
+            const float sourceMaxYRatio = 0.96f;
+
+            // Project only onto the top panel, not onto the modeled crank.
+            float panelMinX = -0.06f * RightScale;
+            float panelMaxX = 0.44f * RightScale;
+            float panelMinZ = -0.72f * FrontScale;
+            float panelMaxZ = 0.72f * FrontScale;
             corners = new[]
             {
-                new Point3(minX, surfaceY, minZ), new Point3(photoMaxX, surfaceY, minZ),
-                new Point3(photoMaxX, surfaceY, maxZ), new Point3(minX, surfaceY, maxZ)
+                new Point3(panelMinX, surfaceY, panelMinZ),
+                new Point3(panelMaxX, surfaceY, panelMinZ),
+                new Point3(panelMaxX, surfaceY, panelMaxZ),
+                new Point3(panelMinX, surfaceY, panelMaxZ)
             };
-            sourceRectangle = new RectangleF(0, 0, image.Width * bodyFraction, image.Height);
+            sourceRectangle = new RectangleF(
+                image.Width * sourceMinXRatio,
+                image.Height * sourceMinYRatio,
+                image.Width * (sourceMaxXRatio - sourceMinXRatio),
+                image.Height * (sourceMaxYRatio - sourceMinYRatio));
         }
         else
         {
