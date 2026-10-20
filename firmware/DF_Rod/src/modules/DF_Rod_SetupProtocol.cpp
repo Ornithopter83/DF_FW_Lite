@@ -41,7 +41,7 @@ void uartPcHandler_NormalMode()
 
   	else if (msg.startsWith(STX_IMU_INTVAL_CHK))
 	{
-	  imuIntervalCheckCnt = 1;
+	  imuIntervalCheckCount = 1;
     }
 	else if (msg.startsWith(STX_VERSION_READ)) 
 	{
@@ -167,7 +167,7 @@ void uartPcHandler_Setup()
 
   	else if (msg.startsWith(STX_IMU_INTVAL_CHK))
 	{
-	  imuIntervalCheckCnt = 1;
+	  imuIntervalCheckCount = 1;
     }
 
 	else
@@ -186,24 +186,24 @@ void setRecvImuData()
 
 	fRecvImuData = 1;		 
 
-  	if(imuIntervalCheckCnt)
+  	if(imuIntervalCheckCount)
   	{
-  		imuIntervalCheckCnt++;
+  		imuIntervalCheckCount++;
 		if(0) {}
-  		else if(2 == imuIntervalCheckCnt) { measureCnt = curr_ms_tick;	} 
-  		else if(3 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
-  		else if(4 == imuIntervalCheckCnt) { imuIntervalTime += (int)(curr_ms_tick - measureCnt); measureCnt = curr_ms_tick;	} 
+  		else if(2 == imuIntervalCheckCount) { measurementCount = curr_ms_tick;	} 
+  		else if(3 == imuIntervalCheckCount) { imuIntervalTime += (int)(curr_ms_tick - measurementCount); measurementCount = curr_ms_tick;	} 
+  		else if(4 == imuIntervalCheckCount) { imuIntervalTime += (int)(curr_ms_tick - measurementCount); measurementCount = curr_ms_tick;	} 
 		else						 
 		{
-			imuIntervalTime += (int)(curr_ms_tick - measureCnt);		 
+			imuIntervalTime += (int)(curr_ms_tick - measurementCount);		 
 			imuIntervalTime = imuIntervalTime/3;
 			String strImuIntv = zeroFill4Char((unsigned int)imuIntervalTime);
 
 			RespPrintln(STX_IMU_INTVAL_CHK + strImuIntv +"%");	 
 
-			imuIntervalCheckCnt = 0;
+			imuIntervalCheckCount = 0;
 			imuIntervalTime = 0;
-			measureCnt = 0;
+			measurementCount = 0;
 		}
   	}
 }
@@ -268,10 +268,10 @@ int isSlaveSetupMode()
 void Entry_SetupMode()
 {
 	rodMode = SETUP_MODE;
-	led1Grn_OutSts = LOW;
-	digitalWrite(LED1_GRN_PIN, led1Grn_OutSts);
-	led2Red_OutSts = HIGH;
-	digitalWrite(LED2_RED_PIN, led2Red_OutSts);
+	led1GreenOutputStatus = LOW;
+	digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus);
+	led2RedOutputStatus = HIGH;
+	digitalWrite(LED2_RED_PIN, led2RedOutputStatus);
 }
 void Exit_SetupMode()
 {

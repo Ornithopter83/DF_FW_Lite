@@ -46,7 +46,7 @@ devReadyCheck();
 
 }
 
-void anaRestDistance(String msg)
+void analyzeRestDistance(String msg)
 {
 
 	restPowerDist = msg.substring(5,(5+3)).toInt();
@@ -57,7 +57,7 @@ void anaRestDistance(String msg)
 
 }
 
-void ana_MainMotControl( String msg )
+void analyzeMainMotorControl( String msg )
 {
 	int recvTorq;
 	unsigned int onTime = 0;
@@ -96,20 +96,20 @@ void ana_MainMotControl( String msg )
 
 static String reqBobbinMsg;
 
-void ana_BobbinControl_Check(String msg)
+void analyzeBobbinControlCheck(String msg)
 {
 	reqBobbinMsg = msg;
 
 		if (!devReadychkFlag)
 	{
-		ana_BobbinControl(msg);
+		analyzeBobbinControl(msg);
 	}
 
 }
 
 static String reqLmMotMsg;
 
-void ana_BobbinControl(String msg)
+void analyzeBobbinControl(String msg)
 {
 
 	String respMsg = "";

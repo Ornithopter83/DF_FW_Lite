@@ -94,7 +94,7 @@ void devChkMsgSend(String msg)
 {
 
 	 
-	msg = STX_DEV_CONT_REQ + msg;	 
+	msg = STX_DEVICE_CONTROL_REQUEST + msg;	 
 	 
 	msg += "%";
 	Resp2ApPrintln(msg);
@@ -370,7 +370,7 @@ void devchk_bbnAll_Control()
 			devReadychkFlag = 0;	 
 			devCheckFlagStep_AllClear();
 			
-			msg = STX_DEV_CONT_REQ + msgErr + "%";
+			msg = STX_DEVICE_CONTROL_REQUEST + msgErr + "%";
 			Resp2ApPrintln(msg);
 
 			break;
@@ -437,7 +437,7 @@ void devReadyCheck()
 void send_Error_Clr()
 {
 	String respMsg;
-	respMsg = STX_DEV_CONT_REQ + "0000";	 
+	respMsg = STX_DEVICE_CONTROL_REQUEST + "0000";	 
 	respMsg += "%";
 	Resp2ApPrintln(respMsg);
 }

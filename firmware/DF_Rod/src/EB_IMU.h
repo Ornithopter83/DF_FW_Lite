@@ -76,7 +76,7 @@ class EB_IMU
     int ebimu_parser(float *item, int number_of_item);
     String reply();
 	int respCheck();
-	short saveIntval(String intvalStr);
+	short saveInterval(String intvalStr);
 };
 
 

@@ -24,7 +24,7 @@ class SwitchButton
 
  
  
-extern unsigned int btn_L_DownCnt;
+extern unsigned int leftButtonDownCount;
 
 extern unsigned short btnLFLedRed_OutSts;
 extern unsigned short btnRTLedBlue_OutSts;

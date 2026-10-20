@@ -70,8 +70,8 @@ unsigned int sys_1sec_cnt = 0;
 #define RUN_TIME_100MS_TICK		100		 
 #define RUN_TIME_1SEC_TICK		1000		 
 
-unsigned short led1Grn_OutSts = 0;
-unsigned short led2Red_OutSts = 0;
+unsigned short led1GreenOutputStatus = 0;
+unsigned short led2RedOutputStatus = 0;
 
 unsigned short btnLFLedRed_OutSts = BTN_LED_OFF;
 unsigned short btnRTLedBlue_OutSts = BTN_LED_OFF;
@@ -126,8 +126,8 @@ String ROD_ENC_CNT = "$0700000+";
 
 unsigned short recvInfoSeqStep = 0;	 
 
-unsigned short imuIntervalCheckCnt = 0;
-unsigned long measureCnt = 0;
+unsigned short imuIntervalCheckCount = 0;
+unsigned long measurementCount = 0;
 
 	extern const int rodBoardType = NEW_BOARD_2;		 
 
@@ -136,9 +136,9 @@ extern const int breakType = BREAK_NO;
 extern const int battType = BATT_800_V2;
 extern const int reelEncType = REEL_ENC_V3;
 
-unsigned int rodRegistMode = 0;		 
+unsigned int rodRegistrationMode = 0;		 
 
-unsigned int vrt_cont_flag = 0;
+unsigned int verticalMotorControlFlag = 0;
 unsigned int vrt_ap_req_cnt = 6;
 unsigned int vrt_ap_req_on_time = 100;
 unsigned int vrt_ap_req_off_time = 50;
@@ -159,12 +159,12 @@ void imuDataCallback(String pid, String str);
 void sendInfo_boardType();
 void imuConnResp();
 void nowRecvHandler();
-void anaReelDeviceControl(int act, String msg);
-void anaVrtMotMainCmd(String msg);
-void anaBtnLedMainCmd(String msg);
-void rodVrtControl_Start(int cnt, unsigned int ontime, unsigned int offtime);
-void rodVrtControl_Stop();
-void rodVrtControl();
+void analyzeReelDeviceControl(int act, String msg);
+void analyzeMainVerticalMotorCommand(String msg);
+void analyzeMainButtonLedCommand(String msg);
+void startRodVerticalMotorControl(int cnt, unsigned int ontime, unsigned int offtime);
+void stopRodVerticalMotorControl();
+void rodVerticalMotorControl();
 void rodBtnLedControl_Start(int idx, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 void rodBtnLedControl_Stop(int idx);
 void rodLfBtnLedControl();
@@ -193,11 +193,11 @@ void imuConnectCheck();
 void t1ms_Process();
 void t10ms_Process();
 void sendRodInfo_forStep();
-void rodRegistToStop();
-void rodRegistToStart();
+void stopRodRegistration();
+void startRodRegistration();
 void rodRegi3secToStart();
-void rodRegistToControl();
-void rodRegistCancel();
+void processRodRegistration();
+void cancelRodRegistration();
 void t100ms_Process();
 void t500ms_Process();
 void t1sec_Process();

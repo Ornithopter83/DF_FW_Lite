@@ -246,7 +246,7 @@ extern String STX_BUTT_SWC;
 
 extern String STX_HAND_ENC;
 
-extern String STX_DEV_CONT_REQ;
+extern String STX_DEVICE_CONTROL_REQUEST;
 extern String STX_ENCODER_CALIBRATION;
 
 extern String STX_GET_ADDR;
@@ -267,9 +267,9 @@ extern String STX_PWRON_STS;
 
 #define REEL_MAIN_BOARD 2
 
-extern String STX_VRT_MOT_CONT;
+extern String STX_VERTICAL_MOTOR_CONTROL;
 
-extern String STX_BTN_LED_CONT;
+extern String STX_BUTTON_LED_CONTROL;
 
 #define BTN_LED_ALL_POSI	0
 
@@ -383,7 +383,7 @@ extern String STS_PWRON_STS;
 
 #define STX_CMD_BLDC_MOTOR			4
 
-#define STX_CMD_LED_CONT			6
+#define STX_CMD_LED_CONTROL			6
 
 #define STX_CMD_IMU_SET				8
 
@@ -399,7 +399,7 @@ extern String STS_PWRON_STS;
 
 #define STX_STS_HAND_ENC			14
 
-#define STX_CMD_DEV_CONT_REQ		15
+#define STX_CMD_DEVICE_CONTROL_REQUEST		15
 
 #define STX_CMD_GET_ADDR			16
 
@@ -417,9 +417,9 @@ extern String STS_PWRON_STS;
 
 #define STX_STS_PWRON_STS			22
 
-#define STX_CMD_VRT_MOT_CONT		23
+#define STX_CMD_VERTICAL_MOTOR_CONTROL		23
 
-#define STX_CMD_BTN_LED_CONT		24
+#define STX_CMD_BUTTON_LED_CONTROL		24
 
 #define STX_CMD_ROD_REGIST			30
 
@@ -1236,7 +1236,7 @@ extern uint8_t rcv_dest_addr[];
 
 extern uint8_t broad_cast_addr[];
 
-extern volatile int rodRegistMode;
+extern volatile int rodRegistrationMode;
 
 extern short endTmReqDuty;
 

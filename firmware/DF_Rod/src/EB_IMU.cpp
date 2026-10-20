@@ -9,7 +9,7 @@
 extern String rodVer;
 extern unsigned short flagIMUSTOP;
 
-extern unsigned short imuIntervalCheckCnt;
+extern unsigned short imuIntervalCheckCount;
 extern unsigned short apType;		 
 
 extern void setRecvImuData();
@@ -235,7 +235,7 @@ void EB_IMU::setConfig(String msg)
 		
 		if (AP_IS_TM == apType)
 		{
-		  imuIntervalCheckCnt = 1;
+		  imuIntervalCheckCount = 1;
 		}
 		break;
 
@@ -584,16 +584,16 @@ String EB_IMU::getIntervalFileStr()
 short EB_IMU::saveInterval(int intval)		 
 {
 	String intvalStr = String(intval);
-	return saveIntval(intvalStr);
+	return saveInterval(intvalStr);
 }
 
 short EB_IMU::saveInterval(String intvalStr)		 
 {
-	return saveIntval(intvalStr);
+	return saveInterval(intvalStr);
 }
 
  
-short EB_IMU::saveIntval(String intvalStr)		 
+short EB_IMU::saveInterval(String intvalStr)		 
 {
 	File file = SPIFFS.open(IMU_FILE, "w");
 	if (!file || file.isDirectory())

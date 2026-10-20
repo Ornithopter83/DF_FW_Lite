@@ -23,17 +23,17 @@ void DF_Rod_Application_Setup()
 	while (cnt < 6)		 
 	{
 	  cnt++;
-	  led1Grn_OutSts = !led1Grn_OutSts;
-	  digitalWrite(LED1_GRN_PIN, led1Grn_OutSts);
-	  led2Red_OutSts = !led2Red_OutSts;
-	  digitalWrite(LED2_RED_PIN, led2Red_OutSts);
+	  led1GreenOutputStatus = !led1GreenOutputStatus;
+	  digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus);
+	  led2RedOutputStatus = !led2RedOutputStatus;
+	  digitalWrite(LED2_RED_PIN, led2RedOutputStatus);
 	  delay(50);	 
 	}
 
-	led1Grn_OutSts = LOW;
-	digitalWrite(LED1_GRN_PIN, led1Grn_OutSts);
-	led2Red_OutSts = LOW;
-	digitalWrite(LED2_RED_PIN, led2Red_OutSts);
+	led1GreenOutputStatus = LOW;
+	digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus);
+	led2RedOutputStatus = LOW;
+	digitalWrite(LED2_RED_PIN, led2RedOutputStatus);
 
 	btnLFLedRed_OutSts = BTN_LED_OFF;		 
 	digitalWrite(BTN_LED_LF_RED_PIN, btnLFLedRed_OutSts);
@@ -72,8 +72,8 @@ void DF_Rod_Application_Setup()
 		imu.setStartStop(IMU_CONF_STOP);			 
 		flagIMUSTOP = 1;
 
-		led2Red_OutSts = HIGH;
-		digitalWrite(LED2_RED_PIN, led2Red_OutSts);		 
+		led2RedOutputStatus = HIGH;
+		digitalWrite(LED2_RED_PIN, led2RedOutputStatus);		 
 	}
 
 	else
@@ -95,8 +95,8 @@ void DF_Rod_Application_Setup()
 
 		imu.setStartStop(IMU_CONF_START);			 
 
-		led1Grn_OutSts = HIGH;
-		digitalWrite(LED1_GRN_PIN, led1Grn_OutSts);
+		led1GreenOutputStatus = HIGH;
+		digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus);
 
 	}
 

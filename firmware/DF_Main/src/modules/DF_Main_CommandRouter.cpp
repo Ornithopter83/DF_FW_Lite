@@ -215,7 +215,7 @@ void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, 
 
 }
 
-void anaDeviceInfoReq(String msg)
+void analyzeDeviceInfoRequest(String msg)
 {
 
 	String respMsg = "";
@@ -412,64 +412,64 @@ void send2RodAlive_CntCheck()
 	}
 }
 
-static unsigned int rodRegistToStep = 0;	 
+static unsigned int rodRegistrationStep = 0;	 
 
-void rodRegistToStop()
+void stopRodRegistration()
 {
-	rodRegistToStep = 0;	 
+	rodRegistrationStep = 0;	 
 }
 
-void rodRegistToStart()
+void startRodRegistration()
 {
-	rodRegistToStep = 10;	 
+	rodRegistrationStep = 10;	 
 }
 
 void rodRegi3secToStart()
 {
-	rodRegistToStep = 30;	 
+	rodRegistrationStep = 30;	 
 }
 
-void rodRegistToControl()
+void processRodRegistration()
 {
 	static unsigned int oldStep = 0;
 	static unsigned long _to = 0;
 
-	switch(rodRegistToStep)
+	switch(rodRegistrationStep)
 	{
 		case 0:
 			break;
 
 		case 10:	 
 			setTO(_to);
-			rodRegistToStep = 11;
+			rodRegistrationStep = 11;
 			break;		
 		case 11:
 			if(checkTO(_to, ROD_REGI_CANCEL_TO))
 			{
 
-				rodRegistCancel();		 
-				rodRegistToStep = 0;		 
+				cancelRodRegistration();		 
+				rodRegistrationStep = 0;		 
 				StsSendPrintln(STX_ROD_REGIST + ROD_REGI_FW_CANCEL);  
 			}
 			break;
 
 		case 30:	 
-			rodRegistToStep = 31;
+			rodRegistrationStep = 31;
 			setTO(_to);
 			break;		
 		case 31:
 			if(checkTO(_to, ROD_REGI_END_TO_1ST))	 
 			{
 				StsSendPrintln(STX_ROD_REGIST+ ROD_REGI_FINISH);  
-				rodRegistToStep = 32;		 
+				rodRegistrationStep = 32;		 
 				setTO(_to);
 			}
 			break;
 		case 32:
 			if(checkTO(_to, ROD_REGI_END_TO_2ND))	 
 			{
-				rodRegistToStep = 0;		 
-				rodRegistCancel();
+				rodRegistrationStep = 0;		 
+				cancelRodRegistration();
 
 				esp_soft_reset();
 
@@ -481,28 +481,28 @@ void rodRegistToControl()
 	}
 }
 
-void rodRegistCancel()
+void cancelRodRegistration()
 {
-	rodRegistMode = 0;
+	rodRegistrationMode = 0;
 }
 
-void anaRodRegist(String msg)
+void analyzeRodRegistration(String msg)
 {
 	String respMsg;
 	int Act = msg.substring(3).toInt();
 	switch(Act)
 	{
 		case ROD_REGI_AP_ENTRY:		 
-			rodRegistMode = 1;
+			rodRegistrationMode = 1;
 			LogPrintln(" LG] RodRg ApMsg:" + String(Act));
 
-			rodRegistToStart();
+			startRodRegistration();
 			break;
 		case ROD_REGI_AP_CANCEL:		 
-			if(1 == rodRegistMode)		 
+			if(1 == rodRegistrationMode)		 
 			{
-				rodRegistToStop();		 
-				rodRegistCancel();		 
+				stopRodRegistration();		 
+				cancelRodRegistration();		 
 				LogPrintln(" LG] RodRg ApMsg:" + String(Act));
 
 			}
@@ -513,15 +513,15 @@ void anaRodRegist(String msg)
 
 }
 
-void rodRegistExec(String msg)
+void executeRodRegistration(String msg)
 {
-	  rodRegistMode = 2;	   
+	  rodRegistrationMode = 2;	   
 
-	  rodRegistToStop();
+	  stopRodRegistration();
 
 	  StsSendPrintln(STX_ROD_REGIST+ ROD_REGI_WRITE_START);    
 
-	  rodRegistMode = 3;	   
+	  rodRegistrationMode = 3;	   
 
 	  int peerRet;
 	  peerRet = esp_now_del_peer(slave_board_addr);
@@ -536,7 +536,7 @@ void rodRegistExec(String msg)
 		  LogPrintln(" LG] ERROR Add PEER: newROD" + String(peerRet));
 	  }
 
-	  rodRegistMode = 4;
+	  rodRegistrationMode = 4;
 
 	  peerRet = eNow.addPeerAddress(broad_cast_addr);  
 	  if (ESP_OK != peerRet)
@@ -557,7 +557,7 @@ void rodRegistExec(String msg)
 	  esp_now_get_peer_num(&rodPeer);
 	  LogPrintln(" LG] nowPR PeerNum:" + String(rodPeer.total_num));
 
-	  rodRegistMode = 5;
+	  rodRegistrationMode = 5;
 
 	  {
 
@@ -571,7 +571,7 @@ void rodRegistExec(String msg)
 	  String wrtAddr = eNow.getTargetAddress();
 	  LogPrintln(" LG] rodRg Addr:" + wrtAddr);
 
-	  rodRegistMode = 6;	   
+	  rodRegistrationMode = 6;	   
 	  rodRegi3secToStart(); 	   
 
 }
@@ -598,19 +598,19 @@ void tmInput_BbnMotorMonitorExec(short _exec)
 	}
 }
 
-void anaTmInputTestReq(String msg)
+void analyzeTestModuleInputTestRequest(String msg)
 {
 
 	diagInputTest(msg);
 }
 
-void anaTmOutputTestReq(String msg)
+void analyzeTestModuleOutputTestRequest(String msg)
 {
 
 	diagOutputTest(msg);
 }
 
-void anaApInfo(String msg)
+void analyzeApInfo(String msg)
 {
 
 	short kind = msg.substring(3,(3+2)).toInt();
@@ -649,7 +649,7 @@ void anaApInfo(String msg)
 
 }
 
-void anaMainAlive(String msg)
+void analyzeMainAlive(String msg)
 {
 
 	String respMsg;

@@ -47,7 +47,7 @@ void DF_Main_Communication_ProcessSendResult()
 	}
 	portEXIT_CRITICAL(&DF_Main_Communication_Mux);
 
-	if (pending && ((ESP_NOW_SEND_SUCCESS != status) || rodRegistMode))
+	if (pending && ((ESP_NOW_SEND_SUCCESS != status) || rodRegistrationMode))
 	{
 		LogPrintln(String(" LG] nowSent ") + ((ESP_NOW_SEND_SUCCESS == status) ? "Ok" : "Fail"));
 	}
@@ -65,7 +65,7 @@ void recv_cb_esp_now_msg(const uint8_t *mac_info, const uint8_t *data, int data_
 		return;
 	}
 
-	if (!rodRegistMode)
+	if (!rodRegistrationMode)
 	{
 		for (i = 0; i < DF_Main_Communication_AddressSize; i++)
 		{

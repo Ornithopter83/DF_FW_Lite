@@ -10,7 +10,7 @@ void run_timer();
 void ioPinSetting();
 void checkFileSystem();
 
-extern unsigned int btn_L_DownCnt;
+extern unsigned int leftButtonDownCount;
 extern unsigned int AddrWrite_LedBlink;
 extern unsigned int system_delay_cnt;
 extern int resp_imu;

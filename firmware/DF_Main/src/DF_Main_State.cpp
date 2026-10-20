@@ -183,7 +183,7 @@ String STX_BAT_LVL        = "$12";
 String STX_BUTT_SWC       = "$13";		 
 String STX_HAND_ENC       = "$14";		 
 
-String STX_DEV_CONT_REQ   = "$15";
+String STX_DEVICE_CONTROL_REQUEST   = "$15";
 String STX_ENCODER_CALIBRATION = "$37";
 String STX_GET_ADDR       = "$16";
 String STX_SET_ADDR       = "$17";
@@ -196,8 +196,8 @@ String STX_PWRON_STS        = "$22";
 	#define CONT_MAIN_BOARD	1
 	#define REEL_MAIN_BOARD 2
 
-String STX_VRT_MOT_CONT      = "$23";			 
-String STX_BTN_LED_CONT      = "$24";			 
+String STX_VERTICAL_MOTOR_CONTROL      = "$23";			 
+String STX_BUTTON_LED_CONTROL      = "$24";			 
 	#define BTN_LED_ALL_POSI	0
 	#define BTN_LED_LEFT_POSI	1
 	#define BTN_LED_RIGHT_POSI	2
@@ -276,7 +276,7 @@ String STS_PWRON_STS         	= "$22";
 #define STX_CMD_TORQUE_MOTOR		2
 #define STX_CMD_SERVO_MOTOR			3
 #define STX_CMD_BLDC_MOTOR			4
-#define STX_CMD_LED_CONT			6		 
+#define STX_CMD_LED_CONTROL			6		 
 #define STX_CMD_IMU_SET				8
 #define STX_STS_IMU_DATA_STS		9	 
 
@@ -286,7 +286,7 @@ String STS_PWRON_STS         	= "$22";
 #define STX_STS_BUTT_SWC			13	 
 #define STX_STS_HAND_ENC			14	 
 
-#define STX_CMD_DEV_CONT_REQ		15
+#define STX_CMD_DEVICE_CONTROL_REQUEST		15
 #define STX_CMD_GET_ADDR			16
 #define STX_CMD_SET_ADDR			17
 #define STX_CMD_APSTS_RESP			18		 
@@ -297,8 +297,8 @@ String STS_PWRON_STS         	= "$22";
 #define STX_STS_IMU_CONN			21	 
 #define STX_STS_PWRON_STS			22		 
 
-#define STX_CMD_VRT_MOT_CONT		23
-#define STX_CMD_BTN_LED_CONT		24
+#define STX_CMD_VERTICAL_MOTOR_CONTROL		23
+#define STX_CMD_BUTTON_LED_CONTROL		24
 
 #define STX_CMD_ROD_REGIST			30		 
 #define STX_STS_ROD_REGIST			30		 
@@ -1092,7 +1092,7 @@ uint8_t rcv_dest_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 uint8_t broad_cast_addr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };	 
 
-volatile int rodRegistMode = 0;		 
+volatile int rodRegistrationMode = 0;		 
 
 short endTmReqDuty = DEFAULT_TORQ;	 
 short leftEndTmReqDuty = DEFAULT_TORQ;	 
@@ -1383,23 +1383,23 @@ void analyzeLedControlCommand(String msg);
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 
-void anaDeviceInfoReq(String msg);
+void analyzeDeviceInfoRequest(String msg);
 
 void apAlive_Check();
 void send2RodAlive_CntCheck();
-void rodRegistToStop();
-void rodRegistToStart();
+void stopRodRegistration();
+void startRodRegistration();
 void rodRegi3secToStart();
-void rodRegistToControl();
-void rodRegistCancel();
-void anaRodRegist(String msg);
-void rodRegistExec(String msg);
+void processRodRegistration();
+void cancelRodRegistration();
+void analyzeRodRegistration(String msg);
+void executeRodRegistration(String msg);
 void tmInput_BoardElecMonitorExec(short _exec);
 void tmInput_BbnMotorMonitorExec(short _exec);
-void anaTmInputTestReq(String msg);
-void anaTmOutputTestReq(String msg);
-void anaApInfo(String msg);
-void anaMainAlive(String msg);
+void analyzeTestModuleInputTestRequest(String msg);
+void analyzeTestModuleOutputTestRequest(String msg);
+void analyzeApInfo(String msg);
+void analyzeMainAlive(String msg);
 void devChkReady_Control();
 void resp_MainBoard_Ver();
 void devchk_OkEnd();
@@ -1412,11 +1412,11 @@ void devchk_bbnAll_Control();
 void devReadyCheck();
 void send_Error_Clr();
 void analyzeDeviceControlRequest(String msg);
-void anaRestDistance(String msg);
-void ana_AngleControl( String msg );
-void ana_MainMotControl( String msg );
-void ana_BobbinControl_Check(String msg);
-void ana_BobbinControl(String msg);
+void analyzeRestDistance(String msg);
+void analyzeAngleControl( String msg );
+void analyzeMainMotorControl( String msg );
+void analyzeBobbinControlCheck(String msg);
+void analyzeBobbinControl(String msg);
 void checkRodTimer();
 void set_rod_conn_status(unsigned int sts);
 
@@ -1475,9 +1475,9 @@ void imuInterval_Measure();
 void nowRecvHandler();
 void uartRecvParsing();
 void uartRecvHandler();
-String anaVrtMotCmd(String msg);
+String analyzeVerticalMotorCommand(String msg);
 
-String anaBtnLedCmd(String msg);
+String analyzeButtonLedCommand(String msg);
 
 void torqMotor_DefaultOut();
 

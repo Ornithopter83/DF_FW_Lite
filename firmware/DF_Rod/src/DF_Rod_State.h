@@ -106,9 +106,9 @@ extern unsigned int sys_1sec_cnt;
 
 #define RUN_TIME_1SEC_TICK		1000
 
-extern unsigned short led1Grn_OutSts;
+extern unsigned short led1GreenOutputStatus;
 
-extern unsigned short led2Red_OutSts;
+extern unsigned short led2RedOutputStatus;
 
 extern unsigned short btnLFLedRed_OutSts;
 
@@ -184,9 +184,9 @@ extern String ROD_ENC_CNT;
 
 extern unsigned short recvInfoSeqStep;
 
-extern unsigned short imuIntervalCheckCnt;
+extern unsigned short imuIntervalCheckCount;
 
-extern unsigned long measureCnt;
+extern unsigned long measurementCount;
 
 extern const int rodBoardType;
 
@@ -198,9 +198,9 @@ extern const int battType;
 
 extern const int reelEncType;
 
-extern unsigned int rodRegistMode;
+extern unsigned int rodRegistrationMode;
 
-extern unsigned int vrt_cont_flag;
+extern unsigned int verticalMotorControlFlag;
 
 extern unsigned int vrt_ap_req_cnt;
 

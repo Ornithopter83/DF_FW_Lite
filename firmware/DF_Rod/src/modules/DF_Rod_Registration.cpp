@@ -12,7 +12,7 @@ void t1ms_Process()
 
 void t10ms_Process()
 {
-	if(vrt_cont_flag) { rodVrtControl(); }			 
+	if(verticalMotorControlFlag) { rodVerticalMotorControl(); }			 
 	if(btn_led_flag[0])	{ rodLfBtnLedControl();	}	 
 	if(btn_led_flag[1])	{ rodRtBtnLedControl();	}	 
 	
@@ -69,60 +69,60 @@ void sendRodInfo_forStep()
  
  
 
-static unsigned int rodRegistToStep = 0;	 
+static unsigned int rodRegistrationStep = 0;	 
 
  
-void rodRegistToStop()
+void stopRodRegistration()
 {
-	rodRegistToStep = 0;	 
+	rodRegistrationStep = 0;	 
 }
 
  
-void rodRegistToStart()
+void startRodRegistration()
 {
-	rodRegistToStep = 10;	 
+	rodRegistrationStep = 10;	 
 }
 
 void rodRegi3secToStart()
 {
-	rodRegistToStep = 30;	 
+	rodRegistrationStep = 30;	 
 }
 
 
 #define ROD_REGI_CANCEL_TO	(15*1000)	 
 #define ROD_REGI_END_TO		(3500)	 
-void rodRegistToControl()
+void processRodRegistration()
 {
 	static unsigned int oldStep = 0;
 	static unsigned long _to = 0;
 
-	switch(rodRegistToStep)
+	switch(rodRegistrationStep)
 	{
 		case 0:
 			break;
 			
 		case 10:	 
 			setTO(_to);
-			rodRegistToStep = 11;
+			rodRegistrationStep = 11;
 			break;		
 		case 11:
 			if(checkTO(_to, ROD_REGI_CANCEL_TO))
 			{
 				 
-				rodRegistCancel();		 
-				rodRegistToStep = 0;		 
+				cancelRodRegistration();		 
+				rodRegistrationStep = 0;		 
 			}
 			break;
 
 		case 30:	 
-			rodRegistToStep = 31;
+			rodRegistrationStep = 31;
 			setTO(_to);
 			break;
 		case 31:
 			if(checkTO(_to, ROD_REGI_END_TO))
 			{
-				rodRegistCancel();		 
-				rodRegistToStep = 0;		 
+				cancelRodRegistration();		 
+				rodRegistrationStep = 0;		 
 				 
 				ESP_Soft_Reset();
 			}
@@ -134,16 +134,16 @@ void rodRegistToControl()
 }
 
  
-void rodRegistCancel()
+void cancelRodRegistration()
 {
-	rodRegistMode = 0;
+	rodRegistrationMode = 0;
 }
 
 
  
  
  
-unsigned int btn_L_DownCnt = 0;
+unsigned int leftButtonDownCount = 0;
 unsigned int AddrWrite_LedBlink = 0;
 
 

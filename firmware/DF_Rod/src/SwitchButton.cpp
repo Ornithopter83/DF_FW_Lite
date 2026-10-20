@@ -85,7 +85,7 @@ void SwitchButton::toggle()
     {
        
       str = "11";	 
-      btn_L_DownCnt = 0;	 
+      leftButtonDownCount = 0;	 
 	  btnLFLedRed_OutSts = BTN_LED_OFF;
 	  digitalWrite(BTN_LED_LF_RED_PIN, btnLFLedRed_OutSts);
     }
@@ -93,7 +93,7 @@ void SwitchButton::toggle()
     {
        
       str = "10";	 
-	  btn_L_DownCnt = 1;	 
+	  leftButtonDownCount = 1;	 
 	  btnLFLedRed_OutSts = BTN_LED_ON;
 	  digitalWrite(BTN_LED_LF_RED_PIN, btnLFLedRed_OutSts);
 

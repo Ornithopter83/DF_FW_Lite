@@ -185,10 +185,10 @@ void nowRecvHandler()
 
   else if (DF_Protocol_Pid_MainToRod_MainAddress == now_rcv_id)			 
   {
-  	if(55 == rodRegistMode)	 
+  	if(55 == rodRegistrationMode)	 
   	{
 
-  		rodRegistToStop();		 
+  		stopRodRegistration();		 
 
 		String msgAddr = cmd_str_data;
 
@@ -240,7 +240,7 @@ void nowRecvHandler()
 	int act = cmd_str_data.substring(0,(0+2)).toInt();
 	if(0 == act)
 	{
-		anaReelDeviceControl(act, cmd_str_data);
+		analyzeReelDeviceControl(act, cmd_str_data);
 	}
 	else
 	{
@@ -329,7 +329,7 @@ void nowRecvHandler()
   {
 		if(isRodNewBoard())
 		{
-			anaVrtMotMainCmd(cmd_str_data);
+			analyzeMainVerticalMotorCommand(cmd_str_data);
 
 		}
 		else
@@ -342,7 +342,7 @@ void nowRecvHandler()
   {
  		if(isRodNewBoard())
 		{
-			anaBtnLedMainCmd(cmd_str_data);
+			analyzeMainButtonLedCommand(cmd_str_data);
 
 		}
 		else
@@ -377,7 +377,7 @@ void nowRecvHandler()
 
 }
 
-void anaReelDeviceControl(int act, String msg)
+void analyzeReelDeviceControl(int act, String msg)
 {
 
 	switch(act)
@@ -386,7 +386,7 @@ void anaReelDeviceControl(int act, String msg)
 
 			imu.setConfig("0");		 
 
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 
 			rodBtnLedControl_Stop(0);
@@ -401,7 +401,7 @@ void anaReelDeviceControl(int act, String msg)
 	}
 }
 
-void anaVrtMotMainCmd(String msg)
+void analyzeMainVerticalMotorCommand(String msg)
 {
 	int act = msg.substring(0,(0+1)).toInt();
 	int cnt = 1;
@@ -412,18 +412,18 @@ void anaVrtMotMainCmd(String msg)
 	{
 		case 0:
 			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 			break;
 
 		case 1:
 			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		 
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 
 			break;
 		case 4:  
 
 			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 
 			cnt = msg.substring(1,(1+2)).toInt();
 			if(!cnt) { cnt = 1;}
@@ -435,13 +435,13 @@ void anaVrtMotMainCmd(String msg)
 			if(20 > offtime || 999 < offtime) { offtime = 50; }
 			vrt_ap_req_off_time = offtime;
 
-			rodVrtControl_Start(vrt_ap_req_cnt, vrt_ap_req_on_time, vrt_ap_req_off_time);	 
+			startRodVerticalMotorControl(vrt_ap_req_cnt, vrt_ap_req_on_time, vrt_ap_req_off_time);	 
 
 			break;
 
 		case 5:  
 			digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 
 			break;
 
@@ -457,7 +457,7 @@ void anaVrtMotMainCmd(String msg)
 #define BTN_LED_RIGHT_POSI	2
 #define BTN_LED_LAST_POSI	BTN_LED_RIGHT_POSI	 
 
-void anaBtnLedMainCmd(String msg)
+void analyzeMainButtonLedCommand(String msg)
 {
 	int idx;
 
@@ -562,73 +562,73 @@ void anaBtnLedMainCmd(String msg)
 
 }
 
-static int vrt_cont_cnt = 0;
-static unsigned int vrt_cont_on_time = 100;
-static unsigned int vrt_cont_off_time = 50;
+static int verticalMotorControlCount = 0;
+static unsigned int verticalMotorControlOnTime = 100;
+static unsigned int verticalMotorControlOffTime = 50;
 
-static unsigned int vrt_cont_step = 0;
+static unsigned int verticalMotorControlStep = 0;
 
-#define VRT_MOT_CONT_START	10
-#define VRT_MOT_CONT_STOP	0
+#define VERTICAL_MOTOR_CONTROL_START	10
+#define VERTICAL_MOTOR_CONTROL_STOP	0
 
-void rodVrtControl_Start(int cnt, unsigned int ontime, unsigned int offtime)
+void startRodVerticalMotorControl(int cnt, unsigned int ontime, unsigned int offtime)
 {
-	vrt_cont_cnt = cnt;
-	vrt_cont_on_time = ontime;
-	vrt_cont_off_time = offtime;
-	vrt_cont_step = VRT_MOT_CONT_START;
+	verticalMotorControlCount = cnt;
+	verticalMotorControlOnTime = ontime;
+	verticalMotorControlOffTime = offtime;
+	verticalMotorControlStep = VERTICAL_MOTOR_CONTROL_START;
 
-	vrt_cont_flag = 1;
+	verticalMotorControlFlag = 1;
 }
 
-void rodVrtControl_Stop()
+void stopRodVerticalMotorControl()
 {
-	vrt_cont_step = VRT_MOT_CONT_STOP;
-	vrt_cont_flag = 0;
+	verticalMotorControlStep = VERTICAL_MOTOR_CONTROL_STOP;
+	verticalMotorControlFlag = 0;
 }
 
-void rodVrtControl()
+void rodVerticalMotorControl()
 {
 	static unsigned int oldStep = 0;
 	static unsigned long _to = 0;
 	static unsigned long _cnt = 0;
 
-	switch(vrt_cont_step)
+	switch(verticalMotorControlStep)
 	{
 		case 0:
 			break;
 
-		case VRT_MOT_CONT_START:	 
+		case VERTICAL_MOTOR_CONTROL_START:	 
 			_cnt = 0;
-			vrt_cont_step = 20;
+			verticalMotorControlStep = 20;
 			break;
 
 		case 20:		 
 			_cnt++;
-			if(_cnt > vrt_cont_cnt)	 
+			if(_cnt > verticalMotorControlCount)	 
 			{
-				vrt_cont_step = 90;
+				verticalMotorControlStep = 90;
 				break;
 			}
 			else
 			{
 				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_ON);		 
 				setTO(_to);
-				vrt_cont_step = 21;
+				verticalMotorControlStep = 21;
 				break;
 			}
 		case 21:		 
-			if(checkTO(_to, vrt_cont_on_time))
+			if(checkTO(_to, verticalMotorControlOnTime))
 			{
 				digitalWrite(VRT_MOT_ON_PIN, VRT_MOT_OFF);		 
 				setTO(_to);
-				vrt_cont_step = 22;
+				verticalMotorControlStep = 22;
 			}
 			break;
 		case 22:		 
-			if(checkTO(_to, vrt_cont_off_time))
+			if(checkTO(_to, verticalMotorControlOffTime))
 			{
-				vrt_cont_step = 20;		 
+				verticalMotorControlStep = 20;		 
 			}
 			break;
 
@@ -636,7 +636,7 @@ void rodVrtControl()
 			oldStep = 0;
 			_to = 0;
 			_cnt = 0;
-			rodVrtControl_Stop();
+			stopRodVerticalMotorControl();
 			break;
 
 		default:
@@ -650,15 +650,15 @@ static unsigned int btn_led_off_time[BTN_LED_MAX_SIZE] = {50,50};
 
 static unsigned int btn_led_step[BTN_LED_MAX_SIZE] = {0,0};
 
-#define BTN_LED_CONT_START	10
-#define BTN_LED_CONT_STOP	0
+#define BUTTON_LED_CONTROL_START	10
+#define BUTTON_LED_CONTROL_STOP	0
 
 void rodBtnLedControl_Start(int idx, unsigned int cnt, unsigned int ontime, unsigned int offtime)
 {
 	btn_led_cnt[idx] = cnt;
 	btn_led_on_time[idx] = ontime;
 	btn_led_off_time[idx] = offtime;
-	btn_led_step[idx] = BTN_LED_CONT_START;
+	btn_led_step[idx] = BUTTON_LED_CONTROL_START;
 
 	btn_led_flag[idx] = 1;
 
@@ -666,7 +666,7 @@ void rodBtnLedControl_Start(int idx, unsigned int cnt, unsigned int ontime, unsi
 
 void rodBtnLedControl_Stop(int idx)
 {
-	btn_led_step[idx] = BTN_LED_CONT_STOP;
+	btn_led_step[idx] = BUTTON_LED_CONTROL_STOP;
 	btn_led_flag[idx] = 0;
 
 }
@@ -688,7 +688,7 @@ void rodLfBtnLedControl()
 		case 0:
 			break;
 
-		case BTN_LED_CONT_START:	 
+		case BUTTON_LED_CONTROL_START:	 
 			_cnt = 0;
 			btn_led_step[idx] = 20;
 			break;
@@ -750,7 +750,7 @@ void rodRtBtnLedControl()
 		case 0:
 			break;
 
-		case BTN_LED_CONT_START:	 
+		case BUTTON_LED_CONTROL_START:	 
 			_cnt = 0;
 			btn_led_step[idx] = 20;
 			break;

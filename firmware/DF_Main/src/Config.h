@@ -76,7 +76,7 @@
 #define RESP_IO_MAIN_TORQ	(1)
 #define RESP_IO_BBN_BLDC	(1)
 
-#define RESP_LED_CONT_CMD	(0)  
+#define RESP_LED_CONTROL_COMMAND	(0)  
 
 #define RESP_IMU_DATA		(1)
 

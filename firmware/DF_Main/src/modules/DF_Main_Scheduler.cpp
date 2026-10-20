@@ -124,7 +124,7 @@ void t10ms_Process_Exec()
 void t100ms_Process_Exec()
 {
 
-	if(rodRegistMode)	{ rodRegistToControl();		}	 
+	if(rodRegistrationMode)	{ processRodRegistration();		}	 
 
 }
 
@@ -141,7 +141,7 @@ void t1sec_Process_Exec()
 
 	apAlive_Check();
 
-	if(!rodRegistMode)		 
+	if(!rodRegistrationMode)		 
 	{
 
 		send2RodAlive_CntCheck();		 
@@ -252,7 +252,7 @@ void logRecvHandler()
 
 		if (msg.startsWith(STX_ROD_REGIST))	 
 		{
-			anaRodRegist(msg);
+			analyzeRodRegistration(msg);
 		}
 
 		else if (msg.startsWith(STX_GET_ADDR))
@@ -421,26 +421,26 @@ void nowRecvHandler()
 		memcpy(rcv_src_addr_back, sourceAddress, 6);
 
 		LogPrintln(" LG] RodRg BC RcvRodaddr:" + now_cmd_data);
-		if(1 == rodRegistMode)		 
+		if(1 == rodRegistrationMode)		 
 		{
-			rodRegistExec(now_cmd_data);
+			executeRodRegistration(now_cmd_data);
 		}
   	}
 
-  else if (DF_Protocol_Pid_RodToMain_Button == now_rcv_id && (!rodRegistMode))	 
+  else if (DF_Protocol_Pid_RodToMain_Button == now_rcv_id && (!rodRegistrationMode))	 
   {
   		respMsg = RESP_STX_BUTTON + now_cmd_data + "%";		 
 		StsSendPrintln(respMsg);	   
 
   }
 
-  else if (DF_Protocol_Pid_RodToMain_Encoder == now_rcv_id && (!rodRegistMode))	 
+  else if (DF_Protocol_Pid_RodToMain_Encoder == now_rcv_id && (!rodRegistrationMode))	 
   {
   		respMsg = RESP_STX_ENCODER + now_cmd_data + "%";
 		StsSendPrintln(respMsg);	   
 
   }
-	else if (DF_Protocol_Pid_RodToMain_EncoderCalibration == now_rcv_id && (!rodRegistMode))
+	else if (DF_Protocol_Pid_RodToMain_EncoderCalibration == now_rcv_id && (!rodRegistrationMode))
 	{
 		if (AP_IS_TM == apType)
 		{
@@ -449,7 +449,7 @@ void nowRecvHandler()
 		}
 	}
 
-  else if (now_rcv_id == DF_Protocol_Pid_RodToMain_ImuData && (!rodRegistMode))
+  else if (now_rcv_id == DF_Protocol_Pid_RodToMain_ImuData && (!rodRegistrationMode))
   {
 
     {
@@ -466,7 +466,7 @@ void nowRecvHandler()
     }
   }
 
-  else if (now_rcv_id == DF_Protocol_Pid_RodToMain_Alive && (!rodRegistMode))
+  else if (now_rcv_id == DF_Protocol_Pid_RodToMain_Alive && (!rodRegistrationMode))
   {
 
 		setRod_Connected();
@@ -481,7 +481,7 @@ void nowRecvHandler()
 		LogPrintln(" FM] Ver__ " + g_RespVersion);	   
 	}
 
-  else if (DF_Protocol_Pid_RodToMain_Battery == now_rcv_id && (!rodRegistMode))	 
+  else if (DF_Protocol_Pid_RodToMain_Battery == now_rcv_id && (!rodRegistrationMode))	 
   {
 
 		battLevelSet(now_cmd_data);
@@ -491,14 +491,14 @@ void nowRecvHandler()
 
 		if(BAT_LVL_LOW > ibatteryLvl)
 		{
-			respMsg = STX_DEV_CONT_REQ + ROD_BAT_LOW_WARN;
+			respMsg = STX_DEVICE_CONTROL_REQUEST + ROD_BAT_LOW_WARN;
 			respMsg += "%";
 			StsSendPrintln(respMsg);	 
 		}
 
   }
 
-	else if (DF_Protocol_Pid_RodToMain_BatteryDiagnostic == now_rcv_id && (!rodRegistMode))
+	else if (DF_Protocol_Pid_RodToMain_BatteryDiagnostic == now_rcv_id && (!rodRegistrationMode))
 	{
 		if ((AP_IS_TM == apType) && dfMainAdcDiagnosticEnabled)
 		{
@@ -686,7 +686,7 @@ void uartRecvHandler()
 	{
 		if (AP_IS_TM != apType) return;
 		dfMainAdcDiagnosticEnabled = (msg == "$31S1") ? 1 : 0;
-		if ((ROD_CONN == rod_conn_status) && (!rodRegistMode))
+		if ((ROD_CONN == rod_conn_status) && (!rodRegistrationMode))
 		{
 			eNow.write(DF_Protocol_MainToRod_ApInfo, dfMainAdcDiagnosticEnabled ? "0201" : "0200");
 		}
@@ -707,7 +707,7 @@ void uartRecvHandler()
 			Resp2ApPrintln(STX_ENCODER_CALIBRATION + "6,0,0,0%");
 			return;
 		}
-		if ((ROD_CONN != rod_conn_status) || rodRegistMode || (0 != gRodSleepStat))
+		if ((ROD_CONN != rod_conn_status) || rodRegistrationMode || (0 != gRodSleepStat))
 		{
 			Resp2ApPrintln(STX_ENCODER_CALIBRATION + "5,0,0,0%");
 			return;
@@ -718,24 +718,24 @@ void uartRecvHandler()
 
     else if (msg.startsWith(STX_ROD_REGIST))	 
 	{
-		anaRodRegist(msg);
+		analyzeRodRegistration(msg);
     }
 
     else if (msg.startsWith(STX_MAINALIVE))	 
 	{
-		anaMainAlive(msg);
+		analyzeMainAlive(msg);
     }
 
     else if (msg.startsWith(STX_AP_INFO_SEND))	 
 	{
-		anaApInfo(msg);
+		analyzeApInfo(msg);
     }
 
     else if (msg.startsWith(STX_TM_INPUT_REQ))	 
 	{
 		if(AP_IS_TM == apType)
 		{
-			anaTmInputTestReq(msg);
+			analyzeTestModuleInputTestRequest(msg);
 		}
     }
 
@@ -743,13 +743,13 @@ void uartRecvHandler()
 	{
 		if(AP_IS_TM == apType)
 		{
-			anaTmOutputTestReq(msg);
+			analyzeTestModuleOutputTestRequest(msg);
 		}
     }
 
 	else if (msg.startsWith(STX_INFO_REQ))
 	{
-		anaDeviceInfoReq(msg);
+		analyzeDeviceInfoRequest(msg);
 	}
 
     else if (msg.startsWith(STX_GET_ADDR))
@@ -776,13 +776,13 @@ void uartRecvHandler()
 
     else if (msg.startsWith(STX_TORQUE_MOTOR))
     {
- 		ana_MainMotControl(msg);
+ 		analyzeMainMotorControl(msg);
 	}
 
 else if (msg.startsWith(STX_BBN_MOTOR))
     {
 
-		ana_BobbinControl_Check(msg);
+		analyzeBobbinControlCheck(msg);
     }
 
 	else if (msg.startsWith(STX_LED_CONTROL))
@@ -812,7 +812,7 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 		}
 	}
 
-	else if (msg.startsWith(STX_DEV_CONT_REQ))
+	else if (msg.startsWith(STX_DEVICE_CONTROL_REQUEST))
     {
 		analyzeDeviceControlRequest(msg);
 
@@ -853,7 +853,7 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 	else if (msg.startsWith(STX_BREAK_MOTOR))
 	{
 
-		if (ROD_CONN == rod_conn_status  && (!rodRegistMode))
+		if (ROD_CONN == rod_conn_status  && (!rodRegistrationMode))
 		{
 
 	  		if(ROD_BOARD_V1 == rodBoardType)	 
@@ -869,7 +869,7 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 	else if (msg.startsWith(STX_IMU_SET))
 	{
 
-		if (ROD_CONN == rod_conn_status  && (!rodRegistMode))
+		if (ROD_CONN == rod_conn_status  && (!rodRegistrationMode))
 		{	
 
 			int act = msg.substring(3,(3+1)).toInt();		 
@@ -898,23 +898,23 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 		}
 	}
 
-	else if (msg.startsWith(STX_VRT_MOT_CONT))
+	else if (msg.startsWith(STX_VERTICAL_MOTOR_CONTROL))
 	{
 		String logMsg = "";
 		if(ROD_BOARD_V2 == rodBoardType)
 		{
-			logMsg = anaVrtMotCmd(msg);
+			logMsg = analyzeVerticalMotorCommand(msg);
 		}
 		Resp2ApPrintln(msg + "%");
 
 	}
 
-	else if (msg.startsWith(STX_BTN_LED_CONT))
+	else if (msg.startsWith(STX_BUTTON_LED_CONTROL))
 	{
 		String logMsg = "";
 		if(ROD_BOARD_V2 == rodBoardType)
 		{
-			logMsg = anaBtnLedCmd(msg);
+			logMsg = analyzeButtonLedCommand(msg);
 		}
 		Resp2ApPrintln(msg + "%");
 
@@ -927,7 +927,7 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 
 }
 
-String anaVrtMotCmd(String msg)
+String analyzeVerticalMotorCommand(String msg)
 {
 	String logMsg = " ok";
 
@@ -957,7 +957,7 @@ String anaVrtMotCmd(String msg)
 	return logMsg;
 }
 
-String anaBtnLedCmd(String msg)
+String analyzeButtonLedCommand(String msg)
 {
 		String logMsg = " ok";
 
@@ -1054,8 +1054,8 @@ static int minOut = 0;
 #define ENC_STOP_WAIT_TO		CHECK_TIME_1SEC_TO  
 #define TENSION_HOLD_TIME_TO	7000  
 
-#define STBY_OFF_CONT_SEN	LVL10_BBNENCA	 
-#define STBY_OFF_CONT_ENCAB	LVL10_ENCAB		 
+#define STANDBY_OFF_CONTROL_SENSOR	LVL10_BBNENCA	 
+#define STANDBY_OFF_CONTROL_ENCODER_AB	LVL10_ENCAB		 
 
 #define	STBY_BBN_MIN_DUTY		10
 #define	BBN_MOVE_DETECT_CNT		10

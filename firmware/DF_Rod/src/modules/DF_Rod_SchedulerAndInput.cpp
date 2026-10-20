@@ -17,15 +17,15 @@ void t100ms_Process()
 
 	#define L_BTN_LONG_TIME	2500	 
 
-	if(btn_L_DownCnt)
+	if(leftButtonDownCount)
 	{
-		btn_L_DownCnt++;
-		if((L_BTN_LONG_TIME/100) < btn_L_DownCnt)	 
+		leftButtonDownCount++;
+		if((L_BTN_LONG_TIME/100) < leftButtonDownCount)	 
 		{
 
-			rodRegistMode = 55;		 
+			rodRegistrationMode = 55;		 
 
-			btn_L_DownCnt = 0;
+			leftButtonDownCount = 0;
 
 			eNow.addPeerAddress(broad_cast_addr);
 
@@ -33,7 +33,7 @@ void t100ms_Process()
 
 			eNow.writeBC(DF_Protocol_RodToMain_RodAddress, rodAddr); 	 
 
-			rodRegistToStart();
+			startRodRegistration();
 
 			AddrWrite_LedBlink = 1;	 
 
@@ -44,8 +44,8 @@ void t100ms_Process()
 
 	if(AddrWrite_LedBlink)
 	{
-		led1Grn_OutSts = !led1Grn_OutSts;
-		digitalWrite(LED1_GRN_PIN, led1Grn_OutSts); 	 
+		led1GreenOutputStatus = !led1GreenOutputStatus;
+		digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus); 	 
 		AddrWrite_LedBlink++;
  		if((ROD_REGI_LED_BLINK_TIME/100) < AddrWrite_LedBlink)
 		{
@@ -55,9 +55,9 @@ void t100ms_Process()
 
 	}
 
-	if(rodRegistMode)
+	if(rodRegistrationMode)
 	{
-		rodRegistToControl();
+		processRodRegistration();
 	}
 
 }
@@ -90,21 +90,21 @@ void rodLed1SecControl()
 	{
 		if(!AddrWrite_LedBlink)
 		{
-			led1Grn_OutSts = !led1Grn_OutSts;
-			digitalWrite(LED1_GRN_PIN, led1Grn_OutSts); 	 
+			led1GreenOutputStatus = !led1GreenOutputStatus;
+			digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus); 	 
 		}
-		led2Red_OutSts = !led2Red_OutSts;
-		digitalWrite(LED2_RED_PIN, led2Red_OutSts); 	 
+		led2RedOutputStatus = !led2RedOutputStatus;
+		digitalWrite(LED2_RED_PIN, led2RedOutputStatus); 	 
 	}
 	else
 	{
 		if(!AddrWrite_LedBlink)
 		{
-			led1Grn_OutSts = HIGH;
-			digitalWrite(LED1_GRN_PIN, led1Grn_OutSts); 	 
+			led1GreenOutputStatus = HIGH;
+			digitalWrite(LED1_GRN_PIN, led1GreenOutputStatus); 	 
 		}
-		led2Red_OutSts = LOW;
-		digitalWrite(LED2_RED_PIN, led2Red_OutSts);	 
+		led2RedOutputStatus = LOW;
+		digitalWrite(LED2_RED_PIN, led2RedOutputStatus);	 
 	}
 }
 

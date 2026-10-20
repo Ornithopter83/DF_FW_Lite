@@ -21,10 +21,10 @@ void imuInterval_Measure();
 void nowRecvHandler();
 void uartRecvParsing();
 void uartRecvHandler();
-String anaVrtMotCmd(String msg);
+String analyzeVerticalMotorCommand(String msg);
 
 
-String anaBtnLedCmd(String msg);
+String analyzeButtonLedCommand(String msg);
 
 
 void torqMotor_DefaultOut();
