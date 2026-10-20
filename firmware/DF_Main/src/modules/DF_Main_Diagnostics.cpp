@@ -30,7 +30,7 @@ void mDiag_exit()
 	diagInput_AllOff();
 	diagOutput_AllOff();
 
-	initSet_LedContVal(1);		   
+	initializeLedControlValues(1);		   
 	 
 	ledOn_MbBtm();
 
@@ -1144,7 +1144,7 @@ void check_PowerSwitch_Change_10ms()
 	{
 	case PS_INITIAL :		 
 		if (CheckPowerSwitch() == PWR_SW_ON) {		 
-			initSet_LedContVal(1);					 
+			initializeLedControlValues(1);					 
 			ledOn_MbBtm();							 
 			pwrMode = PWR_ON;						 
 			g_ProcStatus = PS_ON_WAIT;				 

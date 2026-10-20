@@ -1,45 +1,45 @@
 
 #include "../DF_Main_Internal.h"
 #include "DF_Main_LedControl.h"
-void initSet_LedContVal(int Act)
+void initializeLedControlValues(int Act)
 {
 	int i=0;
 
-	memset(ledCont, 0, sizeof(ledCont));
+	memset(ledControl, 0, sizeof(ledControl));
 	for(i=0; i<LED_IDX_MAX; i++)
 	{
 		if (Act) {
-			ledCont[i].oldcont = 	initledCont[i].oldcont;
-			ledCont[i].cont = 		initledCont[i].cont;
+			ledControl[i].previousControl = 	initialLedControl[i].previousControl;
+			ledControl[i].control = 		initialLedControl[i].control;
 		}
-		ledCont[i].oldcont = 	initledCont[i].oldcont;
-		ledCont[i].cont = 		initledCont[i].cont;
-		ledCont[i].colorNo = 	initledCont[i].colorNo;
-		ledCont[i].colorMany = 	initledCont[i].colorMany;
-		ledCont[i].bTime = 		initledCont[i].bTime;
-		ledCont[i].dTime = 		initledCont[i].dTime;
-		ledCont[i].bStep = 		initledCont[i].bStep;
-		ledCont[i].dStep = 		initledCont[i].dStep;
-		ledCont[i].dColorCnt = 	initledCont[i].dColorCnt;
-		ledCont[i].dReqCnt = 	initledCont[i].dReqCnt;
-		ledCont[i].rsv_e = 		initledCont[i].rsv_e;
+		ledControl[i].previousControl = 	initialLedControl[i].previousControl;
+		ledControl[i].control = 		initialLedControl[i].control;
+		ledControl[i].colorNo = 	initialLedControl[i].colorNo;
+		ledControl[i].colorMany = 	initialLedControl[i].colorMany;
+		ledControl[i].bTime = 		initialLedControl[i].bTime;
+		ledControl[i].dTime = 		initialLedControl[i].dTime;
+		ledControl[i].bStep = 		initialLedControl[i].bStep;
+		ledControl[i].dStep = 		initialLedControl[i].dStep;
+		ledControl[i].dColorCnt = 	initialLedControl[i].dColorCnt;
+		ledControl[i].dReqCnt = 	initialLedControl[i].dReqCnt;
+		ledControl[i].rsv_e = 		initialLedControl[i].rsv_e;
 	}
 
 	for(i=LED_IDX_CENT; i<LED_IDX_MAX; i++)
 	{
-		switch(ledCont[i].cont)
+		switch(ledControl[i].control)
 		{
 			case 0:  
-				ledCont_OffStart(i);
+				ledControl_OffStart(i);
 				break;
 			case 1:  
-				ledCont_OnStart(i);
+				ledControl_OnStart(i);
 				break;
 			case 2:  
-				ledCont_BlinkStart(i);
+				ledControl_BlinkStart(i);
 				break;
 			case 3:  
-				ledCont_DimmStart(i);
+				ledControl_DimmingStart(i);
 				break;
 		}
 	}
@@ -50,26 +50,26 @@ void initSet_LedContVal(int Act)
 
 }
 
-void ledCont_OffStart(unsigned int pos)
+void ledControl_OffStart(unsigned int pos)
 {
 	if(0==pos) { return;}
 
-	ledCont[pos].bStep = 0;
-	ledCont[pos].dStep = 0;
+	ledControl[pos].bStep = 0;
+	ledControl[pos].dStep = 0;
 
 	extLed.off(pos+2);
 }
 
-void ledCont_OnStart(unsigned int pos)
+void ledControl_OnStart(unsigned int pos)
 {
 	if(0==pos) { return;}
 
-	ledCont[pos].bStep = 0;
-	ledCont[pos].dStep = 0;
+	ledControl[pos].bStep = 0;
+	ledControl[pos].dStep = 0;
 
 	if(LED_IDX_CENT == pos)
 	{
-		setRGBcolor(pos, (int)ledCont[pos].colorNo);
+		setRGBcolor(pos, (int)ledControl[pos].colorNo);
 		extLed.RGBon(LEDPOS_CENT_RGB, sRGB[pos].r, sRGB[pos].g, sRGB[pos].b );	
 	}
 	else
@@ -79,23 +79,23 @@ void ledCont_OnStart(unsigned int pos)
 
 }
 
-void ledCont_BlinkStart(unsigned int pos)
+void ledControl_BlinkStart(unsigned int pos)
 {
 	if(0==pos) { return;}
 
-	ledCont[pos].dStep = 0;
+	ledControl[pos].dStep = 0;
 
-	setRGBcolor((int)pos, (int)ledCont[pos].colorNo );
+	setRGBcolor((int)pos, (int)ledControl[pos].colorNo );
 
-	ledCont[pos].bStep = 10;	 
+	ledControl[pos].bStep = 10;	 
 }
 
-void execledCont_Blink(int pos)
+void executeLedControlBlink(int pos)
 {
 	static unsigned long _to[LED_IDX_MAX] ={0,0,0,0,0};
 	static unsigned int _oldStep[LED_IDX_MAX] = {0,0,0,0,0};
 
-	switch(ledCont[pos].bStep)
+	switch(ledControl[pos].bStep)
 	{
 		case 0:	 
 			break;
@@ -112,12 +112,12 @@ void execledCont_Blink(int pos)
 			}
 
 			setTO(_to[pos]);
-			ledCont[pos].bStep = 11;	 
+			ledControl[pos].bStep = 11;	 
 			break;
 		case 11:			 
-			if(checkTO(_to[pos], ledCont[pos].bTime))
+			if(checkTO(_to[pos], ledControl[pos].bTime))
 			{
-				ledCont[pos].bStep = 20;
+				ledControl[pos].bStep = 20;
 			}
 			break;
 
@@ -125,14 +125,14 @@ void execledCont_Blink(int pos)
 			extLed.off(pos+2);
 
 			setTO(_to[pos]);
-			ledCont[pos].bStep = 21;	 
+			ledControl[pos].bStep = 21;	 
 
 			break;
 
 		case 21:	 
-			if(checkTO(_to[pos], ledCont[pos].bTime))
+			if(checkTO(_to[pos], ledControl[pos].bTime))
 			{
-				ledCont[pos].bStep = 10;
+				ledControl[pos].bStep = 10;
 			}
 			break;
 
@@ -149,33 +149,33 @@ void execledCont_Blink(int pos)
 	}
 }
 
-void ledCont_DimmStart(unsigned int pos)
+void ledControl_DimmingStart(unsigned int pos)
 {
 	if(0==pos) { return;}
 
-	ledCont[pos].bStep = 0;
+	ledControl[pos].bStep = 0;
 
-	if(7 > ledCont[pos].colorMany)
+	if(7 > ledControl[pos].colorMany)
 	{
-		ledCont[pos].dColorCnt = COLOR_RED;				 
+		ledControl[pos].dColorCnt = COLOR_RED;				 
 	}
 	else
 	{
-		ledCont[pos].dColorCnt = COLOR_WHITE; 			 
+		ledControl[pos].dColorCnt = COLOR_WHITE; 			 
 	}
-	ledCont[pos].dReqCnt = (ledCont[pos].dTime/LED_CONTROL_10MS/2);	 
-	setRGBcolor((int)pos, (int)ledCont[pos].dColorCnt );
+	ledControl[pos].dReqCnt = (ledControl[pos].dTime/LED_CONTROL_10MS/2);	 
+	setRGBcolor((int)pos, (int)ledControl[pos].dColorCnt );
 
-	ledCont[pos].dStep = 10;	 
+	ledControl[pos].dStep = 10;	 
 }
 
-void execledCont_Dimm(int pos)
+void executeLedControlDimming(int pos)
 {
 	static unsigned long _to[LED_IDX_MAX] ={ 0,0,0,0,0 };
 	static unsigned int _oldStep[LED_IDX_MAX] = { 0,0,0,0,0 };
 	static unsigned int _cnt[LED_IDX_MAX] = { 0,0,0,0,0 };
 
-	switch(ledCont[pos].dStep)
+	switch(ledControl[pos].dStep)
 	{
 		case 0:  
 			break;
@@ -187,35 +187,35 @@ void execledCont_Dimm(int pos)
 			}
 			else
 			{
-				setRGBcolor(pos, ledCont[pos].dColorCnt);	 
+				setRGBcolor(pos, ledControl[pos].dColorCnt);	 
 
 			}
 
 			_cnt[pos] = 0;
-			ledCont[pos].dStep = 20;
+			ledControl[pos].dStep = 20;
 
 			break;
 
 		case 20:		 
 			_cnt[pos]++;
-			if(_cnt[pos] > ledCont[pos].dReqCnt)
+			if(_cnt[pos] > ledControl[pos].dReqCnt)
 			{
 				extLed.RGBon((pos+2), sRGB[pos].r, sRGB[pos].g, sRGB[pos].b);	 
 				setTO(_to[pos]);
-				ledCont[pos].dStep = 21;
+				ledControl[pos].dStep = 21;
 			}
 			else
 			{
-				outRGB[pos].r = (sRGB[pos].r) * _cnt[pos] / ledCont[pos].dReqCnt;
-				outRGB[pos].g = (sRGB[pos].g) * _cnt[pos] / ledCont[pos].dReqCnt;
-				outRGB[pos].b = (sRGB[pos].b) * _cnt[pos] / ledCont[pos].dReqCnt;
+				outRGB[pos].r = (sRGB[pos].r) * _cnt[pos] / ledControl[pos].dReqCnt;
+				outRGB[pos].g = (sRGB[pos].g) * _cnt[pos] / ledControl[pos].dReqCnt;
+				outRGB[pos].b = (sRGB[pos].b) * _cnt[pos] / ledControl[pos].dReqCnt;
 				extLed.RGBon((pos+2), outRGB[pos].r, outRGB[pos].g, outRGB[pos].b);
 			}
 			break;
 		case 21:
-			if(checkTO(_to[pos], ledDimmHoldTime[pos]))		 
+			if(checkTO(_to[pos], ledDimmingHoldTime[pos]))		 
 			{
-				ledCont[pos].dStep = 30;
+				ledControl[pos].dStep = 30;
 			}
 			break;
 
@@ -225,40 +225,40 @@ void execledCont_Dimm(int pos)
 			{
 				extLed.RGBon((pos+2), 0,0,0);	 
 				setTO(_to[pos]);
-				ledCont[pos].dStep = 31;
+				ledControl[pos].dStep = 31;
 			}
 			else
 			{
-				outRGB[pos].r=(sRGB[pos].r) * _cnt[pos] / ledCont[pos].dReqCnt;
-				outRGB[pos].g=(sRGB[pos].g) * _cnt[pos] / ledCont[pos].dReqCnt;
-				outRGB[pos].b=(sRGB[pos].b) * _cnt[pos] / ledCont[pos].dReqCnt;
+				outRGB[pos].r=(sRGB[pos].r) * _cnt[pos] / ledControl[pos].dReqCnt;
+				outRGB[pos].g=(sRGB[pos].g) * _cnt[pos] / ledControl[pos].dReqCnt;
+				outRGB[pos].b=(sRGB[pos].b) * _cnt[pos] / ledControl[pos].dReqCnt;
 				extLed.RGBon((pos+2), outRGB[pos].r, outRGB[pos].g, outRGB[pos].b);
 			}
 			break;
 		case 31:
-			if(checkTO(_to[pos], ledDimmHoldTime[pos]))		 
+			if(checkTO(_to[pos], ledDimmingHoldTime[pos]))		 
 			{
-				ledCont[pos].dStep = 40;
+				ledControl[pos].dStep = 40;
 			}
 			break;
 
 		case 40:
-			ledCont[pos].dColorCnt++;
-			if(ledCont[pos].dColorCnt > ledCont[pos].colorMany)
+			ledControl[pos].dColorCnt++;
+			if(ledControl[pos].dColorCnt > ledControl[pos].colorMany)
 			{
-				if(7 > ledCont[pos].colorMany)
+				if(7 > ledControl[pos].colorMany)
 				{
-					ledCont[pos].dColorCnt = COLOR_RED;
+					ledControl[pos].dColorCnt = COLOR_RED;
 				}
 				else
 				{
-					ledCont[pos].dColorCnt = COLOR_WHITE;
+					ledControl[pos].dColorCnt = COLOR_WHITE;
 				}
 			}
 			else
 			{
 			}
-			ledCont[pos].dStep = 10;
+			ledControl[pos].dStep = 10;
 			break;
 
 		case 50:
@@ -431,7 +431,7 @@ void extLed_On(unsigned int idx)
 	{
 		case LED_IDX_CENT:
 
-			color = ledCont[idx].colorNo;
+			color = ledControl[idx].colorNo;
 			if(COLOR_MAGENTA < color) { color = COLOR_WHITE; }	 
 			setRGBcolor((int)idx, (int)color);
 			extLed.RGBon((idx+2), sRGB[idx].r, sRGB[idx].g, sRGB[idx].b);
@@ -462,32 +462,32 @@ void extLed_Control()
 
 			for(pos=LED_IDX_CENT; pos<LED_IDX_MAX; pos++)
 			{
-				if(LED_CON_BLINK == ledCont[pos].cont)		 
+				if(LED_CONTROL_BLINK == ledControl[pos].control)		 
 				{
 
-					execledCont_Blink(pos);
+					executeLedControlBlink(pos);
 				}
-				else if(LED_CON_DIMM == ledCont[pos].cont)	 
+				else if(LED_CONTROL_DIMMING == ledControl[pos].control)	 
 				{
 
 					{
 
-						execledCont_Dimm(pos);		 
+						executeLedControlDimming(pos);		 
 					}
 				}
 				else	 
 				{
-					if(ledCont[pos].oldcont != ledCont[pos].cont)
+					if(ledControl[pos].previousControl != ledControl[pos].control)
 					{
-						if(LED_CON_OFF == ledCont[pos].cont)	 
+						if(LED_CONTROL_OFF == ledControl[pos].control)	 
 						{
 							extLed_Off(pos);
 						}
-						else if(LED_CON_ON == ledCont[pos].cont)	 
+						else if(LED_CONTROL_ON == ledControl[pos].control)	 
 						{
 							extLed_On(pos);
 						}
-						ledCont[pos].oldcont = ledCont[pos].cont;
+						ledControl[pos].previousControl = ledControl[pos].control;
 					}
 					else
 					{

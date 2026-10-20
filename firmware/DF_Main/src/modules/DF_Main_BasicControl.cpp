@@ -1,7 +1,7 @@
 
 #include "../DF_Main_Internal.h"
 #include "DF_Main_BasicControl.h"
-void anaDeviceContReq(String msg)
+void analyzeDeviceControlRequest(String msg)
 {
 	unsigned int iKind = msg.substring(3).toInt();
 

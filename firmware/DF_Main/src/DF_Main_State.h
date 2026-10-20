@@ -54,10 +54,10 @@ extern volatile int reelAlloffStep;
 
 extern String strMainBoard[10];
 
-typedef struct _ledCont
+typedef struct _ledControl
 {
-	unsigned int oldcont;			               
-	unsigned int cont;			               
+	unsigned int previousControl;			               
+	unsigned int control;			               
 	unsigned int colorNo;		           
 	unsigned int colorMany;		             
 	unsigned int bTime;			                
@@ -67,9 +67,9 @@ typedef struct _ledCont
 	unsigned int dColorCnt;		                          
 	unsigned int dReqCnt;		  
 	unsigned int rsv_e;
-}stLedCont;
+}stLedControl;
 
-typedef stLedCont *ptrLedCont;
+typedef stLedControl *ptrLedControl;
 
 #define LED_CONTROL_10MS	10
 
@@ -77,13 +77,13 @@ typedef stLedCont *ptrLedCont;
 
 #define LED_CONTROL_50MS	50
 
-extern const stLedCont initledCont[LED_IDX_MAX];
+extern const stLedControl initialLedControl[LED_IDX_MAX];
 
-extern stLedCont ledCont[LED_IDX_MAX];
+extern stLedControl ledControl[LED_IDX_MAX];
 
 extern unsigned int ledLight;
 
-extern unsigned int ledDimmHoldTime[LED_IDX_MAX];
+extern unsigned int ledDimmingHoldTime[LED_IDX_MAX];
 
 #define COLOR_ORDER	10
 
@@ -228,7 +228,7 @@ extern String STX_BBN_MOTOR;
 
 extern String STX_BREAK_MOTOR;
 
-extern String STX_LED_CONT;
+extern String STX_LED_CONTROL;
 
 extern String STX_IMU_SET;
 

@@ -21,10 +21,10 @@ String strMainBoard[10] =
 	"MBD_V11",		 
 };
 
-typedef struct _ledCont
+typedef struct _ledControl
 {
-	unsigned int oldcont;			 
-	unsigned int cont;			 
+	unsigned int previousControl;			 
+	unsigned int control;			 
 	unsigned int colorNo;		 
 	unsigned int colorMany;		 
 	unsigned int bTime;			 
@@ -34,14 +34,14 @@ typedef struct _ledCont
 	unsigned int dColorCnt;		 
 	unsigned int dReqCnt;		 
 	unsigned int rsv_e;
-}stLedCont;
-typedef stLedCont *ptrLedCont;
+}stLedControl;
+typedef stLedControl *ptrLedControl;
 
 #define LED_CONTROL_10MS	10
 #define LED_CONTROL_20MS	20
 #define LED_CONTROL_50MS	50
 
-extern const stLedCont initledCont[LED_IDX_MAX] =
+extern const stLedControl initialLedControl[LED_IDX_MAX] =
 {
 	{0, },								 
 
@@ -51,11 +51,11 @@ extern const stLedCont initledCont[LED_IDX_MAX] =
 	{ 0, 0, 	3, 		1, 		500, 	3000, 	0,	0,	0,	(3000/2/LED_CONTROL_10MS), 0	},	 
 };
 
-stLedCont ledCont[LED_IDX_MAX];
+stLedControl ledControl[LED_IDX_MAX];
 
 unsigned int ledLight=100;				 
 
-unsigned int ledDimmHoldTime[LED_IDX_MAX] = 	 
+unsigned int ledDimmingHoldTime[LED_IDX_MAX] = 	 
 { 
 	10,		 
 
@@ -170,7 +170,7 @@ String STX_SERVO_MOTOR    = "$03";
 String STX_BBN_MOTOR     = "$04";
 
 String STX_BREAK_MOTOR    = "$05";
-String STX_LED_CONT			= "$06";
+String STX_LED_CONTROL			= "$06";
 
 String STX_IMU_SET			= "$08";
 
@@ -1366,19 +1366,19 @@ void bbnMotor_OffTime_Control();
 void SetIMU_Measure_Out_OnOff(unsigned int _setClr);
 void sendSleepEnable(int Mode, int Time, int Id);
 void sendCurrentStatus();
-void initSet_LedContVal(int Act);
-void ledCont_OffStart(unsigned int pos);
-void ledCont_OnStart(unsigned int pos);
-void ledCont_BlinkStart(unsigned int pos);
-void execledCont_Blink(int pos);
-void ledCont_DimmStart(unsigned int pos);
-void execledCont_Dimm(int pos);
+void initializeLedControlValues(int Act);
+void ledControl_OffStart(unsigned int pos);
+void ledControl_OnStart(unsigned int pos);
+void ledControl_BlinkStart(unsigned int pos);
+void executeLedControlBlink(int pos);
+void ledControl_DimmingStart(unsigned int pos);
+void executeLedControlDimming(int pos);
 void old_execCentLed_Dimming_Control(int color, int sec);
 void extLed_Off(unsigned int idx);
 void extLed_On(unsigned int idx);
 void extLed_Control();
 
-void analedContCmd(String msg);
+void analyzeLedControlCommand(String msg);
 
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
 void sendRodBtnLedCmd(int posi, int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);
@@ -1411,7 +1411,7 @@ void devCheckFlagStep_AllClear();
 void devchk_bbnAll_Control();
 void devReadyCheck();
 void send_Error_Clr();
-void anaDeviceContReq(String msg);
+void analyzeDeviceControlRequest(String msg);
 void anaRestDistance(String msg);
 void ana_AngleControl( String msg );
 void ana_MainMotControl( String msg );
@@ -1657,7 +1657,7 @@ void extLed_controlOff()
 	unsigned int i;
 	for(i=LED_IDX_CENT; i<LED_IDX_MAX; i++)
 	{
-		ledCont[i].cont = 0;	 
+		ledControl[i].control = 0;	 
 	}
 }
 

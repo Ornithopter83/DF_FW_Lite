@@ -2,7 +2,7 @@
 #include "../DF_Main_Internal.h"
 #include "DF_Main_CommandRouter.h"
 
-void analedContCmd(String msg)
+void analyzeLedControlCommand(String msg)
 {
 	int lightReadFlag = 0;
 
@@ -22,53 +22,53 @@ void analedContCmd(String msg)
 	switch(act)
 	{
 		case 0:		 
-			ledCont[pos].cont = act;
+			ledControl[pos].control = act;
 
-			ledCont_OffStart(pos);
+			ledControl_OffStart(pos);
 			break;
 
 		case 1:		 
-			ledCont[pos].cont = act;
+			ledControl[pos].control = act;
 
 			color = msg.substring(5,(5+2)).toInt();
 			if(0> color) { color = 0; } if(14 < color) { color = 0; }  
-			ledCont[pos].colorNo = color;
+			ledControl[pos].colorNo = color;
 
-			ledCont_OnStart(pos);
+			ledControl_OnStart(pos);
 			break;
 
 		case 2:		 
-			ledCont[pos].cont = act; 
+			ledControl[pos].control = act; 
 
 			color = msg.substring(5,(5+2)).toInt();
 			if(0> color) { color = 0; } if(14 < color) { color = 0; }  
-			ledCont[pos].colorNo = color; 
+			ledControl[pos].colorNo = color; 
 
 			time = msg.substring(7,(7+4)).toInt();
 			if(10> time) { time = 10; } if(9999 < time) { time = 9999; }  
-			ledCont[pos].bTime = time; 
+			ledControl[pos].bTime = time; 
 
-			ledCont_BlinkStart(pos);
+			ledControl_BlinkStart(pos);
 			break;
 
 		case 3:		 
-			ledCont[pos].cont = act; 
+			ledControl[pos].control = act; 
 
 			if(LED_IDX_BTM == pos)
 			{
-				ledCont[pos].colorMany = 1;		 
+				ledControl[pos].colorMany = 1;		 
 			}
 			else
 			{
 				color = msg.substring(5,(5+2)).toInt();
 				if(1> color) { color = 1; } if(14 < color) { color = 14; }  
-				ledCont[pos].colorMany = color;	 
+				ledControl[pos].colorMany = color;	 
 			}
 
 			time = msg.substring(7,(7+4)).toInt();
 			if(10> time) { time = 10; } if(9999 < time) { time = 9999; }  
-			ledCont[pos].dTime = time; 
-			ledCont_DimmStart(pos);
+			ledControl[pos].dTime = time; 
+			ledControl_DimmingStart(pos);
 			break;
 
 		case 7:			 

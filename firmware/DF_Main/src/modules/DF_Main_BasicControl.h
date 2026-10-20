@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-void anaDeviceContReq(String msg);
+void analyzeDeviceControlRequest(String msg);
 void anaRestDistance(String msg);
 void ana_MainMotControl( String msg );
 void ana_BobbinControl_Check(String msg);

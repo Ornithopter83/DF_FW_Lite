@@ -196,7 +196,7 @@ void DF_Main_Application_Setup()
 
   curr_ms_tick = millis();
 
-  initSet_LedContVal(ledMd);		 
+  initializeLedControlValues(ledMd);		 
 
 	if (ledMd == 0) {
 		pwrMode = PWR_OFF;			 

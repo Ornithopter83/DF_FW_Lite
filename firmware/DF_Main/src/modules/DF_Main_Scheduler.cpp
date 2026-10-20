@@ -280,9 +280,9 @@ void logRecvHandler()
 		{
 		}
 
-		else if (msg.startsWith(STX_LED_CONT))
+		else if (msg.startsWith(STX_LED_CONTROL))
 		{
-			analedContCmd(msg);
+			analyzeLedControlCommand(msg);
 		}
 
 		else if (msg.startsWith(STX_VER_READ))
@@ -785,9 +785,9 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 		ana_BobbinControl_Check(msg);
     }
 
-	else if (msg.startsWith(STX_LED_CONT))
+	else if (msg.startsWith(STX_LED_CONTROL))
 	{
-		analedContCmd(msg);
+		analyzeLedControlCommand(msg);
 	}
 
     else if (msg.startsWith(STX_VER_READ))
@@ -814,7 +814,7 @@ else if (msg.startsWith(STX_BBN_MOTOR))
 
 	else if (msg.startsWith(STX_DEV_CONT_REQ))
     {
-		anaDeviceContReq(msg);
+		analyzeDeviceControlRequest(msg);
 
 	}
 

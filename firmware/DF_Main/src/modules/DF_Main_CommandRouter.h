@@ -3,7 +3,7 @@
 #include <Arduino.h>
 
 
-void analedContCmd(String msg);
+void analyzeLedControlCommand(String msg);
 
 
 void sendRodVrtCmd(int act, unsigned int cnt, unsigned int ontime, unsigned int offtime);

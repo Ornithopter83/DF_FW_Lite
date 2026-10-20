@@ -242,10 +242,10 @@
 #define LED_MAX_COLOR	255			 
 #define LED_MIN_COLOR	0
 
-#define LED_CON_OFF		0
-#define LED_CON_ON		1
-#define LED_CON_BLINK	2
-#define LED_CON_DIMM	3
+#define LED_CONTROL_OFF		0
+#define LED_CONTROL_ON		1
+#define LED_CONTROL_BLINK	2
+#define LED_CONTROL_DIMMING	3
 
 #define LED_IDX_CENT	1
 #define LED_IDX_BTM		2
